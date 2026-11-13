@@ -28,7 +28,7 @@ export const CursorTrail: React.FC = () => {
 
     let animId: number;
     let points: Point[] = [];
-    const maxAge = 18; // Frames before point fades out completely (~300ms at 60fps)
+    const maxAge = 14; // Ultra quick fade (~220ms at 60fps)
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -39,6 +39,10 @@ export const CursorTrail: React.FC = () => {
 
     const onMouseMove = (e: MouseEvent) => {
       points.push({ x: e.clientX, y: e.clientY, age: 0 });
+      // Keep array small
+      if (points.length > 20) {
+        points.shift();
+      }
     };
 
     window.addEventListener("mousemove", onMouseMove, { passive: true });
@@ -47,20 +51,18 @@ export const CursorTrail: React.FC = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (points.length > 1) {
-        // Increment age of points
         for (let i = 0; i < points.length; i++) {
           points[i].age++;
         }
-        // Remove old points
         points = points.filter((p) => p.age < maxAge);
 
-        // Draw smooth tapered ribbon
         for (let i = 0; i < points.length - 1; i++) {
           const p1 = points[i];
           const p2 = points[i + 1];
-          const progress = i / points.length; // 0 (oldest) -> 1 (newest near cursor)
-          const alpha = progress * 0.28; // Subtle ethereal opacity (max 0.28)
-          const width = progress * 5 + 1; // Tapering from 6px near cursor down to 1px
+          const progress = i / points.length;
+          // Very light, ethereal terracotta aura (max opacity 0.16)
+          const alpha = progress * 0.16;
+          const width = progress * 4 + 0.5;
 
           ctx.beginPath();
           ctx.moveTo(p1.x, p1.y);
@@ -69,8 +71,8 @@ export const CursorTrail: React.FC = () => {
           ctx.lineWidth = width;
           ctx.lineCap = "round";
           ctx.lineJoin = "round";
-          ctx.shadowColor = "rgba(214, 107, 67, 0.25)";
-          ctx.shadowBlur = 6;
+          ctx.shadowColor = "rgba(214, 107, 67, 0.18)";
+          ctx.shadowBlur = 4;
           ctx.stroke();
         }
       }
