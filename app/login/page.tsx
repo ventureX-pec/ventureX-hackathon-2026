@@ -103,16 +103,6 @@ export default function LoginPage() {
 
   return (
     <div className="h-screen min-h-[580px] bg-[#faf7f2] text-[#1c1917] relative flex items-center justify-center p-3 sm:p-5 lg:p-6 overflow-hidden">
-      {/* Decorative Warm Background Shapes (referencing the uploaded composition) */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-        {/* Soft floating rounded panels */}
-        <div className="absolute -top-12 -left-12 w-56 h-56 rounded-[36px] bg-[#c96342]/10 blur-xl transform -rotate-6" />
-        <div className="absolute top-1/4 -left-16 w-40 h-40 rounded-[28px] bg-[#e7dfd5]/60 blur-md" />
-        <div className="absolute -bottom-16 -right-16 w-72 h-72 rounded-[44px] bg-[#c96342]/12 blur-2xl transform rotate-12" />
-        <div className="absolute top-8 right-8 w-44 h-44 rounded-[28px] bg-[#f4ede4] border border-[#e7dfd5]/70" />
-        <div className="absolute bottom-16 left-1/3 w-32 h-32 rounded-2xl bg-[#c96342]/5" />
-      </div>
-
       {/* Back to Home Link */}
       <Link
         href="/"
