@@ -11,6 +11,7 @@ import {
   AlertCircle,
   PackageCheck,
   BellRing,
+  QrCode,
 } from "lucide-react";
 import { AdminOrder } from "@/data/mockAdminData";
 
@@ -117,8 +118,24 @@ export const KitchenView: React.FC<KitchenViewProps> = ({ orders, onUpdateStatus
                     ))}
                   </div>
 
-                  <div className="text-[11px] text-[#736E65] font-medium bg-[#FAF8F5] p-2 rounded-xl">
-                    Destination: <span className="font-bold text-[#252522]">{order.tableOrShelf}</span>
+                  <div className="text-[11px] text-[#736E65] font-medium bg-[#FAF8F5] p-2.5 rounded-xl flex items-center justify-between">
+                    <div>
+                      {order.restaurantName && (
+                        <span className="text-[10px] font-bold text-[#c96342] uppercase tracking-wider block">
+                          {order.restaurantName}
+                        </span>
+                      )}
+                      <span>Destination: </span>
+                      <span className="font-bold text-[#252522]">
+                        {order.tableNumber ? `Table ${order.tableNumber}` : order.tableOrShelf}
+                      </span>
+                    </div>
+                    {order.tableNumber && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#c96342]/10 text-[#c96342] text-[10px] font-bold">
+                        <QrCode className="w-3 h-3" />
+                        <span>T#{order.tableNumber}</span>
+                      </span>
+                    )}
                   </div>
 
                   <button
@@ -213,8 +230,24 @@ export const KitchenView: React.FC<KitchenViewProps> = ({ orders, onUpdateStatus
                     })}
                   </div>
 
-                  <div className="text-[11px] text-[#736E65] font-medium bg-[#FAF8F5] p-2 rounded-xl">
-                    Assign To: <span className="font-bold text-[#252522]">{order.tableOrShelf}</span>
+                  <div className="text-[11px] text-[#736E65] font-medium bg-[#FAF8F5] p-2.5 rounded-xl flex items-center justify-between">
+                    <div>
+                      {order.restaurantName && (
+                        <span className="text-[10px] font-bold text-[#c96342] uppercase tracking-wider block">
+                          {order.restaurantName}
+                        </span>
+                      )}
+                      <span>Assign To: </span>
+                      <span className="font-bold text-[#252522]">
+                        {order.tableNumber ? `Table ${order.tableNumber}` : order.tableOrShelf}
+                      </span>
+                    </div>
+                    {order.tableNumber && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#c96342]/10 text-[#c96342] text-[10px] font-bold">
+                        <QrCode className="w-3 h-3" />
+                        <span>T#{order.tableNumber}</span>
+                      </span>
+                    )}
                   </div>
 
                   <button
@@ -270,9 +303,15 @@ export const KitchenView: React.FC<KitchenViewProps> = ({ orders, onUpdateStatus
                   </div>
 
                   <div className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs">
-                    <span className="text-emerald-900 font-semibold block">Pickup Location:</span>
-                    <span className="font-serif text-base font-bold text-emerald-950">
-                      {order.tableOrShelf}
+                    {order.restaurantName && (
+                      <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block mb-0.5">
+                        {order.restaurantName}
+                      </span>
+                    )}
+                    <span className="text-emerald-900 font-semibold block">Pickup / Dine-In Location:</span>
+                    <span className="font-serif text-base font-bold text-emerald-950 flex items-center gap-1.5 mt-0.5">
+                      <QrCode className="w-4 h-4 text-emerald-700" />
+                      <span>{order.tableNumber ? `Table ${order.tableNumber}` : order.tableOrShelf}</span>
                     </span>
                   </div>
 

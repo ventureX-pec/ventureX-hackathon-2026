@@ -35,6 +35,9 @@ interface CartDrawerProps {
     pickupSlot: string;
     notes: string;
   }) => void;
+  defaultTable?: string;
+  defaultOrderType?: "dine-in" | "takeaway";
+  restaurantName?: string;
 }
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({
@@ -44,11 +47,29 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onUpdateQuantity,
   onRemoveItem,
   onCheckout,
+  defaultTable,
+  defaultOrderType,
+  restaurantName,
 }) => {
-  const [orderType, setOrderType] = useState<"dine-in" | "takeaway">("takeaway");
-  const [tableOrShelf, setTableOrShelf] = useState("Shelf B • Express");
-  const [pickupSlot, setPickupSlot] = useState("⚡ Instant (Ready in ~8-10 min)");
+  const [orderType, setOrderType] = useState<"dine-in" | "takeaway">(
+    defaultOrderType || (defaultTable ? "dine-in" : "takeaway")
+  );
+  const [tableOrShelf, setTableOrShelf] = useState(
+    defaultTable ? `Table ${defaultTable}` : "Shelf B • Express"
+  );
+  const [pickupSlot, setPickupSlot] = useState(
+    defaultTable ? "⚡ Table-Side Service (~10 min)" : "⚡ Instant (Ready in ~8-10 min)"
+  );
   const [specialNotes, setSpecialNotes] = useState("");
+
+  // Sync if defaultTable changes
+  React.useEffect(() => {
+    if (defaultTable) {
+      setOrderType("dine-in");
+      setTableOrShelf(`Table ${defaultTable}`);
+      setPickupSlot("⚡ Table-Side Service (~10 min)");
+    }
+  }, [defaultTable]);
 
   const subtotal = items.reduce(
     (sum, item) => sum + item.dish.price * item.quantity,
@@ -108,6 +129,23 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 <X className="w-4 h-4" />
               </button>
             </div>
+
+            {/* Dine-In Table Indicator Banner */}
+            {defaultTable && (
+              <div className="mx-5 mt-4 p-3 rounded-2xl bg-[#fbebe4] border border-[#e8cbbd] flex items-center justify-between text-xs">
+                <div>
+                  <span className="text-[10px] font-bold text-[#c96342] uppercase tracking-wider block">
+                    {restaurantName || "Dine-In Restaurant"}
+                  </span>
+                  <span className="font-serif font-bold text-[#1c1917] text-sm">
+                    Table {defaultTable}
+                  </span>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#c96342] text-white text-[10px] font-bold shadow-xs">
+                  Dine-In Table Seated
+                </span>
+              </div>
+            )}
 
             {/* Scrollable Content */}
             {items.length === 0 ? (

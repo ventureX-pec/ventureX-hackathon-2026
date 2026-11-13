@@ -55,12 +55,16 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
           </div>
 
           <div>
-            <span className="text-[#8C877D] uppercase font-bold text-[10px] block">Destination</span>
+            <span className="text-[#8C877D] uppercase font-bold text-[10px] block">
+              {order.restaurantName || "Destination"}
+            </span>
             <div className="font-bold text-[#252522] mt-0.5 flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-[#D66B43]" />
-              <span>{order.tableOrShelf}</span>
+              <span>{order.tableNumber ? `Table ${order.tableNumber}` : order.tableOrShelf}</span>
             </div>
-            <div className="text-[#736E65] capitalize mt-0.5">{order.orderType} order</div>
+            <div className="text-[#736E65] capitalize mt-0.5">
+              {order.tableNumber ? "Dine-In Table Order" : `${order.orderType} order`}
+            </div>
           </div>
         </div>
 

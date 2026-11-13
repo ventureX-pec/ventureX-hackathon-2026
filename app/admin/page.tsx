@@ -26,6 +26,7 @@ import { OverviewView } from "@/components/admin/views/OverviewView";
 import { OrdersView } from "@/components/admin/views/OrdersView";
 import { KitchenView } from "@/components/admin/views/KitchenView";
 import { PickupQueueView } from "@/components/admin/views/PickupQueueView";
+import { TableManagementView } from "@/components/admin/views/TableManagementView";
 import { MenuManagementView } from "@/components/admin/views/MenuManagementView";
 import { IngredientsView } from "@/components/admin/views/IngredientsView";
 import { RevenueView } from "@/components/admin/views/RevenueView";
@@ -295,6 +296,8 @@ export default function AdminDashboardPage() {
                   onOpenQrScanner={() => setIsPickupPassOpen(true)}
                 />
               )}
+
+              {activeTab === "tables" && <TableManagementView />}
 
               {activeTab === "menu" && (
                 <MenuManagementView
