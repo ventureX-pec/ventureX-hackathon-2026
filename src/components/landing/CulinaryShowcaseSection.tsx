@@ -40,8 +40,8 @@ export const CulinaryShowcaseSection = () => {
       </div>
 
       {/* Subtle indicator bar below carousel */}
-      <div className="text-center mt-4">
-        <span className="inline-flex items-center gap-1.5 text-xs text-[#6E6D66] bg-white border border-[#ECE7DE] px-3.5 py-1.5 rounded-full shadow-xs">
+      <div className="text-center mt-6">
+        <span className="inline-flex items-center gap-2 text-xs text-[#6E6D66] bg-[#FAF8F3] border border-[#ECE7DE] px-4 py-2 rounded-full shadow-xs">
           <Sparkles className="w-3.5 h-3.5 text-[#D66B43]" />
           <span>Interactive 3D Cylinder • Rotates with scroll or drag</span>
         </span>
