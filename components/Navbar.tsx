@@ -7,11 +7,13 @@ import { ShoppingBag, Search, Menu as MenuIcon, X } from "lucide-react"
 export default function Navbar() {
   const { totalItems, setIsCartOpen } = useCart()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [isScrolledToLight, setIsScrolledToLight] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
+      // Check if user has scrolled past the dark hero section (hero track is ~250vh)
+      const heroThreshold = window.innerHeight * 1.5
+      setIsScrolledToLight(window.scrollY > heroThreshold)
     }
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
@@ -42,9 +44,9 @@ export default function Navbar() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
+        isScrolledToLight
           ? "bg-[#faf7f2]/95 backdrop-blur-md shadow-xs border-b border-[#e7dfd5]"
-          : "bg-[#faf7f2]/85 backdrop-blur-sm border-b border-[#e7dfd5]/60"
+          : "bg-[#0f0e0d]/85 backdrop-blur-md border-b border-white/10"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -58,10 +60,20 @@ export default function Navbar() {
             CT
           </div>
           <div className="flex flex-col">
-            <span className="font-serif font-medium text-lg tracking-tight text-[#1c1917] group-hover:text-[#c96342] transition-colors">
+            <span
+              className={`font-serif font-medium text-lg tracking-tight transition-colors ${
+                isScrolledToLight
+                  ? "text-[#1c1917] group-hover:text-[#c96342]"
+                  : "text-white group-hover:text-[#e07a5f]"
+              }`}
+            >
               The Corner Table
             </span>
-            <span className="text-[10px] tracking-widest uppercase font-medium text-[#78716c]">
+            <span
+              className={`text-[10px] tracking-widest uppercase font-medium ${
+                isScrolledToLight ? "text-[#78716c]" : "text-[#a8a29e]"
+              }`}
+            >
               Kitchen & Hearth
             </span>
           </div>
@@ -74,7 +86,11 @@ export default function Navbar() {
               key={link.label}
               href={link.href}
               onClick={(e) => handleNavClick(e, link.href)}
-              className="text-sm font-medium text-[#44403c] hover:text-[#c96342] transition-colors relative py-1 hover:after:w-full after:w-0 after:h-[2px] after:bg-[#c96342] after:absolute after:bottom-0 after:left-0 after:transition-all after:duration-200"
+              className={`text-sm font-medium transition-colors relative py-1 hover:after:w-full after:w-0 after:h-[2px] after:bg-[#c96342] after:absolute after:bottom-0 after:left-0 after:transition-all after:duration-200 ${
+                isScrolledToLight
+                  ? "text-[#44403c] hover:text-[#c96342]"
+                  : "text-[#d6cbbe] hover:text-white"
+              }`}
             >
               {link.label}
             </a>
@@ -87,7 +103,11 @@ export default function Navbar() {
           <a
             href="#menu"
             onClick={(e) => handleNavClick(e, "#menu")}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-[#57534e] hover:text-[#1c1917] hover:bg-[#f4ede4] transition-colors"
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+              isScrolledToLight
+                ? "text-[#57534e] hover:text-[#1c1917] hover:bg-[#f4ede4]"
+                : "text-[#d6cbbe] hover:text-white hover:bg-white/10"
+            }`}
             title="Search Menu"
             aria-label="Search Menu"
           >
@@ -117,7 +137,11 @@ export default function Navbar() {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden w-10 h-10 rounded-xl bg-[#f4ede4] border border-[#e7dfd5] flex items-center justify-center text-[#1c1917] hover:bg-[#eae2d7] transition-colors"
+            className={`md:hidden w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+              isScrolledToLight
+                ? "bg-[#f4ede4] border border-[#e7dfd5] text-[#1c1917] hover:bg-[#eae2d7]"
+                : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
+            }`}
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
@@ -127,18 +151,24 @@ export default function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-[#e7dfd5] bg-[#faf7f2] px-4 pt-4 pb-6 space-y-3">
+        <div
+          className={`md:hidden border-b px-4 pt-4 pb-6 space-y-3 ${
+            isScrolledToLight
+              ? "bg-[#faf7f2] border-[#e7dfd5] text-[#1c1917]"
+              : "bg-[#0f0e0d] border-white/10 text-white"
+          }`}
+        >
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
               onClick={(e) => handleNavClick(e, link.href)}
-              className="block py-2 text-base font-medium text-[#1c1917] hover:text-[#c96342] transition-colors"
+              className="block py-2 text-base font-medium hover:text-[#c96342] transition-colors"
             >
               {link.label}
             </a>
           ))}
-          <div className="pt-3 border-t border-[#e7dfd5]">
+          <div className="pt-3 border-t border-white/10">
             <button
               onClick={() => {
                 setMobileMenuOpen(false)

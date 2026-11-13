@@ -5,7 +5,7 @@ import DishOrbitCarousel, { type Dish } from "@/components/ui/dish-orbit-carouse
 import { useCart } from "@/context/CartContext"
 import { MENU_ITEMS } from "@/data/menuData"
 
-// Featured dishes matching our artisanal restaurant menu
+// Featured artisanal dishes for the hero orbit carousel
 const FEATURED_HERO_DISHES: Dish[] = [
   {
     title: "Char-Grilled",
@@ -24,7 +24,7 @@ const FEATURED_HERO_DISHES: Dish[] = [
   {
     title: "Mediterranean",
     subtitle: "Mezze & Feta Salad",
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=700&auto=format&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=700&auto=format&fit=crop&q=80",
     eyebrow: "#2 Garden Harvest Pick",
     label: "Mediterranean Salad",
     rating: 4.8,
@@ -33,7 +33,7 @@ const FEATURED_HERO_DISHES: Dish[] = [
     description: "Crisp organic greens, Persian cucumbers, heirloom tomatoes, sheep's milk feta, Kalamata olives and cold-pressed extra virgin olive oil.",
     likes: 312,
     ingredients: ["Organic Greens", "Kalamata Olives", "Sheep's Feta", "Za'atar Croutons", "Cold-Pressed EVOO"],
-    accent: "#b45309",
+    accent: "#d97706",
   },
   {
     title: "Pan-Seared",
@@ -47,7 +47,7 @@ const FEATURED_HERO_DISHES: Dish[] = [
     description: "Crispy skin Atlantic salmon over slow-simmered lemon-herb arborio risotto with tender spring asparagus spears.",
     likes: 389,
     ingredients: ["Wild Salmon", "Arborio Rice", "Lemon Zest", "Baby Asparagus", "Dill Oil"],
-    accent: "#a35334",
+    accent: "#e07a5f",
   },
   {
     title: "Artisanal",
@@ -61,15 +61,14 @@ const FEATURED_HERO_DISHES: Dish[] = [
     description: "Thick-cut country sourdough with crushed ripe Hass avocado, pasture-raised poached eggs, microgreens and chili flakes.",
     likes: 512,
     ingredients: ["Country Sourdough", "Hass Avocado", "Organic Farm Eggs", "Microgreens", "Aleppo Chili"],
-    accent: "#8c4a2f",
+    accent: "#b45309",
   },
 ]
 
 export default function HeroSection() {
   const { addItem, setIsCartOpen } = useCart()
 
-  const handleCarouselOrder = (dish: Dish, index: number) => {
-    // Map the hero dish to our full menu item and add to cart
+  const handleCarouselOrder = (dish: Dish) => {
     const found = MENU_ITEMS.find(
       (m) =>
         m.name.toLowerCase().includes(dish.subtitle.toLowerCase()) ||
@@ -79,7 +78,6 @@ export default function HeroSection() {
       addItem(found, 1)
       setIsCartOpen(true)
     } else {
-      // Fallback: scroll directly to menu
       const menuEl = document.querySelector("#menu")
       if (menuEl) menuEl.scrollIntoView({ behavior: "smooth" })
     }
@@ -97,11 +95,9 @@ export default function HeroSection() {
   }
 
   return (
-    <section id="hero" className="relative w-full bg-[#faf7f2] overflow-hidden">
+    <section id="hero" className="relative w-full bg-[#0f0e0d]">
       <DishOrbitCarousel
         dishes={FEATURED_HERO_DISHES}
-        height="100svh"
-        loop={true}
         onOrder={handleCarouselOrder}
         onExploreMenu={handleExploreMenu}
         onOrderFood={handleOrderFood}
