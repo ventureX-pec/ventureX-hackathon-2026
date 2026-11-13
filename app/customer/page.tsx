@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -16,6 +16,9 @@ import {
   ArrowRight,
   TrendingUp,
   Heart,
+  ClipboardList,
+  LayoutGrid,
+  UtensilsCrossed,
 } from "lucide-react";
 import { CursorTrail } from "@/components/motion/CursorTrail";
 import { FoodPhotographyBackdrop } from "@/components/customer/FoodPhotographyBackdrop";
@@ -25,10 +28,17 @@ import { TopHeader } from "@/components/customer/TopHeader";
 import { HeroFeaturedSection } from "@/components/customer/HeroFeaturedSection";
 import { CategorySection } from "@/components/customer/CategorySection";
 import { RestaurantSection } from "@/components/customer/RestaurantSection";
+import { RestaurantMenuView } from "@/components/customer/RestaurantMenuView";
+import { CustomerFavoritesView } from "@/components/customer/CustomerFavoritesView";
 import { ActiveOrderCard } from "@/components/customer/ActiveOrderCard";
 import { CartDrawer, CartItem } from "@/components/customer/CartDrawer";
 import { CheckoutSuccessModal } from "@/components/customer/CheckoutSuccessModal";
 import { DishDetailModal } from "@/components/customer/DishDetailModal";
+import {
+  CustomerOrderDetailsModal,
+  CustomerOrderRecord,
+} from "@/components/customer/CustomerOrderDetailsModal";
+import { CustomerOrdersView } from "@/components/customer/CustomerOrdersView";
 import {
   CATEGORIES,
   RESTAURANTS,
@@ -43,37 +53,59 @@ import {
   saveStoredActiveOrder,
   getStoredCart,
   saveStoredCart,
-  getStoredFavorites,
-  saveStoredFavorites,
-  getStoredDishes,
   subscribeToDataChanges,
 } from "@/lib/dataService";
 
 export default function CustomerDashboardPage() {
-  // Navigation & Active Tab
+  // Navigation & Active Tab ("home", "categories", "restaurants", "orders", "favorites")
   const [activeTab, setActiveTab] = useState<string>("home");
 
-  // Change 1: Resizable & Collapsible Sidebar State (defaults to collapsed as in visual reference)
+  // Selected Restaurant for In-Depth Menu View
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
+  const [highlightedDishId, setHighlightedDishId] = useState<string | null>(null);
+
+  // Resizable & Collapsible Sidebar State
   const [sidebarWidth, setSidebarWidth] = useState<number>(256);
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
 
   // Search & Filters
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [restaurantFilter, setRestaurantFilter] = useState<string>("all");
-  const [favorites, setFavorites] = useState<string[]>(["burger-house", "pizza-palace"]);
+  const [restaurantFavorites, setRestaurantFavorites] = useState<string[]>([
+    "burger-house",
+    "pizza-palace",
+  ]);
 
-  // Menu Dishes State (Hydrated from persistent storage)
-  const [dishes, setDishes] = useState<MenuItem[]>(MENU_ITEMS);
+  // Dish-Level Favorites (Persisted in localStorage)
+  const [favoriteDishIds, setFavoriteDishIds] = useState<string[]>([
+    "bh-1",
+    "th-1",
+    "pp-1",
+  ]);
 
-  // Cart & Order State
+  // Cart State
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [inspectingDish, setInspectingDish] = useState<MenuItem | null>(null);
 
-  // Active Placed Order State (Hydrated from persistent storage)
+  // Logged-in Customer & Orders State
+  const [loggedInCustomer, setLoggedInCustomer] = useState<{
+    name: string;
+    email: string;
+  }>({
+    name: "Alex Morgan",
+    email: "alex.morgan@serveza.com",
+  });
+
+  const [customerOrders, setCustomerOrders] = useState<CustomerOrderRecord[]>([]);
+  const [selectedOrderForModal, setSelectedOrderForModal] =
+    useState<CustomerOrderRecord | null>(null);
+
+  // Active Placed Order State
   const [activeOrder, setActiveOrder] = useState<{
     id?: string;
+    orderNumber?: string;
     token: string;
     tokenNumber?: string;
     items: CartItem[];
@@ -83,32 +115,105 @@ export default function CustomerDashboardPage() {
     pickupSlot: string;
     status?: string;
   } | null>(null);
+
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
-  // Hydrate persistent customer state & subscribe to live updates
+  // Scroll spy control refs
+  const isManualScrolling = useRef(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Load user profile, orders, cart, and favorite dishes on mount & subscribe to Supabase live changes
   useEffect(() => {
-    // 1. Load active order from storage
-    const storedOrder = getStoredActiveOrder();
-    if (storedOrder) {
-      setActiveOrder(storedOrder);
-    }
+    try {
+      const savedUser = localStorage.getItem("serveza_customer_user");
+      let currentUser = {
+        name: "Alex Morgan",
+        email: "alex.morgan@serveza.com",
+      };
+      if (savedUser) {
+        try {
+          currentUser = JSON.parse(savedUser);
+          setLoggedInCustomer(currentUser);
+        } catch (e) {}
+      }
 
-    // 2. Load cart & favorites
-    setCart(getStoredCart());
-    const storedFavs = getStoredFavorites();
-    if (storedFavs && storedFavs.length > 0) {
-      setFavorites(storedFavs);
-    }
+      // Load persistent dish favorites for this customer
+      const favKey = `serveza_fav_dishes_${currentUser.email}`;
+      const savedFavs =
+        localStorage.getItem(favKey) || localStorage.getItem("serveza_favorite_dishes");
+      if (savedFavs) {
+        try {
+          const parsedFavs = JSON.parse(savedFavs);
+          if (Array.isArray(parsedFavs)) {
+            setFavoriteDishIds(parsedFavs);
+          }
+        } catch (e) {}
+      }
 
-    // 3. Load dishes
-    setDishes(getStoredDishes());
+      // Load persistent cart
+      const storedCart = getStoredCart();
+      if (storedCart && storedCart.length > 0) {
+        setCart(storedCart);
+      }
 
-    // 4. Subscribe to cross-tab & Supabase live sync
+      // Load persistent customer orders
+      const storageKey = `serveza_orders_${currentUser.email}`;
+      const savedOrders =
+        localStorage.getItem(storageKey) || localStorage.getItem("serveza_customer_orders");
+      if (savedOrders) {
+        try {
+          const parsed = JSON.parse(savedOrders);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCustomerOrders(parsed);
+
+            const latestActive = parsed.find((o: CustomerOrderRecord) =>
+              ["pending", "confirmed", "preparing", "out_for_delivery"].includes(o.status)
+            );
+            if (latestActive) {
+              setActiveOrder({
+                token: latestActive.tokenNumber,
+                items: latestActive.items.map((i: any) => ({
+                  dish:
+                    MENU_ITEMS.find((m) => m.name === i.dishName) || {
+                      id: "custom",
+                      name: i.dishName,
+                      restaurantId: "custom",
+                      restaurantName: latestActive.restaurantName,
+                      category: "bowls",
+                      description: "",
+                      price: i.price,
+                      image:
+                        i.image ||
+                        "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80",
+                      isVeg: true,
+                      prepTimeMinutes: 12,
+                      rating: 4.8,
+                      tags: [],
+                    },
+                  quantity: i.quantity,
+                  instructions: i.instructions,
+                })),
+                total: latestActive.totalAmount,
+                orderType: latestActive.orderType,
+                tableOrShelf: latestActive.tableOrShelf,
+                pickupSlot: latestActive.pickupSlot,
+              });
+            }
+          }
+        } catch (e) {}
+      }
+
+      // Check persistent active order
+      const storedActive = getStoredActiveOrder();
+      if (storedActive) {
+        setActiveOrder(storedActive);
+      }
+    } catch (e) {}
+
+    // Subscribe to cross-tab & Supabase live sync
     const unsubscribe = subscribeToDataChanges((event) => {
-      if (event.type === "DISHES_UPDATED" && Array.isArray(event.payload)) {
-        setDishes(event.payload);
-      } else if (event.type === "ORDERS_UPDATED" && Array.isArray(event.payload)) {
-        // Check if our active order had its status updated in the kitchen
+      if (event.type === "ORDERS_UPDATED" && Array.isArray(event.payload)) {
+        // When kitchen updates order status (e.g. from Preparing to Ready), update active order
         const current = getStoredActiveOrder();
         if (current) {
           const match = event.payload.find(
@@ -131,15 +236,131 @@ export default function CustomerDashboardPage() {
     return () => unsubscribe();
   }, []);
 
-  // Toggle favorite
-  const handleToggleFavorite = (id: string) => {
-    setFavorites((prev) => {
-      const updated = prev.includes(id)
-        ? prev.filter((item) => item !== id)
-        : [...prev, id];
-      saveStoredFavorites(updated);
-      return updated;
+  // Dish-Level Favorite Toggle Handler
+  const handleToggleFavoriteDish = (dishId: string) => {
+    setFavoriteDishIds((prev) => {
+      const next = prev.includes(dishId)
+        ? prev.filter((id) => id !== dishId)
+        : [...prev, dishId];
+      try {
+        localStorage.setItem(`serveza_fav_dishes_${loggedInCustomer.email}`, JSON.stringify(next));
+        localStorage.setItem("serveza_favorite_dishes", JSON.stringify(next));
+      } catch (e) {
+        console.warn("Could not save favorites", e);
+      }
+      return next;
     });
+  };
+
+  // Restaurant Menu Navigation
+  const handleOpenRestaurant = (restaurantId: string, targetDishId?: string) => {
+    setSelectedRestaurantId(restaurantId);
+    setHighlightedDishId(targetDishId || null);
+    if (activeTab === "orders" || activeTab === "favorites") {
+      setActiveTab("home");
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Smooth scroll helper with sticky header offset
+  const scrollToSection = (sectionId: string) => {
+    setSelectedRestaurantId(null);
+    isManualScrolling.current = true;
+
+    if (activeTab === "orders" || activeTab === "favorites") {
+      const targetTab =
+        sectionId === "categories-section"
+          ? "categories"
+          : sectionId === "popular-restaurants"
+          ? "restaurants"
+          : "home";
+      setActiveTab(targetTab);
+
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
+        if (el) {
+          const yOffset = -85;
+          const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+        }
+      }, 60);
+
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => {
+        isManualScrolling.current = false;
+      }, 900);
+      return;
+    }
+
+    const el = document.getElementById(sectionId);
+    if (el) {
+      const targetTab =
+        sectionId === "categories-section"
+          ? "categories"
+          : sectionId === "popular-restaurants"
+          ? "restaurants"
+          : "home";
+      setActiveTab(targetTab);
+
+      const yOffset = -85;
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => {
+        isManualScrolling.current = false;
+      }, 900);
+    }
+  };
+
+  // Scroll Spy for Home, Categories, and Restaurants
+  useEffect(() => {
+    if (activeTab === "orders" || activeTab === "favorites" || selectedRestaurantId) return;
+
+    const handleScroll = () => {
+      if (isManualScrolling.current) return;
+      if (activeTab === "orders" || activeTab === "favorites" || selectedRestaurantId) return;
+
+      const scrollPosition = window.scrollY + 130;
+
+      const restEl = document.getElementById("popular-restaurants");
+      const catEl = document.getElementById("categories-section");
+      const homeEl = document.getElementById("home-section");
+
+      if (restEl && scrollPosition >= restEl.offsetTop) {
+        setActiveTab("restaurants");
+      } else if (catEl && scrollPosition >= catEl.offsetTop) {
+        setActiveTab("categories");
+      } else if (homeEl) {
+        setActiveTab("home");
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [activeTab, selectedRestaurantId]);
+
+  // Sidebar Tab Navigation Handler
+  const handleTabChange = (tab: string) => {
+    setSelectedRestaurantId(null);
+    setHighlightedDishId(null);
+
+    if (tab === "home") {
+      setActiveTab("home");
+      setSelectedCategory("all");
+      setRestaurantFilter("all");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (tab === "categories") {
+      scrollToSection("categories-section");
+    } else if (tab === "restaurants") {
+      scrollToSection("popular-restaurants");
+    } else if (tab === "orders") {
+      setActiveTab("orders");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (tab === "favorites") {
+      setActiveTab("favorites");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   // Cart operations
@@ -202,20 +423,13 @@ export default function CustomerDashboardPage() {
   // Filtered Restaurants
   const filteredRestaurants = useMemo(() => {
     return RESTAURANTS.filter((rest) => {
-      // Category filter
       if (selectedCategory !== "all" && rest.category !== selectedCategory) {
         return false;
       }
-      // Tab filter
-      if (activeTab === "favorites" && !favorites.includes(rest.id)) {
-        return false;
-      }
-      // Filter options
       if (restaurantFilter === "dine-in" && !rest.isDineIn) return false;
       if (restaurantFilter === "takeaway" && !rest.isTakeaway) return false;
       if (restaurantFilter === "fastest" && parseInt(rest.prepTime) > 15) return false;
 
-      // Search filter
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesName = rest.name.toLowerCase().includes(q);
@@ -224,15 +438,28 @@ export default function CustomerDashboardPage() {
       }
       return true;
     });
-  }, [selectedCategory, activeTab, favorites, restaurantFilter, searchQuery]);
+  }, [selectedCategory, restaurantFilter, searchQuery]);
 
-  // Filtered Menu Items (Dynamically reflects live dishes from database & storage)
-  const filteredDishes = useMemo(() => {
-    return dishes.filter((dish) => {
-      // Respect item availability toggled by admin
-      if ((dish as any).isAvailable === false) {
-        return false;
-      }
+  // Active restaurant object if in restaurant menu view
+  const activeRestaurantObj = useMemo(() => {
+    if (!selectedRestaurantId) return null;
+    return RESTAURANTS.find((r) => r.id === selectedRestaurantId) || null;
+  }, [selectedRestaurantId]);
+
+  // Dishes belonging to the selected restaurant
+  const selectedRestaurantDishes = useMemo(() => {
+    if (!selectedRestaurantId) return [];
+    return MENU_ITEMS.filter((d) => d.restaurantId === selectedRestaurantId);
+  }, [selectedRestaurantId]);
+
+  // Customer's Favorited Dishes
+  const customerFavoriteDishes = useMemo(() => {
+    return MENU_ITEMS.filter((dish) => favoriteDishIds.includes(dish.id));
+  }, [favoriteDishIds]);
+
+  // Featured Dishes for the main homepage
+  const featuredDishes = useMemo(() => {
+    return MENU_ITEMS.filter((dish) => {
       if (selectedCategory !== "all" && dish.category !== selectedCategory) {
         return false;
       }
@@ -245,9 +472,9 @@ export default function CustomerDashboardPage() {
       }
       return true;
     });
-  }, [dishes, selectedCategory, searchQuery]);
+  }, [selectedCategory, searchQuery]);
 
-  // Checkout trigger (Saves to Supabase Database, syncs with Admin KDS, & persists locally)
+  // Checkout trigger (Saves to Supabase Database, syncs with Admin KDS, & updates Customer Orders)
   const handleCheckout = (details: {
     orderType: "dine-in" | "takeaway";
     tableOrShelf: string;
@@ -258,46 +485,79 @@ export default function CustomerDashboardPage() {
     const orderTotal = cartTotalAmount + Math.round(cartTotalAmount * 0.05);
     const orderId = `ord-${Date.now()}`;
     const orderNumber = `#D${Math.floor(1000 + Math.random() * 9000)}`;
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString("en-IN", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-    const orderData = {
+    const primaryRestaurant = cart[0]?.dish.restaurantName || "ServeZa Campus Kitchen";
+
+    // 1. Create Customer History Record (for "My Orders" tab)
+    const newCustomerOrder: CustomerOrderRecord = {
+      id: orderId,
+      tokenNumber: randomToken,
+      customerName: loggedInCustomer.name,
+      customerEmail: loggedInCustomer.email,
+      restaurantName: primaryRestaurant,
+      items: cart.map((i) => ({
+        dishName: i.dish.name,
+        quantity: i.quantity,
+        price: i.dish.price,
+        image: i.dish.image,
+        instructions: i.instructions,
+      })),
+      totalAmount: orderTotal,
+      status: "preparing",
+      orderType: details.orderType,
+      tableOrShelf: details.tableOrShelf,
+      pickupSlot: details.pickupSlot,
+      createdAt: now.toISOString(),
+      formattedDate: formattedDate,
+      notes: details.notes,
+    };
+
+    const updatedOrders = [newCustomerOrder, ...customerOrders];
+    setCustomerOrders(updatedOrders);
+
+    try {
+      localStorage.setItem(`serveza_orders_${loggedInCustomer.email}`, JSON.stringify(updatedOrders));
+      localStorage.setItem("serveza_customer_orders", JSON.stringify(updatedOrders));
+    } catch (e) {
+      console.warn("Could not save customer order", e);
+    }
+
+    // 2. Create Active Order State for live tracking card
+    const activeOrderData = {
       id: orderId,
       orderNumber,
       token: randomToken,
       tokenNumber: randomToken,
       items: [...cart],
       total: orderTotal,
-      totalAmount: orderTotal,
-      customerName: "Alex Morgan",
-      customerPhone: "+91 98765 43210",
-      status: "new",
-      prepTimeEstimate: "~ 12 min",
-      timeAgo: "Just now",
-      createdAt: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      image:
-        cart[0]?.dish.image ||
-        "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80",
-      ...details,
+      orderType: details.orderType,
+      tableOrShelf: details.tableOrShelf,
+      pickupSlot: details.pickupSlot,
+      status: "preparing",
     };
 
-    // 1. Immediately persist active order for zero-flicker resilience
-    setActiveOrder(orderData);
-    saveStoredActiveOrder(orderData);
+    setActiveOrder(activeOrderData);
+    saveStoredActiveOrder(activeOrderData);
 
-    // 2. Clear customer cart and persist
+    // 3. Clear customer cart & update storage
     setCart([]);
     saveStoredCart([]);
     setIsCartOpen(false);
     setIsSuccessModalOpen(true);
 
-    // 3. Persist order to Supabase Database (syncs live with Admin Kitchen KDS)
+    // 4. Persist to Supabase PostgreSQL Database (Instantly syncs with Admin Kitchen KDS)
     const adminOrderPayload: AdminOrder = {
       id: orderId,
       orderNumber,
       tokenNumber: randomToken,
-      customerName: "Alex Morgan",
+      customerName: loggedInCustomer.name,
       customerPhone: "+91 98765 43210",
       orderType: details.orderType,
       tableOrShelf: details.tableOrShelf,
@@ -311,7 +571,7 @@ export default function CustomerDashboardPage() {
       status: "new",
       prepTimeEstimate: "~ 12 min",
       timeAgo: "Just now",
-      createdAt: new Date().toLocaleTimeString([], {
+      createdAt: now.toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       }),
@@ -323,39 +583,45 @@ export default function CustomerDashboardPage() {
     createLiveOrder(adminOrderPayload);
   };
 
+  // Reorder functionality
+  const handleReorderOrder = (order: CustomerOrderRecord) => {
+    order.items.forEach((item) => {
+      const match = MENU_ITEMS.find((m) => m.name === item.dishName);
+      if (match) {
+        handleAddToCart(match, item.quantity, item.instructions);
+      }
+    });
+    setIsCartOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-[#FAF8F3] text-[#252522] selection:bg-[#D66B43]/20 selection:text-[#D66B43] relative overflow-x-hidden isolate">
-      {/* Editorial Food Photography Background Layer (Frames the layout, dynamically tracks sidebar width) */}
+      {/* Editorial Food Photography Background Layer */}
       <FoodPhotographyBackdrop isSidebarOpen={isSidebarOpen} sidebarWidth={sidebarWidth} />
 
       {/* Light subtle cursor trail */}
       <CursorTrail />
 
-      {/* Change 1 & 2: Resizable & Collapsible Desktop Sidebar */}
+      {/* Resizable & Collapsible Desktop Sidebar */}
       <Sidebar
         activeTab={activeTab}
-        onTabChange={(tab) => {
-          setActiveTab(tab);
-          if (tab === "home") {
-            setSelectedCategory("all");
-            setRestaurantFilter("all");
-          }
-        }}
-        favoritesCount={favorites.length}
+        onTabChange={handleTabChange}
+        favoritesCount={favoriteDishIds.length}
+        ordersCount={customerOrders.length}
         width={sidebarWidth}
         onWidthChange={setSidebarWidth}
         isOpen={isSidebarOpen}
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
       />
 
-      {/* Main Content Area (relative z-10 ensures all cards & content stay strictly in front of background decorations) */}
+      {/* Main Content Area */}
       <div
         className="relative z-10 flex flex-col min-h-screen transition-all"
         style={{
           paddingLeft: isSidebarOpen ? `${sidebarWidth}px` : "0px",
         }}
       >
-        {/* Top Header Bar with Sidebar Toggle Button */}
+        {/* Top Header Bar */}
         <TopHeader
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -368,205 +634,287 @@ export default function CustomerDashboardPage() {
 
         {/* Dashboard Body */}
         <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 sm:space-y-10 pb-28 lg:pb-16">
-          {/* Active Order Card */}
-          {activeOrder && (
-            <ActiveOrderCard
-              tokenNumber={activeOrder.token}
-              itemsCount={activeOrder.items.reduce((s, i) => s + i.quantity, 0)}
-              pickupSlot={activeOrder.pickupSlot}
-              tableOrShelf={activeOrder.tableOrShelf}
-              onOpenModal={() => setIsSuccessModalOpen(true)}
-            />
-          )}
-
-          {/* Change 3 & 6: Hero Banner with Word-by-Word Reveal & 5-Second Auto Slide */}
-          <HeroFeaturedSection
-            onExploreClick={() => {
-              const el = document.getElementById("popular-restaurants");
-              el?.scrollIntoView({ behavior: "smooth" });
-            }}
-            onHotDealClick={() => {
-              setSelectedCategory("burgers");
-              const el = document.getElementById("menu-dishes");
-              el?.scrollIntoView({ behavior: "smooth" });
-            }}
-          />
-
-          {/* Change 4: Infinite Left-to-Right Continuous Marquee Categories without 'All' icon */}
-          <CategorySection
-            selectedCategory={selectedCategory}
-            onSelectCategory={(catId) => setSelectedCategory(catId)}
-            onViewAllClick={() => setSelectedCategory("all")}
-          />
-
-          {/* Popular Restaurants Section */}
-          <div id="popular-restaurants">
-            <RestaurantSection
-              restaurants={filteredRestaurants}
-              selectedFilter={restaurantFilter}
-              onFilterChange={setRestaurantFilter}
-              favorites={favorites}
-              onToggleFavorite={handleToggleFavorite}
-              onSelectRestaurant={(restId) => {
-                const rest = RESTAURANTS.find((r) => r.id === restId);
-                if (rest) setSelectedCategory(rest.category);
+          {/* VIEW 1: My Orders View */}
+          {activeTab === "orders" ? (
+            <CustomerOrdersView
+              orders={customerOrders}
+              onOpenDetails={(ord) => setSelectedOrderForModal(ord)}
+              onExploreClick={() => {
+                setActiveTab("restaurants");
+                scrollToSection("popular-restaurants");
               }}
-              onViewAllClick={() => {
-                setSelectedCategory("all");
-                setRestaurantFilter("all");
+              onReorder={handleReorderOrder}
+            />
+          ) : activeTab === "favorites" ? (
+            /* VIEW 2: Favorites View (Displays individual liked dishes with restaurant details) */
+            <CustomerFavoritesView
+              favoriteDishes={customerFavoriteDishes}
+              cart={cart}
+              onRemoveFavorite={handleToggleFavoriteDish}
+              onAddToCart={handleAddToCart}
+              onUpdateQuantity={handleUpdateQuantity}
+              onNavigateToRestaurant={(restId, dishId) =>
+                handleOpenRestaurant(restId, dishId)
+              }
+              onOpenDishModal={(dish) => setInspectingDish(dish)}
+              onExploreClick={() => {
+                setActiveTab("restaurants");
+                scrollToSection("popular-restaurants");
               }}
             />
-          </div>
+          ) : selectedRestaurantId && activeRestaurantObj ? (
+            /* VIEW 3: Dedicated In-Depth Restaurant Menu View (12-20 dishes with categories & search) */
+            <RestaurantMenuView
+              restaurant={activeRestaurantObj}
+              dishes={selectedRestaurantDishes}
+              cart={cart}
+              favoriteDishIds={favoriteDishIds}
+              onToggleFavoriteDish={handleToggleFavoriteDish}
+              onAddToCart={handleAddToCart}
+              onUpdateQuantity={handleUpdateQuantity}
+              onOpenDishModal={(dish) => setInspectingDish(dish)}
+              onBack={() => {
+                setSelectedRestaurantId(null);
+                setHighlightedDishId(null);
+              }}
+              highlightedDishId={highlightedDishId}
+            />
+          ) : (
+            /* VIEW 4: Main Homepage (Hero, Categories, Popular Near You, Featured Dishes) */
+            <>
+              {/* Active Live Order Banner */}
+              {activeOrder && (
+                <ActiveOrderCard
+                  tokenNumber={activeOrder.token}
+                  itemsCount={activeOrder.items.reduce((s, i) => s + i.quantity, 0)}
+                  pickupSlot={activeOrder.pickupSlot}
+                  tableOrShelf={activeOrder.tableOrShelf}
+                  onOpenModal={() => setIsSuccessModalOpen(true)}
+                />
+              )}
 
-          {/* Featured Dishes / Menu Items Grid */}
-          <section id="menu-dishes" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#252522]">
-                  Featured Dishes
-                </h2>
-                <p className="text-xs text-[#6E6D66]">
-                  Steaming hot plates prepared directly by partner kitchens
-                </p>
+              {/* 1. Home / Hero Banner Section */}
+              <div id="home-section" className="scroll-mt-24">
+                <HeroFeaturedSection
+                  onExploreClick={() => scrollToSection("popular-restaurants")}
+                  onHotDealClick={() => {
+                    setSelectedCategory("burgers");
+                    scrollToSection("menu-dishes");
+                  }}
+                />
               </div>
 
-              {selectedCategory !== "all" && (
-                <button
-                  onClick={() => setSelectedCategory("all")}
-                  className="text-xs font-semibold text-[#D66B43] hover:underline"
-                >
-                  Show All Dishes
-                </button>
-              )}
-            </div>
+              {/* 2. Categories Marquee Section */}
+              <CategorySection
+                selectedCategory={selectedCategory}
+                onSelectCategory={(catId) => {
+                  setSelectedCategory(catId);
+                  scrollToSection("menu-dishes");
+                }}
+                onViewAllClick={() => setSelectedCategory("all")}
+              />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredDishes.map((dish) => {
-                const inCart = cart.find((i) => i.dish.id === dish.id);
-                return (
-                  <motion.div
-                    key={dish.id}
-                    whileHover={{ y: -3 }}
-                    className="group bg-white rounded-2xl border border-[#ECE7DE] overflow-hidden shadow-soft hover:shadow-card transition-all flex flex-col justify-between"
-                  >
-                    {/* Dish Photo */}
-                    <div
-                      onClick={() => setInspectingDish(dish)}
-                      className="relative h-48 w-full bg-[#ECE7DE] overflow-hidden cursor-pointer"
+              {/* 3. Popular Near You / Restaurants Section */}
+              <div id="popular-restaurants" className="scroll-mt-24">
+                <RestaurantSection
+                  restaurants={filteredRestaurants}
+                  selectedFilter={restaurantFilter}
+                  onFilterChange={setRestaurantFilter}
+                  favorites={restaurantFavorites}
+                  onToggleFavorite={(id) => {
+                    setRestaurantFavorites((prev) =>
+                      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+                    );
+                  }}
+                  onSelectRestaurant={(restId) => handleOpenRestaurant(restId)}
+                  onViewAllClick={() => {
+                    setSelectedCategory("all");
+                    setRestaurantFilter("all");
+                  }}
+                />
+              </div>
+
+              {/* 4. Featured Dishes Section */}
+              <section id="menu-dishes" className="scroll-mt-24 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#252522]">
+                      Featured Dishes
+                    </h2>
+                    <p className="text-xs text-[#6E6D66]">
+                      Handcrafted specialties prepared hot across campus partner kitchens
+                    </p>
+                  </div>
+
+                  {selectedCategory !== "all" && (
+                    <button
+                      onClick={() => setSelectedCategory("all")}
+                      className="text-xs font-semibold text-[#D66B43] hover:underline cursor-pointer"
                     >
-                      <Image
-                        src={dish.image}
-                        alt={dish.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      />
+                      Show All Dishes
+                    </button>
+                  )}
+                </div>
 
-                      <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                        <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/95 backdrop-blur-sm text-[#252522] shadow-xs flex items-center gap-1.5 border border-[#ECE7DE]">
-                          <Clock className="w-3 h-3 text-[#D66B43]" />
-                          {dish.prepTimeMinutes}m prep
-                        </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {featuredDishes.slice(0, 15).map((dish) => {
+                    const inCart = cart.find((i) => i.dish.id === dish.id);
+                    const isFav = favoriteDishIds.includes(dish.id);
 
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#252522]/90 backdrop-blur-sm text-white shadow-xs">
-                          ⭐ {dish.rating}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Dish Info & Actions */}
-                    <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold text-[#D66B43] uppercase tracking-wider">
-                            {dish.restaurantName}
-                          </span>
-                          {dish.isVeg && (
-                            <span className="w-3.5 h-3.5 rounded-sm border border-emerald-600 flex items-center justify-center p-0.5">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                            </span>
-                          )}
-                        </div>
-
-                        <h3
+                    return (
+                      <motion.div
+                        key={dish.id}
+                        whileHover={{ y: -3 }}
+                        className="group bg-white rounded-2xl border border-[#ECE7DE] overflow-hidden shadow-soft hover:shadow-card transition-all flex flex-col justify-between"
+                      >
+                        {/* Dish Photo */}
+                        <div
                           onClick={() => setInspectingDish(dish)}
-                          className="font-bold text-sm text-[#252522] group-hover:text-[#D66B43] transition-colors leading-snug cursor-pointer"
+                          className="relative h-48 w-full bg-[#ECE7DE] overflow-hidden cursor-pointer"
                         >
-                          {dish.name}
-                        </h3>
+                          <Image
+                            src={dish.image}
+                            alt={dish.name}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          />
 
-                        <p className="text-xs text-[#6E6D66] line-clamp-2 leading-relaxed">
-                          {dish.description}
-                        </p>
-                      </div>
-
-                      {/* Price & Add to Cart Action */}
-                      <div className="pt-2.5 border-t border-[#ECE7DE] flex items-center justify-between">
-                        <div className="flex items-baseline gap-1.5">
-                          <span className="font-serif text-base font-bold text-[#252522]">
-                            ₹{dish.price}
-                          </span>
-                          {dish.originalPrice && (
-                            <span className="text-[11px] text-[#6E6D66] line-through">
-                              ₹{dish.originalPrice}
+                          <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/95 backdrop-blur-sm text-[#252522] shadow-xs flex items-center gap-1.5 border border-[#ECE7DE]">
+                              <Clock className="w-3 h-3 text-[#D66B43]" />
+                              {dish.prepTimeMinutes}m prep
                             </span>
-                          )}
-                        </div>
 
-                        {inCart ? (
-                          <div className="flex items-center gap-2 rounded-xl bg-[#FAF8F3] border border-[#D66B43] px-2 py-1 shadow-xs">
+                            {/* Dish Favorite Heart Button */}
                             <button
-                              onClick={() => handleUpdateQuantity(dish.id, -1)}
-                              className="text-[#6E6D66] hover:text-[#D66B43] transition-colors p-0.5"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleFavoriteDish(dish.id);
+                              }}
+                              className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-xs ${
+                                isFav
+                                    ? "bg-rose-50 text-rose-500"
+                                  : "bg-white/90 text-[#6E6D66] hover:text-rose-500 hover:bg-white"
+                              }`}
+                              title={isFav ? "Remove from Favorites" : "Save to Favorites"}
                             >
-                              <Minus className="w-3 h-3" />
-                            </button>
-                            <span className="text-xs font-bold text-[#252522] w-4 text-center">
-                              {inCart.quantity}
-                            </span>
-                            <button
-                              onClick={() => handleUpdateQuantity(dish.id, 1)}
-                              className="text-[#6E6D66] hover:text-[#D66B43] transition-colors p-0.5"
-                            >
-                              <Plus className="w-3 h-3" />
+                              <Heart
+                                className={`w-3.5 h-3.5 ${
+                                  isFav ? "fill-rose-500 text-rose-500" : ""
+                                }`}
+                              />
                             </button>
                           </div>
-                        ) : (
-                          <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => handleAddToCart(dish)}
-                            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#252522] text-white text-xs font-semibold hover:bg-[#D66B43] transition-colors shadow-soft"
-                          >
-                            <Plus className="w-3.5 h-3.5" />
-                            <span>Add</span>
-                          </motion.button>
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </section>
 
-          {/* Change 5: Recently Ordered section has been completely removed per user request */}
+                          <div className="absolute bottom-2.5 left-3">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#252522]/90 backdrop-blur-sm text-white shadow-xs">
+                              ⭐ {dish.rating}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Dish Info & Actions */}
+                        <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOpenRestaurant(dish.restaurantId, dish.id);
+                                }}
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-[#D66B43] uppercase tracking-wider hover:underline text-left cursor-pointer"
+                                title={`Open ${dish.restaurantName} full menu`}
+                              >
+                                <Store className="w-3 h-3" />
+                                <span>{dish.restaurantName}</span>
+                              </button>
+
+                              {dish.isVeg ? (
+                                <span className="w-3.5 h-3.5 rounded-sm border border-emerald-600 flex items-center justify-center p-0.5">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                                </span>
+                              ) : (
+                                <span className="w-3.5 h-3.5 rounded-sm border border-rose-600 flex items-center justify-center p-0.5">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
+                                </span>
+                              )}
+                            </div>
+
+                            <h3
+                              onClick={() => setInspectingDish(dish)}
+                              className="font-bold text-sm text-[#252522] group-hover:text-[#D66B43] transition-colors leading-snug cursor-pointer"
+                            >
+                              {dish.name}
+                            </h3>
+
+                            <p className="text-xs text-[#6E6D66] line-clamp-2 leading-relaxed">
+                              {dish.description}
+                            </p>
+                          </div>
+
+                          {/* Price & Add to Cart Action */}
+                          <div className="pt-2.5 border-t border-[#ECE7DE] flex items-center justify-between">
+                            <div className="flex items-baseline gap-1.5">
+                              <span className="font-serif text-base font-bold text-[#252522]">
+                                ₹{dish.price}
+                              </span>
+                              {dish.originalPrice && (
+                                <span className="text-[11px] text-[#6E6D66] line-through">
+                                  ₹{dish.originalPrice}
+                                </span>
+                              )}
+                            </div>
+
+                            {inCart ? (
+                              <div className="flex items-center gap-2 rounded-xl bg-[#FAF8F3] border border-[#D66B43] px-2 py-1 shadow-xs">
+                                <button
+                                  onClick={() => handleUpdateQuantity(dish.id, -1)}
+                                  className="text-[#6E6D66] hover:text-[#D66B43] transition-colors p-0.5 cursor-pointer"
+                                  title="Decrease quantity"
+                                >
+                                  <Minus className="w-3 h-3" />
+                                </button>
+                                <span className="text-xs font-bold text-[#252522] w-4 text-center">
+                                  {inCart.quantity}
+                                </span>
+                                <button
+                                  onClick={() => handleUpdateQuantity(dish.id, 1)}
+                                  className="text-[#6E6D66] hover:text-[#D66B43] transition-colors p-0.5 cursor-pointer"
+                                  title="Increase quantity"
+                                >
+                                  <Plus className="w-3 h-3" />
+                                </button>
+                              </div>
+                            ) : (
+                              <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => handleAddToCart(dish)}
+                                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#252522] text-white text-xs font-semibold hover:bg-[#D66B43] transition-colors shadow-soft cursor-pointer"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                                <span>Add</span>
+                              </motion.button>
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </section>
+            </>
+          )}
         </main>
       </div>
 
       {/* Fixed Mobile Bottom Navigation */}
       <MobileBottomNav
         activeTab={activeTab}
-        onTabChange={(tab) => {
-          setActiveTab(tab);
-          if (tab === "home") {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          } else if (tab === "orders" && activeOrder) {
-            setIsSuccessModalOpen(true);
-          }
-        }}
-        favoritesCount={favorites.length}
-        ordersCount={activeOrder ? 1 : 0}
+        onTabChange={handleTabChange}
+        favoritesCount={favoriteDishIds.length}
+        ordersCount={customerOrders.length}
       />
 
       {/* Floating Island Cart Trigger for Mobile / Quick Access */}
@@ -588,7 +936,7 @@ export default function CustomerDashboardPage() {
 
             <button
               onClick={() => setIsCartOpen(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-[#D66B43] text-white text-xs font-bold hover:bg-[#BF5832] transition-colors flex items-center gap-1 shadow-soft"
+              className="px-3.5 py-1.5 rounded-xl bg-[#D66B43] text-white text-xs font-bold hover:bg-[#BF5832] transition-colors flex items-center gap-1 shadow-soft cursor-pointer"
             >
               <span>View Plate</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -597,7 +945,7 @@ export default function CustomerDashboardPage() {
         </div>
       )}
 
-      {/* Dish Customization Modal */}
+      {/* Dish Customization Modal (with Favorite Heart support) */}
       <DishDetailModal
         dish={inspectingDish}
         onClose={() => setInspectingDish(null)}
@@ -605,6 +953,8 @@ export default function CustomerDashboardPage() {
         currentCartQty={
           inspectingDish ? cart.find((i) => i.dish.id === inspectingDish.id)?.quantity || 0 : 0
         }
+        isFavorite={inspectingDish ? favoriteDishIds.includes(inspectingDish.id) : false}
+        onToggleFavorite={(dishId) => handleToggleFavoriteDish(dishId)}
       />
 
       {/* Cart Drawer */}
@@ -617,7 +967,7 @@ export default function CustomerDashboardPage() {
         onCheckout={handleCheckout}
       />
 
-      {/* Checkout Success / Live Token Modal */}
+      {/* Live Token Modal (from active order card) */}
       {activeOrder && (
         <CheckoutSuccessModal
           isOpen={isSuccessModalOpen}
@@ -630,6 +980,14 @@ export default function CustomerDashboardPage() {
           pickupSlot={activeOrder.pickupSlot}
         />
       )}
+
+      {/* Order Details Modal (from My Orders view) */}
+      <CustomerOrderDetailsModal
+        order={selectedOrderForModal}
+        isOpen={!!selectedOrderForModal}
+        onClose={() => setSelectedOrderForModal(null)}
+        onReorder={handleReorderOrder}
+      />
     </div>
   );
 }

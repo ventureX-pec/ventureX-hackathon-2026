@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Home, UtensilsCrossed, ClipboardList, Heart, User } from "lucide-react";
+import { Home, LayoutGrid, UtensilsCrossed, ClipboardList, Heart } from "lucide-react";
 
 interface MobileBottomNavProps {
   activeTab: string;
@@ -18,10 +18,20 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 }) => {
   const items = [
     { id: "home", label: "Home", icon: Home },
+    { id: "categories", label: "Categories", icon: LayoutGrid },
     { id: "restaurants", label: "Restaurants", icon: UtensilsCrossed },
-    { id: "orders", label: "Orders", icon: ClipboardList, badge: ordersCount > 0 ? ordersCount : undefined },
-    { id: "favorites", label: "Favorites", icon: Heart, badge: favoritesCount > 0 ? favoritesCount : undefined },
-    { id: "profile", label: "Profile", icon: User },
+    {
+      id: "orders",
+      label: "Orders",
+      icon: ClipboardList,
+      badge: ordersCount > 0 ? ordersCount : undefined,
+    },
+    {
+      id: "favorites",
+      label: "Favorites",
+      icon: Heart,
+      badge: favoritesCount > 0 ? favoritesCount : undefined,
+    },
   ];
 
   return (
@@ -34,7 +44,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             <button
               key={item.id}
               onClick={() => onTabChange(item.id)}
-              className={`relative flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-1 px-2 rounded-xl transition-all ${
+              className={`relative flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
                 isActive
                   ? "text-[#D66B43] font-bold"
                   : "text-[#6E6D66] font-medium hover:text-[#252522]"

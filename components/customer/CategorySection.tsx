@@ -20,7 +20,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   const loopingCategories = [...CATEGORIES, ...CATEGORIES, ...CATEGORIES];
 
   return (
-    <section className="space-y-4 overflow-hidden">
+    <section id="categories-section" className="scroll-mt-24 space-y-4 overflow-hidden">
       {/* Section Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -34,7 +34,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
 
         <button
           onClick={onViewAllClick}
-          className="text-xs font-semibold text-[#D66B43] hover:underline"
+          className="text-xs font-semibold text-[#D66B43] hover:underline cursor-pointer"
         >
           View All
         </button>
@@ -46,7 +46,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
         <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-r from-[#FAF8F3] to-transparent" />
         <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-l from-[#FAF8F3] to-transparent" />
 
-        {/* Animated Marquee Strip: 0% -> -33.333% moves RIGHT TO LEFT continuously */}
+        {/* Animated Marquee Strip */}
         <motion.div
           animate={{ x: ["0%", "-33.333%"] }}
           transition={{

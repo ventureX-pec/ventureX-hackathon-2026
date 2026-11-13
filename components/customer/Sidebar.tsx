@@ -2,23 +2,20 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "motion/react";
 import {
   Home,
-  UtensilsCrossed,
   LayoutGrid,
+  UtensilsCrossed,
   ClipboardList,
   Heart,
-  Tag,
-  HelpCircle,
   PanelLeftClose,
-  PanelLeftOpen,
 } from "lucide-react";
 
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   favoritesCount?: number;
+  ordersCount?: number;
   width: number;
   onWidthChange: (w: number) => void;
   isOpen: boolean;
@@ -29,6 +26,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onTabChange,
   favoritesCount = 0,
+  ordersCount = 0,
   width,
   onWidthChange,
   isOpen,
@@ -37,14 +35,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const sidebarRef = useRef<HTMLDivElement | null>(null);
 
+  // Updated navigation order: Home -> Categories -> Restaurants -> My Orders -> Favorites
   const navItems = [
     { id: "home", label: "Home", icon: Home },
-    { id: "restaurants", label: "Restaurants", icon: UtensilsCrossed },
     { id: "categories", label: "Categories", icon: LayoutGrid },
-    { id: "orders", label: "My Orders", icon: ClipboardList },
-    { id: "favorites", label: "Favorites", icon: Heart, badge: favoritesCount > 0 ? favoritesCount : undefined },
-    { id: "offers", label: "Offers", icon: Tag },
-    { id: "help", label: "Help Center", icon: HelpCircle },
+    { id: "restaurants", label: "Restaurants", icon: UtensilsCrossed },
+    {
+      id: "orders",
+      label: "My Orders",
+      icon: ClipboardList,
+      badge: ordersCount > 0 ? ordersCount : undefined,
+    },
+    {
+      id: "favorites",
+      label: "Favorites",
+      icon: Heart,
+      badge: favoritesCount > 0 ? favoritesCount : undefined,
+    },
   ];
 
   // Mouse drag handler for resizing
@@ -129,7 +136,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition-all ${
+                className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   isActive
                     ? "bg-[#D66B43]/10 text-[#D66B43] shadow-xs"
                     : "text-[#6E6D66] hover:text-[#252522] hover:bg-[#FAF8F3]"
@@ -155,12 +162,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
       </div>
 
-      {/* Clean Bottom Area (Removed 50% off promo & name per user request) */}
+      {/* Clean Bottom Area */}
       <div className="pt-4 border-t border-[#ECE7DE] flex items-center justify-between text-[11px] text-[#6E6D66]">
         <span>Drag right edge to resize</span>
         <button
           onClick={onToggle}
-          className="text-[#D66B43] font-semibold hover:underline"
+          className="text-[#D66B43] font-semibold hover:underline cursor-pointer"
         >
           Hide
         </button>
