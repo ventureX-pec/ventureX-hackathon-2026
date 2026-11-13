@@ -22,7 +22,7 @@ export function getAppBaseUrl(): string {
     return window.location.origin.replace(/\/$/, "");
   }
 
-  return "https://serveza.vercel.app";
+  return "https://venture-x-hackathon-2026.vercel.app";
 }
 
 /**

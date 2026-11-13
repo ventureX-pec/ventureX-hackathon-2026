@@ -33,7 +33,7 @@ export const TableStandeeModal: React.FC<TableStandeeModalProps> = ({
     : "10.198.54.135";
 
   const localUrl = `http://${localIp}:3000/r/${restaurantSlug}/menu?table=${tableNum}`;
-  const prodUrl = `https://serveza.vercel.app/r/${restaurantSlug}/menu?table=${tableNum}`;
+  const prodUrl = `https://venture-x-hackathon-2026.vercel.app/r/${restaurantSlug}/menu?table=${tableNum}`;
 
   const targetUrl = targetMode === "local" ? localUrl : prodUrl;
 
