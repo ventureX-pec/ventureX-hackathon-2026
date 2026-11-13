@@ -1,13 +1,15 @@
 "use client"
 
-import { memo, useEffect, useLayoutEffect, useMemo, useState } from "react"
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import {
   AnimatePresence,
   motion,
   useAnimation,
   useMotionValue,
   useTransform,
-} from "framer-motion"
+  useScroll,
+  useSpring,
+} from "motion/react"
 
 export const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect
@@ -82,28 +84,39 @@ const Carousel = memo(
     controls,
     cards,
     isCarouselActive,
+    scrollRotation,
   }: {
     handleClick: (imgUrl: string, index: number) => void
     controls: any
     cards: string[]
     isCarouselActive: boolean
+    scrollRotation: any
   }) => {
     const isScreenSizeSm = useMediaQuery("(max-width: 640px)")
-    const cylinderWidth = isScreenSizeSm ? 1100 : 1800
+    const cylinderWidth = isScreenSizeSm ? 1300 : 2200
     const faceCount = cards.length
     const faceWidth = cylinderWidth / faceCount
     const radius = cylinderWidth / (2 * Math.PI)
-    const rotation = useMotionValue(0)
+    
+    // Drag rotation offset
+    const dragOffset = useMotionValue(0)
+
+    // Combined rotation: scroll progress + user drag
+    const totalRotation = useTransform(
+      [scrollRotation, dragOffset],
+      ([scroll, drag]: any[]) => (scroll || 0) + (drag || 0)
+    )
+
     const transform = useTransform(
-      rotation,
+      totalRotation,
       (value) => `rotate3d(0, 1, 0, ${value}deg)`
     )
 
     return (
       <div
-        className="flex h-full items-center justify-center"
+        className="flex h-full items-center justify-center w-full"
         style={{
-          perspective: "1000px",
+          perspective: "1200px",
           transformStyle: "preserve-3d",
           willChange: "transform",
         }}
@@ -113,18 +126,18 @@ const Carousel = memo(
           className="relative flex h-full origin-center cursor-grab justify-center active:cursor-grabbing"
           style={{
             transform,
-            rotateY: rotation,
+            rotateY: totalRotation,
             width: cylinderWidth,
             transformStyle: "preserve-3d",
           }}
           onDrag={(_, info) =>
             isCarouselActive &&
-            rotation.set(rotation.get() + info.offset.x * 0.05)
+            dragOffset.set(dragOffset.get() + info.offset.x * 0.05)
           }
           onDragEnd={(_, info) =>
             isCarouselActive &&
             controls.start({
-              rotateY: rotation.get() + info.velocity.x * 0.05,
+              rotateY: totalRotation.get() + info.velocity.x * 0.05,
               transition: {
                 type: "spring",
                 stiffness: 100,
@@ -138,7 +151,7 @@ const Carousel = memo(
           {cards.map((imgUrl, i) => (
             <motion.div
               key={`key-${imgUrl}-${i}`}
-              className="absolute flex h-full origin-center items-center justify-center rounded-2xl bg-white p-2 shadow-soft border border-[#ECE7DE]"
+              className="absolute flex h-full origin-center items-center justify-center rounded-3xl bg-white p-2.5 shadow-card border border-[#ECE7DE] hover:border-[#D66B43]/50 transition-colors"
               style={{
                 width: `${faceWidth}px`,
                 transform: `rotateY(${
@@ -149,9 +162,9 @@ const Carousel = memo(
             >
               <motion.img
                 src={imgUrl}
-                alt={`Culinary highlight ${i + 1}`}
+                alt={`Culinary plate ${i + 1}`}
                 layoutId={`img-${imgUrl}`}
-                className="pointer-events-none w-full rounded-xl object-cover aspect-square shadow-xs"
+                className="pointer-events-none w-full rounded-2xl object-cover aspect-square shadow-xs"
                 initial={{ filter: "blur(4px)" }}
                 layout="position"
                 animate={{ filter: "blur(0px)" }}
@@ -167,13 +180,37 @@ const Carousel = memo(
 
 Carousel.displayName = "Carousel"
 
-function ThreeDPhotoCarousel({ images }: { images?: string[] }) {
+function ThreeDPhotoCarousel({
+  images,
+  scrollContainerRef,
+}: {
+  images?: string[]
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>
+}) {
   const [activeImg, setActiveImg] = useState<string | null>(null)
   const [isCarouselActive, setIsCarouselActive] = useState(true)
   const controls = useAnimation()
-  
+  const internalRef = useRef<HTMLDivElement>(null)
+  const targetRef = scrollContainerRef || internalRef
+
+  // Synchronize cylinder rotation with page scroll!
+  const { scrollYProgress } = useScroll({
+    target: targetRef as React.RefObject<HTMLDivElement>,
+    offset: ["start end", "end start"],
+  })
+
+  // Smooth spring physics for scroll rotation
+  const smoothScroll = useSpring(scrollYProgress, {
+    damping: 30,
+    stiffness: 120,
+    mass: 0.1,
+  })
+
+  // Maps scroll progress across 0 -> 1 into -70deg to +120deg rotation
+  const scrollRotation = useTransform(smoothScroll, [0, 1], [-60, 130])
+
   const cards = useMemo(
-    () => images && images.length > 0 ? images : foodImages,
+    () => (images && images.length > 0 ? images : foodImages),
     [images]
   )
 
@@ -189,28 +226,29 @@ function ThreeDPhotoCarousel({ images }: { images?: string[] }) {
   }
 
   return (
-    <motion.div layout className="relative select-none">
+    <div ref={internalRef} className="relative w-full overflow-hidden select-none">
+      {/* Lightbox Overlay */}
       <AnimatePresence mode="sync">
         {activeImg && (
           <motion.div
-            initial={{ opacity: 0, scale: 0 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0 }}
+            exit={{ opacity: 0, scale: 0.9 }}
             layoutId={`img-container-${activeImg}`}
             layout="position"
             onClick={handleClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-10 cursor-pointer"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 sm:p-10 cursor-pointer"
             style={{ willChange: "opacity" }}
             transition={transitionOverlay}
           >
             <motion.img
               layoutId={`img-${activeImg}`}
               src={activeImg}
-              className="max-w-[90vw] max-h-[80vh] rounded-2xl shadow-2xl object-contain border border-white/20"
-              initial={{ scale: 0.5 }}
+              className="max-w-[92vw] max-h-[82vh] rounded-3xl shadow-2xl object-contain border border-white/20"
+              initial={{ scale: 0.7 }}
               animate={{ scale: 1 }}
               transition={{
-                delay: 0.2,
+                delay: 0.15,
                 duration: 0.4,
                 ease: [0.25, 0.1, 0.25, 1],
               }}
@@ -221,16 +259,23 @@ function ThreeDPhotoCarousel({ images }: { images?: string[] }) {
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="relative h-[440px] sm:h-[500px] w-full overflow-hidden">
+
+      {/* Edge Gradient Blends to make the cylinder look infinite across the full screen */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-36 bg-gradient-to-r from-[#FAF8F3] via-[#FAF8F3]/70 to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-36 bg-gradient-to-l from-[#FAF8F3] via-[#FAF8F3]/70 to-transparent z-10" />
+
+      {/* Full-width 3D viewport */}
+      <div className="relative h-[480px] sm:h-[580px] w-full overflow-hidden flex items-center justify-center">
         <Carousel
           handleClick={handleClick}
           controls={controls}
           cards={cards}
           isCarouselActive={isCarouselActive}
+          scrollRotation={scrollRotation}
         />
       </div>
-    </motion.div>
+    </div>
   )
 }
 
-export { ThreeDPhotoCarousel };
+export { ThreeDPhotoCarousel }

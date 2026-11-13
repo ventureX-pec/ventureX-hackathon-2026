@@ -83,6 +83,7 @@ export const ScrollStorytelling = () => {
 
   return (
     <section
+      id="flow"
       ref={containerRef}
       className="py-24 sm:py-32 bg-[#FAF8F3] border-b border-[#ECE7DE] relative overflow-hidden"
     >

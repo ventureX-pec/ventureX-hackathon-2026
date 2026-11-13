@@ -19,10 +19,9 @@ export const Navbar = () => {
 
   const navLinks = [
     { label: "Home", href: "#" },
-    { label: "For Customers", href: "#customers" },
-    { label: "For Restaurants", href: "#restaurants" },
     { label: "How It Works", href: "#how-it-works" },
-    { label: "About", href: "#about" },
+    { label: "Menu Showcase", href: "#showcase" },
+    { label: "Interactive Flow", href: "#flow" },
   ];
 
   return (
@@ -56,7 +55,7 @@ export const Navbar = () => {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-8">
+            <nav className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => (
                 <a
                   key={link.label}
@@ -70,14 +69,8 @@ export const Navbar = () => {
 
             {/* Right Action CTAs */}
             <div className="hidden sm:flex items-center gap-3">
-              <a
-                href="#restaurants"
-                className="text-sm font-medium text-[#252522] hover:text-[#D66B43] px-3 py-2 transition-colors"
-              >
-                Login
-              </a>
               <motion.a
-                href="#restaurants"
+                href="#cta"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D66B43] text-white text-sm font-medium hover:bg-[#BF5832] transition-colors shadow-soft"
@@ -90,7 +83,7 @@ export const Navbar = () => {
             {/* Mobile Menu Hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-[#252522] hover:bg-[#EFECE6] transition-colors"
+              className="md:hidden p-2 rounded-xl text-[#252522] hover:bg-[#EFECE6] transition-colors"
               aria-label="Toggle navigation"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -107,7 +100,7 @@ export const Navbar = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-20 z-40 bg-[#FAF8F3] border-b border-[#ECE7DE] px-6 py-6 shadow-xl lg:hidden"
+            className="fixed inset-x-0 top-20 z-40 bg-[#FAF8F3] border-b border-[#ECE7DE] px-6 py-6 shadow-xl md:hidden"
           >
             <nav className="space-y-4">
               {navLinks.map((link) => (
@@ -124,14 +117,7 @@ export const Navbar = () => {
 
             <div className="pt-6 mt-6 border-t border-[#ECE7DE] flex flex-col gap-3">
               <a
-                href="#restaurants"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-2.5 text-center text-sm font-medium rounded-xl border border-[#ECE7DE] bg-white text-[#252522]"
-              >
-                Login
-              </a>
-              <a
-                href="#restaurants"
+                href="#cta"
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full py-2.5 text-center text-sm font-medium rounded-xl bg-[#D66B43] text-white shadow-soft"
               >

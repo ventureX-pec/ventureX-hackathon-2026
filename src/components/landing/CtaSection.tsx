@@ -6,7 +6,7 @@ import { ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
 
 export const CtaSection = () => {
   return (
-    <section className="py-20 sm:py-28 bg-[#FAF8F3]">
+    <section id="cta" className="py-20 sm:py-28 bg-[#FAF8F3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Banner Card */}
