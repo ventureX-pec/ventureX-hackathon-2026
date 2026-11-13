@@ -19,7 +19,8 @@ export const Navbar = () => {
 
   const navLinks = [
     { label: "Home", href: "#" },
-    { label: "Curated Dishes", href: "#showcase" },
+    { label: "Featured Dishes", href: "#featured" },
+    { label: "3D Showcase", href: "#showcase" },
     { label: "Get Started", href: "#cta" },
   ];
 

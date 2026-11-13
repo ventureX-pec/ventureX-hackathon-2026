@@ -1,6 +1,7 @@
 import React from "react";
 import { Navbar } from "@/components/landing/Navbar";
 import { HeroSection } from "@/components/landing/HeroSection";
+import { FeaturedDishesSection } from "@/components/landing/FeaturedDishesSection";
 import { CulinaryShowcaseSection } from "@/components/landing/CulinaryShowcaseSection";
 import { CtaSection } from "@/components/landing/CtaSection";
 import { Footer } from "@/components/landing/Footer";
@@ -12,6 +13,7 @@ export default function Home() {
       <main className="min-h-screen bg-[#FAF8F3] text-[#252522]">
         <Navbar />
         <HeroSection />
+        <FeaturedDishesSection />
         <CulinaryShowcaseSection />
         <CtaSection />
         <Footer />
