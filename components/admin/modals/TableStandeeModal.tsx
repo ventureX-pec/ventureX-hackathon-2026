@@ -12,6 +12,7 @@ interface TableStandeeModalProps {
   onClose: () => void;
   table: RestaurantTable | null;
   restaurantName: string;
+  restaurantSlug?: string;
 }
 
 export const TableStandeeModal: React.FC<TableStandeeModalProps> = ({
@@ -19,17 +20,27 @@ export const TableStandeeModal: React.FC<TableStandeeModalProps> = ({
   onClose,
   table,
   restaurantName,
+  restaurantSlug = "the-corner-table",
 }) => {
   const standeeRef = useRef<HTMLDivElement>(null);
+  const [targetMode, setTargetMode] = React.useState<"local" | "production">("local");
 
   if (!isOpen || !table) return null;
 
-  const targetUrl = table.qr_code_url || "";
+  const tableNum = table.table_number || (table as any).tableNumber || "T01";
+  const localIp = typeof window !== "undefined" && window.location.hostname !== "localhost"
+    ? window.location.hostname
+    : "10.198.54.135";
+
+  const localUrl = `http://${localIp}:3000/r/${restaurantSlug}/menu?table=${tableNum}`;
+  const prodUrl = `https://serveza.vercel.app/r/${restaurantSlug}/menu?table=${tableNum}`;
+
+  const targetUrl = targetMode === "local" ? localUrl : prodUrl;
 
   const handleDownload = async () => {
     try {
       const dataUrl = await generateQrDataUrl(targetUrl, { width: 1024 });
-      downloadQrPng(dataUrl, `ServeZa_${restaurantName.replace(/\s+/g, "_")}_Table_${table.table_number}_QR.png`);
+      downloadQrPng(dataUrl, `ServeZa_${restaurantName.replace(/\s+/g, "_")}_Table_${tableNum}_QR.png`);
     } catch (e) {
       console.error("Error generating QR PNG:", e);
     }
@@ -72,6 +83,32 @@ export const TableStandeeModal: React.FC<TableStandeeModalProps> = ({
           </button>
         </div>
 
+        {/* Destination Target Switcher */}
+        <div className="flex items-center justify-center p-1 rounded-xl bg-[#FAF8F5] border border-[#EDE4D8] text-xs print:hidden">
+          <button
+            type="button"
+            onClick={() => setTargetMode("local")}
+            className={`flex-1 py-1.5 px-2 rounded-lg font-bold transition-all text-center ${
+              targetMode === "local"
+                ? "bg-[#c96342] text-white shadow-xs"
+                : "text-[#78716c] hover:text-[#1c1917]"
+            }`}
+          >
+            📱 Local Wi-Fi (Scan with Phone)
+          </button>
+          <button
+            type="button"
+            onClick={() => setTargetMode("production")}
+            className={`flex-1 py-1.5 px-2 rounded-lg font-bold transition-all text-center ${
+              targetMode === "production"
+                ? "bg-[#c96342] text-white shadow-xs"
+                : "text-[#78716c] hover:text-[#1c1917]"
+            }`}
+          >
+            🌐 Production (Vercel)
+          </button>
+        </div>
+
         {/* ============================================================ */}
         {/* Printable Acrylic Standee Card                                */}
         {/* ============================================================ */}
@@ -106,7 +143,7 @@ export const TableStandeeModal: React.FC<TableStandeeModalProps> = ({
               Dine-In Table
             </span>
             <span className="font-serif text-2xl font-bold tracking-wider">
-              {table.table_number}
+              {tableNum}
             </span>
           </div>
 

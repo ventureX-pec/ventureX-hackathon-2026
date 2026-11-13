@@ -532,6 +532,7 @@ export const TableManagementView: React.FC = () => {
         isOpen={!!standeeTable}
         table={standeeTable}
         restaurantName={activeRestaurant.name}
+        restaurantSlug={activeRestaurant.slug}
         onClose={() => setStandeeTable(null)}
       />
     </div>
