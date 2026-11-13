@@ -81,7 +81,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <ClipboardList className="w-5 h-5" />
             </div>
           </div>
-          <div className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-[#252522]">
+          <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#252522]">
             {stats.totalOrders}
           </div>
           <div className="flex items-center justify-between mt-1.5">
@@ -103,7 +103,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <ChefHat className="w-5 h-5" />
             </div>
           </div>
-          <div className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-[#252522]">
+          <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#252522]">
             {stats.inKitchen}
           </div>
           <div className="flex items-center justify-between mt-1.5">
@@ -122,7 +122,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
-          <div className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-[#252522]">
+          <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#252522]">
             {stats.completed}
           </div>
           <div className="flex items-center justify-between mt-1.5">
@@ -144,7 +144,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               ₹
             </div>
           </div>
-          <div className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-[#252522]">
+          <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[#252522]">
             ₹{stats.todayRevenue.toLocaleString("en-IN")}
           </div>
           <div className="flex items-center justify-between mt-1.5">

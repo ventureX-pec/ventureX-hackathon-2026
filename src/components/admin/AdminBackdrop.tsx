@@ -9,36 +9,29 @@ interface AdminBackdropProps {
   sidebarWidth?: number;
 }
 
-export const AdminBackdrop: React.FC<AdminBackdropProps> = ({
-  isSidebarOpen = true,
-  sidebarWidth = 260,
-}) => {
+export const AdminBackdrop: React.FC<AdminBackdropProps> = () => {
   return (
     <div
       aria-hidden="true"
-      className="absolute top-0 right-0 bottom-0 pointer-events-none overflow-hidden select-none -z-10 transition-[left] duration-300 ease-out"
-      style={{
-        left: isSidebarOpen ? `${sidebarWidth}px` : "0px",
-      }}
+      className="fixed inset-0 pointer-events-none overflow-hidden select-none -z-10"
     >
       {/* ============================================================ */}
       {/* 1. WARM PEACH & APRICOT AMBIENT GLOWS (Matching Reference)   */}
       {/* ============================================================ */}
 
       {/* Top-Right Large Warm Peach Radial Wash */}
-      <div className="absolute -top-24 -right-24 w-[650px] lg:w-[850px] h-[650px] lg:h-[850px] rounded-full bg-gradient-to-br from-[#FDE8DC]/80 via-[#FDF3EC]/50 to-transparent blur-3xl" />
+      <div className="absolute -top-28 -right-28 w-[700px] lg:w-[900px] h-[700px] lg:h-[900px] rounded-full bg-gradient-to-br from-[#FDE8DC]/85 via-[#FDF3EC]/50 to-transparent blur-3xl" />
 
-      {/* Upper Center Warm Glow Behind Overview Header */}
-      <div className="absolute top-[200px] right-[15%] w-[550px] h-[550px] rounded-full bg-gradient-to-br from-[#FBE5D6]/70 via-[#FDF0E7]/40 to-transparent blur-3xl" />
+      {/* Center Warm Ambiance Glow (Behind Cards - Soft, never harsh) */}
+      <div className="absolute top-[240px] right-[20%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#FBE5D6]/60 via-[#FDF0E7]/35 to-transparent blur-3xl" />
 
       {/* Mid-Left Gentle Ivory/Sage Wash */}
-      <div className="absolute top-[450px] -left-20 w-[450px] h-[450px] rounded-full bg-gradient-to-tr from-[#F5ECE0]/60 via-[#FAF6EE]/40 to-transparent blur-3xl" />
+      <div className="absolute top-[500px] -left-28 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-[#F5ECE0]/60 via-[#FAF6EE]/40 to-transparent blur-3xl" />
 
-      {/* Lower Section Warm Ambiance */}
-      <div className="absolute top-[1100px] -right-20 w-[600px] h-[600px] rounded-full bg-gradient-to-bl from-[#FDE8DC]/60 via-[#FAF1E8]/35 to-transparent blur-3xl" />
-      <div className="absolute bottom-10 left-1/4 w-[500px] h-[400px] rounded-full bg-gradient-to-t from-[#EAF1EC]/40 to-transparent blur-3xl" />
+      {/* Bottom Section Warm Ambiance */}
+      <div className="absolute bottom-0 right-1/4 w-[600px] h-[450px] rounded-full bg-gradient-to-t from-[#F8EAE0]/50 to-transparent blur-3xl" />
 
-      {/* Organic Curved Flowing Wave Shape (Exact shape from admin reference image) */}
+      {/* Flowing Organic Wave Shape (Exact shape from admin reference image) */}
       <svg
         className="absolute top-0 right-0 w-[1100px] lg:w-[1400px] h-[850px] opacity-55 text-[#FBE5D6]/60 pointer-events-none"
         viewBox="0 0 1400 850"
@@ -52,96 +45,79 @@ export const AdminBackdrop: React.FC<AdminBackdropProps> = ({
       </svg>
 
       {/* ============================================================ */}
-      {/* 2. REALISTIC FOOD PHOTOGRAPHY FRAMING THE WORKSPACE          */}
+      {/* 2. REALISTIC FOOD PHOTOGRAPHY IN FAR CORNERS ONLY             */}
+      {/* Strictly in outer gutters - NEVER overlapping text or cards  */}
       {/* ============================================================ */}
 
-      {/* A. Top-Left: Artisanal Pasta / Woodfired Dish */}
+      {/* A. Top-Left: Tucked in the far top-left window corner (Behind sidebar / top edge) */}
       <motion.div
         animate={{ y: [-2, 2, -2] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-10 -left-12 sm:-top-16 sm:-left-16 md:-top-20 md:-left-20 lg:-top-22 lg:-left-22 w-40 h-40 sm:w-56 sm:h-56 md:w-68 md:h-68 lg:w-76 lg:h-76"
+        className="absolute -top-16 -left-16 sm:-top-20 sm:-left-20 w-44 h-44 sm:w-60 sm:h-60 rounded-full overflow-hidden shadow-[0_20px_40px_-8px_rgba(37,37,34,0.18)] border-4 border-white/70"
       >
-        <div className="relative w-full h-full rounded-full overflow-hidden shadow-[0_20px_40px_-8px_rgba(37,37,34,0.18)] border-4 border-white/70">
+        <div className="relative w-full h-full">
           <Image
             src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=700&q=80"
             alt="Artisanal Pasta Dish"
             fill
             className="object-cover"
-            sizes="(max-width: 640px) 160px, (max-width: 1024px) 272px, 304px"
+            sizes="(max-width: 640px) 176px, 240px"
             priority
           />
           <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-black/5" />
         </div>
       </motion.div>
 
-      {/* B. Top-Right: Decadent Chocolate Brownie Plate (Exactly as in admin reference) */}
+      {/* B. Top-Right: Decadent Chocolate Brownie (Far top-right viewport corner) */}
       <motion.div
         animate={{ y: [2, -2, 2] }}
         transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute top-2 -right-10 sm:top-4 sm:-right-14 md:top-6 md:-right-18 lg:top-8 lg:-right-20 w-36 h-36 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64"
+        className="absolute -top-8 -right-12 sm:-top-10 sm:-right-16 md:-top-12 md:-right-20 w-40 h-40 sm:w-56 sm:h-56 md:w-68 md:h-68 rounded-full overflow-hidden shadow-[0_20px_40px_-8px_rgba(37,37,34,0.16)] border-4 border-white/90"
       >
-        <div className="relative w-full h-full rounded-full overflow-hidden shadow-[0_20px_40px_-8px_rgba(37,37,34,0.16)] border-4 border-white/90">
+        <div className="relative w-full h-full">
           <Image
             src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=700&q=85"
             alt="Decadent Chocolate Brownie"
             fill
             className="object-cover"
-            sizes="(max-width: 640px) 144px, (max-width: 1024px) 224px, 256px"
+            sizes="(max-width: 640px) 160px, 272px"
             priority
           />
           <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-black/5" />
         </div>
       </motion.div>
 
-      {/* C. Middle-Left: Creamy Pasta Bowl Peeking Beside Sidebar */}
+      {/* C. Middle-Left: Creamy Pasta Bowl (Tucked deep on left gutter below sidebar) */}
       <motion.div
         animate={{ y: [-3, 3, -3] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        className="absolute top-[480px] -left-10 sm:top-[490px] sm:-left-14 md:top-[500px] md:-left-16 lg:top-[510px] lg:-left-20 w-36 h-36 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64"
+        className="hidden xl:block absolute top-[540px] -left-20 w-48 h-48 rounded-full overflow-hidden shadow-[0_20px_40px_-8px_rgba(37,37,34,0.16)] border-4 border-white/90"
       >
-        <div className="relative w-full h-full rounded-full overflow-hidden shadow-[0_20px_40px_-8px_rgba(37,37,34,0.16)] border-4 border-white/90">
+        <div className="relative w-full h-full">
           <Image
             src="https://images.unsplash.com/photo-1546549032-9571cd6b27df?auto=format&fit=crop&w=700&q=80"
             alt="Fresh Pasta Bowl"
             fill
             className="object-cover"
-            sizes="(max-width: 640px) 144px, (max-width: 1024px) 224px, 256px"
+            sizes="192px"
           />
           <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-black/5" />
         </div>
       </motion.div>
 
-      {/* D. Bottom-Right: Fresh Mediterranean Salad Bowl (Exactly as in admin reference) */}
+      {/* D. Bottom-Right: Fresh Mediterranean Salad Bowl (Far bottom-right viewport corner) */}
       <motion.div
         animate={{ y: [-2.5, 2.5, -2.5] }}
         transition={{ duration: 11.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-        className="absolute top-[680px] -right-12 sm:top-[700px] sm:-right-16 md:top-[720px] md:-right-20 lg:top-[740px] lg:-right-24 w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 lg:w-80 lg:h-80"
+        className="absolute top-[700px] sm:top-[740px] -right-16 sm:-right-24 md:-right-32 w-56 h-56 sm:w-72 sm:h-72 md:w-88 md:h-88 rounded-full overflow-hidden shadow-[0_20px_40px_-8px_rgba(37,37,34,0.18)] border-4 border-white/90"
       >
-        <div className="relative w-full h-full rounded-full overflow-hidden shadow-[0_20px_40px_-8px_rgba(37,37,34,0.18)] border-4 border-white/90">
+        <div className="relative w-full h-full">
           <Image
             src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=700&q=85"
             alt="Fresh Mediterranean Salad Bowl"
             fill
             className="object-cover"
-            sizes="(max-width: 640px) 192px, (max-width: 1024px) 288px, 320px"
-          />
-          <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-black/5" />
-        </div>
-      </motion.div>
-
-      {/* E. Lower-Right: Neapolitan Truffle Pizza */}
-      <motion.div
-        animate={{ y: [2, -2, 2] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-        className="absolute top-[1350px] -right-12 sm:top-[1400px] sm:-right-16 md:top-[1450px] md:-right-20 lg:top-[1500px] lg:-right-24 w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72"
-      >
-        <div className="relative w-full h-full rounded-full overflow-hidden shadow-[0_20px_40px_-8px_rgba(37,37,34,0.18)] border-4 border-white/90">
-          <Image
-            src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=700&q=85"
-            alt="Woodfired Pizza"
-            fill
-            className="object-cover"
-            sizes="(max-width: 640px) 176px, (max-width: 1024px) 256px, 288px"
+            sizes="(max-width: 640px) 224px, 352px"
           />
           <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-black/5" />
         </div>
