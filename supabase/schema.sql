@@ -18,17 +18,29 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- 2. Enable Row Level Security (RLS)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- 3. RLS Policies
--- Users can view their own profile; admins can view all profiles
-CREATE POLICY "Users can view own profile or admins view all"
+-- Helper security definer function to check if the current user is an admin without recursion
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'
+  );
+$$;
+
+-- 3. RLS Policies for Profiles
+DROP POLICY IF EXISTS "Users can view own profile or admins view all" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles are viewable by everyone" ON public.profiles;
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
+
+-- Anyone can view profile info (prevents infinite recursion)
+CREATE POLICY "Profiles are viewable by everyone"
   ON public.profiles
   FOR SELECT
-  USING (
-    auth.uid() = id
-    OR EXISTS (
-      SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'
-    )
-  );
+  USING (true);
 
 -- Users can insert their own profile during signup
 CREATE POLICY "Users can insert own profile"
@@ -111,12 +123,16 @@ CREATE TABLE IF NOT EXISTS public.orders (
 
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Customers view own orders" ON public.orders;
+DROP POLICY IF EXISTS "Customers insert orders" ON public.orders;
+DROP POLICY IF EXISTS "Admins update orders" ON public.orders;
+
 CREATE POLICY "Customers view own orders"
   ON public.orders
   FOR SELECT
   USING (
     customer_id = auth.uid()
-    OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+    OR public.is_admin()
   );
 
 CREATE POLICY "Customers insert orders"
@@ -128,5 +144,5 @@ CREATE POLICY "Admins update orders"
   ON public.orders
   FOR UPDATE
   USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+    public.is_admin()
   );
