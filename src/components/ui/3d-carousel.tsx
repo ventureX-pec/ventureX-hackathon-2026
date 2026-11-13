@@ -202,46 +202,35 @@ const Carousel = memo(
       ([scroll, drag]: any[]) => (scroll || 0) + (drag || 0)
     )
 
-    const transform = useTransform(
-      totalRotation,
-      (value) => `rotate3d(0, 1, 0, ${value}deg)`
-    )
-
     return (
       <div
         className="flex h-full items-center justify-center w-full"
         style={{
           perspective: "1400px",
           transformStyle: "preserve-3d",
-          willChange: "transform",
         }}
       >
         <motion.div
           drag={isCarouselActive ? "x" : false}
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0}
           className="relative flex h-full origin-center cursor-grab justify-center items-center active:cursor-grabbing"
           style={{
-            transform,
             rotateY: totalRotation,
             width: cylinderWidth,
             transformStyle: "preserve-3d",
           }}
-          onDrag={(_, info) =>
-            isCarouselActive &&
-            dragOffset.set(dragOffset.get() + info.offset.x * 0.05)
-          }
-          onDragEnd={(_, info) =>
-            isCarouselActive &&
-            controls.start({
-              rotateY: totalRotation.get() + info.velocity.x * 0.05,
-              transition: {
-                type: "spring",
-                stiffness: 100,
-                damping: 30,
-                mass: 0.1,
-              },
-            })
-          }
-          animate={controls}
+          onDrag={(_, info) => {
+            if (isCarouselActive) {
+              dragOffset.set(dragOffset.get() + info.delta.x * 0.35)
+            }
+          }}
+          onDragEnd={(_, info) => {
+            if (isCarouselActive) {
+              const momentum = info.velocity.x * 0.08
+              dragOffset.set(dragOffset.get() + momentum)
+            }
+          }}
         >
           {dishes.map((dish, i) => (
             <motion.div
