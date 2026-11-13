@@ -198,9 +198,9 @@ export default function CustomerDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F3] text-[#252522] selection:bg-[#D66B43]/20 selection:text-[#D66B43] relative overflow-x-hidden">
-      {/* Editorial Food Photography Background Layer */}
-      <FoodPhotographyBackdrop />
+    <div className="min-h-screen bg-[#FAF8F3] text-[#252522] selection:bg-[#D66B43]/20 selection:text-[#D66B43] relative overflow-x-hidden isolate">
+      {/* Editorial Food Photography Background Layer (Frames the layout, dynamically tracks sidebar width) */}
+      <FoodPhotographyBackdrop isSidebarOpen={isSidebarOpen} sidebarWidth={sidebarWidth} />
 
       {/* Light subtle cursor trail */}
       <CursorTrail />
@@ -222,9 +222,9 @@ export default function CustomerDashboardPage() {
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
       />
 
-      {/* Main Content Area (dynamic padding based on resizable sidebar state on desktop) */}
+      {/* Main Content Area (relative z-10 ensures all cards & content stay strictly in front of background decorations) */}
       <div
-        className="flex flex-col min-h-screen transition-all"
+        className="relative z-10 flex flex-col min-h-screen transition-all"
         style={{
           paddingLeft: isSidebarOpen ? `${sidebarWidth}px` : "0px",
         }}
@@ -241,7 +241,7 @@ export default function CustomerDashboardPage() {
         />
 
         {/* Dashboard Body */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 sm:space-y-10 pb-28 lg:pb-16">
+        <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 sm:space-y-10 pb-28 lg:pb-16">
           {/* Active Order Card */}
           {activeOrder && (
             <ActiveOrderCard

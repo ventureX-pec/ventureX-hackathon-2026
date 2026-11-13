@@ -118,7 +118,7 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
                 {prefixWords.map((word, i) => (
                   <span
                     key={`p-${activeSlide}-${i}`}
-                    className="inline-block overflow-hidden mr-2.5 pb-1"
+                    className="inline-block overflow-hidden mr-2.5 pb-2 pt-0.5"
                   >
                     <motion.span
                       initial={{ y: "110%", opacity: 0 }}
@@ -141,7 +141,7 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
                 {highlightWords.map((word, i) => (
                   <span
                     key={`h-${activeSlide}-${i}`}
-                    className="inline-block overflow-hidden mr-2.5 pb-1"
+                    className="inline-block overflow-hidden mr-2.5 pb-2 pt-0.5"
                   >
                     <motion.span
                       initial={{ y: "110%", opacity: 0 }}
