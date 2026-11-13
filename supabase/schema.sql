@@ -15,8 +15,12 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 2. Enable Row Level Security (RLS)
+-- 2. Enable Row Level Security (RLS) & Grant Permissions
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.profiles TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.orders TO anon, authenticated, service_role;
 
 -- Helper security definer function to check if the current user is an admin without recursion
 CREATE OR REPLACE FUNCTION public.is_admin()
