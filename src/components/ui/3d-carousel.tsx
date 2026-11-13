@@ -235,7 +235,7 @@ const Carousel = memo(
           {dishes.map((dish, i) => (
             <motion.div
               key={dish.id}
-              className="absolute origin-center rounded-3xl overflow-hidden cursor-pointer shadow-[0_20px_50px_rgba(37,37,34,0.16)] border border-[#ECE7DE] hover:border-[#D66B43] hover:shadow-[0_28px_65px_rgba(214,107,67,0.3)] transition-all duration-300 group"
+              className="absolute origin-center rounded-3xl overflow-hidden cursor-pointer shadow-md border border-[#ECE7DE] hover:border-[#D66B43] transition-colors duration-200 group"
               style={{
                 width: `${faceWidth}px`,
                 height: `${cardHeight}px`,
@@ -246,20 +246,18 @@ const Carousel = memo(
               onClick={() => handleClick(dish, i)}
             >
               {/* Photo fills 100% of the card - NO white border or empty white pillar */}
-              <motion.img
+              <img
                 src={dish.image}
                 alt={dish.name}
-                className="pointer-events-none w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                initial={{ filter: "blur(4px)" }}
-                animate={{ filter: "blur(0px)" }}
-                transition={transition}
+                className="pointer-events-none w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                loading="eager"
               />
 
               {/* Editorial DineFlow overlay integrated directly with the dish */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent pointer-events-none flex flex-col justify-between p-5 sm:p-6">
                 {/* Top Badges */}
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#FAF8F3]/95 text-[#252522] backdrop-blur-md shadow-xs">
+                  <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#FAF8F3] text-[#252522] shadow-xs">
                     {dish.tag}
                   </span>
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#D66B43] text-white shadow-xs flex items-center gap-1">

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { QrCode, ShieldCheck } from "lucide-react";
+import { QrCode } from "lucide-react";
 
 interface StepItem {
   id: string;
@@ -21,7 +21,7 @@ const steps: StepItem[] = [
     tag: "DISCOVERY",
     title: "Discover Local Kitchens",
     description: "Compare live preparation times at nearby campus eateries before leaving your desk.",
-    photoUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80",
+    photoUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
     photoCaption: "The Corner Café • 120m away",
   },
   {
@@ -30,7 +30,7 @@ const steps: StepItem[] = [
     tag: "DIGITAL MENU",
     title: "Explore Digital Menus",
     description: "Browse high-res dish photos with 100% verified dietary filters and live counter stock.",
-    photoUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80",
+    photoUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80",
     photoCaption: "Freshly Made-to-Order • In Stock",
   },
   {
@@ -39,7 +39,7 @@ const steps: StepItem[] = [
     tag: "EXPRESS CHECKOUT",
     title: "Order Ahead With UPI",
     description: "Pick your exact lunch break pickup slot and pay in 1 tap with zero queue waiting.",
-    photoUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80",
+    photoUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80",
     photoCaption: "Scheduled Pickup • Zero Queue",
   },
   {
@@ -48,7 +48,7 @@ const steps: StepItem[] = [
     tag: "KITCHEN SYNC",
     title: "Track Live Preparation",
     description: "Watch your order route directly to the kitchen display screen with minute-by-minute updates.",
-    photoUrl: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80",
+    photoUrl: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=600&q=80",
     photoCaption: "Direct to Chef • Live Grill Station",
   },
   {
@@ -57,7 +57,7 @@ const steps: StepItem[] = [
     tag: "INSTANT PICKUP",
     title: "Collect Without Waiting",
     description: "Walk straight to the express pickup shelf, scan your QR token, and enjoy your hot meal.",
-    photoUrl: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80",
+    photoUrl: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=600&q=80",
     photoCaption: "Counter Shelf B • Steaming Hot",
   },
 ];
@@ -66,7 +66,7 @@ export const ScrollStorytelling = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Synchronize center text with the 3.2s card interval (16s total loop / 5 cards)
+  // Synchronize center text with card cycle (16s loop / 5 cards = 3.2s per card)
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
@@ -84,6 +84,69 @@ export const ScrollStorytelling = () => {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
+      {/* Inline Hardware GPU Keyframes for 100% reliable execution */}
+      <style>{`
+        @keyframes corridorLeft {
+          0% {
+            transform: translate3d(50px, 0, -800px) rotateY(32deg) scale(0.65);
+            opacity: 0;
+          }
+          15% {
+            opacity: 0.4;
+          }
+          40% {
+            transform: translate3d(20px, 0, -250px) rotateY(32deg) scale(0.88);
+            opacity: 0.85;
+          }
+          55% {
+            transform: translate3d(0, 0, 0) rotateY(32deg) scale(1.0);
+            opacity: 1;
+          }
+          70% {
+            transform: translate3d(-35px, 0, 260px) rotateY(32deg) scale(1.12);
+            opacity: 0.55;
+          }
+          85% {
+            transform: translate3d(-80px, 0, 520px) rotateY(32deg) scale(1.22);
+            opacity: 0;
+          }
+          100% {
+            transform: translate3d(-120px, 0, 750px) rotateY(32deg) scale(1.32);
+            opacity: 0;
+          }
+        }
+
+        @keyframes corridorRight {
+          0% {
+            transform: translate3d(-50px, 0, -800px) rotateY(-32deg) scale(0.65);
+            opacity: 0;
+          }
+          15% {
+            opacity: 0.4;
+          }
+          40% {
+            transform: translate3d(-20px, 0, -250px) rotateY(-32deg) scale(0.88);
+            opacity: 0.85;
+          }
+          55% {
+            transform: translate3d(0, 0, 0) rotateY(-32deg) scale(1.0);
+            opacity: 1;
+          }
+          70% {
+            transform: translate3d(35px, 0, 260px) rotateY(-32deg) scale(1.12);
+            opacity: 0.55;
+          }
+          85% {
+            transform: translate3d(80px, 0, 520px) rotateY(-32deg) scale(1.22);
+            opacity: 0;
+          }
+          100% {
+            transform: translate3d(120px, 0, 750px) rotateY(-32deg) scale(1.32);
+            opacity: 0;
+          }
+        }
+      `}</style>
+
       {/* Editorial Subtitle */}
       <div className="text-center mb-6 sm:mb-10 z-30 pointer-events-none">
         <span className="text-xs font-bold tracking-widest uppercase text-[#D66B43]">
@@ -93,26 +156,24 @@ export const ScrollStorytelling = () => {
 
       {/* 3D Perspective Corridor Viewport */}
       <div
-        className="relative w-full h-[480px] sm:h-[560px] lg:h-[620px] flex items-center justify-center overflow-hidden"
+        className="relative w-full h-[460px] sm:h-[540px] lg:h-[600px] flex items-center justify-center overflow-hidden"
         style={{
           perspective: "1200px",
           perspectiveOrigin: "50% 50%",
         }}
       >
-        {/* Edge Gradient Blend Masks to smoothly blend into ivory background */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-20 sm:w-40 bg-gradient-to-r from-[#FAF8F3] via-[#FAF8F3]/80 to-transparent z-20" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-20 sm:w-40 bg-gradient-to-l from-[#FAF8F3] via-[#FAF8F3]/80 to-transparent z-20" />
+        {/* Soft edge blend overlays */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-36 bg-gradient-to-r from-[#FAF8F3] via-[#FAF8F3]/80 to-transparent z-20" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-36 bg-gradient-to-l from-[#FAF8F3] via-[#FAF8F3]/80 to-transparent z-20" />
 
-        {/* ======================================================== */}
-        {/* LEFT 3D PERSPECTIVE WALL (Hardware GPU CSS Keyframes)    */}
-        {/* ======================================================== */}
+        {/* Left Wall 3D Cards */}
         <div className="absolute left-0 top-0 bottom-0 w-1/2 flex items-center pointer-events-none">
           {steps.map((step, idx) => (
             <div
               key={`left-card-${step.id}`}
-              className="absolute left-2 sm:left-6 lg:left-12 w-[270px] sm:w-[330px] lg:w-[370px] h-[370px] sm:h-[440px] rounded-3xl bg-white border border-[#ECE7DE] shadow-[0_20px_50px_rgba(37,37,34,0.12)] p-5 sm:p-6 flex flex-col justify-between overflow-hidden pointer-events-none select-none"
+              className="absolute left-2 sm:left-6 lg:left-12 w-[260px] sm:w-[320px] lg:w-[360px] h-[360px] sm:h-[430px] rounded-3xl bg-white border border-[#ECE7DE] shadow-md p-5 sm:p-6 flex flex-col justify-between overflow-hidden pointer-events-none select-none"
               style={{
-                animation: "corridor-left 16s linear infinite",
+                animation: "corridorLeft 16s linear infinite",
                 animationDelay: `${-idx * 3.2}s`,
                 animationPlayState: isPaused ? "paused" : "running",
                 transformStyle: "preserve-3d",
@@ -134,22 +195,22 @@ export const ScrollStorytelling = () => {
               <div className="flex-1 py-4 flex flex-col justify-center">
                 {step.id === "discover" && (
                   <div className="space-y-3">
-                    <div className="p-3.5 rounded-2xl bg-[#FAF8F3] border border-[#ECE7DE] flex items-center gap-3">
+                    <div className="p-3 rounded-2xl bg-[#FAF8F3] border border-[#ECE7DE] flex items-center gap-3">
                       <img
-                        src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80"
+                        src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=200&q=80"
                         alt="Cafe"
-                        className="w-12 h-12 rounded-xl object-cover"
+                        className="w-11 h-11 rounded-xl object-cover"
                       />
                       <div className="flex-1 min-w-0">
                         <span className="font-bold text-xs text-[#252522] block">The Corner Café</span>
                         <span className="text-[11px] text-[#5F7A65] font-semibold">⚡ 8m prep • 120m away</span>
                       </div>
                     </div>
-                    <div className="p-3.5 rounded-2xl bg-[#FAF8F3] border border-[#ECE7DE] flex items-center gap-3">
+                    <div className="p-3 rounded-2xl bg-[#FAF8F3] border border-[#ECE7DE] flex items-center gap-3">
                       <img
-                        src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=300&q=80"
+                        src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=200&q=80"
                         alt="Pizza"
-                        className="w-12 h-12 rounded-xl object-cover"
+                        className="w-11 h-11 rounded-xl object-cover"
                       />
                       <div className="flex-1 min-w-0">
                         <span className="font-bold text-xs text-[#252522] block">Oven & Hearth</span>
@@ -161,12 +222,12 @@ export const ScrollStorytelling = () => {
 
                 {step.id === "menu" && (
                   <div className="space-y-3">
-                    <div className="p-3.5 rounded-2xl bg-[#FAF8F3] border border-[#ECE7DE] flex items-center justify-between">
+                    <div className="p-3 rounded-2xl bg-[#FAF8F3] border border-[#ECE7DE] flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <img
-                          src="https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?auto=format&fit=crop&w=300&q=80"
+                          src="https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?auto=format&fit=crop&w=200&q=80"
                           alt="Paneer bowl"
-                          className="w-12 h-12 rounded-xl object-cover"
+                          className="w-11 h-11 rounded-xl object-cover"
                         />
                         <div>
                           <span className="text-xs font-bold text-[#252522] block">Crispy Paneer Bowl</span>
@@ -177,12 +238,12 @@ export const ScrollStorytelling = () => {
                         + Added
                       </span>
                     </div>
-                    <div className="p-3.5 rounded-2xl bg-[#FAF8F3] border border-[#ECE7DE] flex items-center justify-between">
+                    <div className="p-3 rounded-2xl bg-[#FAF8F3] border border-[#ECE7DE] flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <img
-                          src="https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=300&q=80"
+                          src="https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=200&q=80"
                           alt="Cold brew"
-                          className="w-12 h-12 rounded-xl object-cover"
+                          className="w-11 h-11 rounded-xl object-cover"
                         />
                         <div>
                           <span className="text-xs font-bold text-[#252522] block">Iced Hazelnut Coffee</span>
@@ -231,7 +292,7 @@ export const ScrollStorytelling = () => {
 
                 {step.id === "collect" && (
                   <div className="p-4 rounded-2xl bg-[#EBF1ED] border border-[#5F7A65]/20 text-center space-y-2">
-                    <div className="w-24 h-24 mx-auto bg-white rounded-2xl p-2 shadow-xs border border-[#ECE7DE] flex items-center justify-center">
+                    <div className="w-20 h-20 mx-auto bg-white rounded-2xl p-2 shadow-xs border border-[#ECE7DE] flex items-center justify-center">
                       <QrCode className="w-full h-full text-[#252522]" />
                     </div>
                     <span className="text-lg font-black text-[#252522] block">Token #41</span>
@@ -249,16 +310,14 @@ export const ScrollStorytelling = () => {
           ))}
         </div>
 
-        {/* ======================================================== */}
-        {/* RIGHT 3D PERSPECTIVE WALL (Hardware GPU CSS Keyframes)   */}
-        {/* ======================================================== */}
+        {/* Right Wall 3D Cards */}
         <div className="absolute right-0 top-0 bottom-0 w-1/2 flex items-center pointer-events-none">
           {steps.map((step, idx) => (
             <div
               key={`right-card-${step.id}`}
-              className="absolute right-2 sm:right-6 lg:right-12 w-[270px] sm:w-[330px] lg:w-[370px] h-[370px] sm:h-[440px] rounded-3xl overflow-hidden border border-[#ECE7DE] shadow-[0_20px_50px_rgba(37,37,34,0.14)] pointer-events-none select-none"
+              className="absolute right-2 sm:right-6 lg:right-12 w-[260px] sm:w-[320px] lg:w-[360px] h-[360px] sm:h-[430px] rounded-3xl overflow-hidden border border-[#ECE7DE] shadow-md pointer-events-none select-none"
               style={{
-                animation: "corridor-right 16s linear infinite",
+                animation: "corridorRight 16s linear infinite",
                 animationDelay: `${-idx * 3.2}s`,
                 animationPlayState: isPaused ? "paused" : "running",
                 transformStyle: "preserve-3d",
@@ -270,9 +329,9 @@ export const ScrollStorytelling = () => {
                 alt={step.photoCaption}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent flex flex-col justify-between p-5 sm:p-6 text-white">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent flex flex-col justify-between p-5 text-white">
                 <div className="flex justify-between items-start">
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#FAF8F3]/95 text-[#252522] backdrop-blur-md">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#FAF8F3] text-[#252522]">
                     Step {step.stepNum}
                   </span>
                   <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-[#D66B43] text-white">
@@ -289,30 +348,25 @@ export const ScrollStorytelling = () => {
           ))}
         </div>
 
-        {/* ======================================================== */}
-        {/* CENTER CORRIDOR (Clean, Calm, Uncluttered)                */}
-        {/* ======================================================== */}
+        {/* Center Stage */}
         <div className="relative z-30 max-w-sm sm:max-w-md lg:max-w-lg mx-auto text-center px-4 pointer-events-none">
           <AnimatePresence mode="wait">
             <motion.div
               key={`center-text-${currentStep.id}`}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3 }}
               className="space-y-3"
             >
-              {/* Step indicator */}
               <span className="text-xs font-bold text-[#D66B43] tracking-widest uppercase block">
                 STEP {currentStep.stepNum} OF 05
               </span>
 
-              {/* Big Elegant Headline */}
               <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#252522] tracking-tight leading-tight">
                 {currentStep.title}
               </h3>
 
-              {/* Single Concise Description Sentence */}
               <p className="text-sm sm:text-base text-[#6E6D66] leading-relaxed max-w-md mx-auto">
                 {currentStep.description}
               </p>
