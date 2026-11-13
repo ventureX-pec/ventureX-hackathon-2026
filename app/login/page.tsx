@@ -525,8 +525,8 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* Prominent Action Toggle Button (Create Account vs Sign In) */}
-            <div className="mt-2.5">
+            {/* Toggle between Sign In & Sign Up */}
+            <div className="mt-2 text-center">
               <button
                 type="button"
                 onClick={() => {
@@ -534,24 +534,11 @@ export default function LoginPage() {
                   setAuthError(null)
                   setLoginSuccess(null)
                 }}
-                className={`w-full py-2.5 px-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer shadow-sm group ${
-                  !isSignUp
-                    ? "border-2 border-[#c96342] bg-[#fdf8f5] hover:bg-[#faede5] text-[#c96342] hover:text-[#a84d31]"
-                    : "border-2 border-[#78716c]/40 bg-[#fbf9f6] hover:bg-[#f4ede4] text-[#1c1917]"
-                }`}
+                className="text-xs font-medium text-[#c96342] hover:text-[#a84d31] transition-colors cursor-pointer"
               >
-                {!isSignUp ? (
-                  <>
-                    <UserPlus className="w-4 h-4 text-[#c96342] group-hover:scale-110 transition-transform shrink-0" />
-                    <span>Don&apos;t have an account? <u>Create Account here</u></span>
-                    <ArrowRight className="w-3.5 h-3.5 text-[#c96342] group-hover:translate-x-0.5 transition-transform shrink-0" />
-                  </>
-                ) : (
-                  <>
-                    <LogIn className="w-4 h-4 text-[#57534e] group-hover:-translate-x-0.5 transition-transform shrink-0" />
-                    <span>Already registered? <u>Sign In to your account</u></span>
-                  </>
-                )}
+                {isSignUp
+                  ? "Already have an account? Sign In"
+                  : "New to ServeZa? Create an account"}
               </button>
             </div>
 
