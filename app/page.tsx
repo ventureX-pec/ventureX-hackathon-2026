@@ -18,7 +18,7 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#0f0e0d] text-[#fdfbf7] selection:bg-[#c96342]/20 selection:text-[#c96342]">
+    <div className="min-h-screen bg-[#faf7f2] text-[#1c1917] selection:bg-[#c96342]/20 selection:text-[#c96342]">
       {/* Top Adaptive Navigation Bar */}
       <Navbar onOpenReservation={() => setReservationOpen(true)} />
 

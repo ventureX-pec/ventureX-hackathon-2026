@@ -97,7 +97,7 @@ const CSS =
   ".dsh-root *{box-sizing:border-box}" +
   /* Integrated Hero Header */
   ".dsh-hero-intro{text-align:center;max-width:760px;padding:0 1rem;z-index:20;margin-bottom:0.4rem;flex-shrink:0}" +
-  ".dsh-hero-title{font-size:clamp(1.85rem,3.2vw,2.75rem);font-family:Georgia,\"Times New Roman\",Times,serif;font-weight:400;letter-spacing:-0.01em;line-height:1.25;color:#ffffff;margin:0;padding-top:0.2rem}" +
+  ".dsh-hero-title{font-size:clamp(1.85rem,3.2vw,2.75rem);font-family:Georgia,\"Times New Roman\",Times,serif;font-weight:400;letter-spacing:-0.01em;line-height:1.35;color:#ffffff;margin:0;padding-top:0.5rem;overflow:visible}" +
   ".dsh-hero-accent{font-style:italic;font-weight:400;color:#e07a5f}" +
   ".dsh-hero-desc{font-size:clamp(0.84rem,1.1vw,0.92rem);color:#a8a29e;margin:0.4rem auto 0.75rem;max-width:520px;line-height:1.45}" +
   ".dsh-hero-ctas{display:flex;gap:0.75rem;justify-content:center;align-items:center}" +

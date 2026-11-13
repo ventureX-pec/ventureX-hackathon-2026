@@ -97,7 +97,7 @@ export default function HowItWorksStacked() {
   return (
     <section
       id="how-it-works"
-      className="py-20 sm:py-28 bg-[#0f0e0d] border-t border-white/10 relative overflow-hidden select-none"
+      className="py-20 sm:py-28 bg-[#faf7f2] border-t border-[#e7dfd5] relative overflow-hidden select-none"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
@@ -108,16 +108,16 @@ export default function HowItWorksStacked() {
           transition={{ duration: 0.5 }}
           className="text-center max-w-3xl mx-auto mb-12 sm:mb-16"
         >
-          <span className="text-xs font-semibold tracking-widest uppercase text-[#e07a5f]">
+          <span className="text-xs font-semibold tracking-widest uppercase text-[#c96342]">
             SIMPLE & EFFORTLESS
           </span>
           <h2
-            className="text-3xl sm:text-5xl font-bold tracking-tight text-white mt-3"
+            className="text-3xl sm:text-5xl font-bold tracking-tight text-[#1c1917] mt-3"
             style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
           >
             How DINEFLOW Works
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-[#a8a29e] leading-relaxed max-w-xl mx-auto">
+          <p className="mt-3 text-base sm:text-lg text-[#57534e] leading-relaxed max-w-xl mx-auto">
             From discovering nearby eateries to collecting your hot meal without waiting in line.
           </p>
         </motion.div>
@@ -128,18 +128,18 @@ export default function HowItWorksStacked() {
           <button
             onClick={handlePrev}
             aria-label="Previous step"
-            className="absolute left-2 sm:left-6 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-[#181614]/90 hover:bg-[#252320] text-white border border-white/15 shadow-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 focus:outline-none cursor-pointer"
+            className="absolute left-2 sm:left-6 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white/95 hover:bg-white text-[#1c1917] border border-[#e7dfd5] shadow-md flex items-center justify-center transition-all hover:scale-105 active:scale-95 focus:outline-none cursor-pointer"
           >
-            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-[#1c1917]" />
           </button>
 
           {/* Next Arrow Button */}
           <button
             onClick={handleNext}
             aria-label="Next step"
-            className="absolute right-2 sm:right-6 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-[#181614]/90 hover:bg-[#252320] text-white border border-white/15 shadow-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 focus:outline-none cursor-pointer"
+            className="absolute right-2 sm:right-6 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white/95 hover:bg-white text-[#1c1917] border border-[#e7dfd5] shadow-md flex items-center justify-center transition-all hover:scale-105 active:scale-95 focus:outline-none cursor-pointer"
           >
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-[#1c1917]" />
           </button>
 
           {/* Fanned-out Cards Deck */}
@@ -286,7 +286,7 @@ export default function HowItWorksStacked() {
               className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                 activeIndex === i
                   ? "w-8 bg-[#c96342]"
-                  : "w-2.5 bg-white/20 hover:bg-[#c96342]/50"
+                  : "w-2.5 bg-[#e7dfd5] hover:bg-[#c96342]/40"
               }`}
             />
           ))}

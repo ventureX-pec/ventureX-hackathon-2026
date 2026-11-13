@@ -51,7 +51,7 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolledToLight
-          ? "bg-[#0f0e0d]/95 backdrop-blur-md shadow-lg border-b border-white/10"
+          ? "bg-[#faf7f2]/95 backdrop-blur-md shadow-xs border-b border-[#e7dfd5]"
           : "bg-[#0f0e0d]/80 backdrop-blur-md border-b border-transparent"
       }`}
     >
@@ -66,10 +66,20 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
             CT
           </div>
           <div className="flex flex-col">
-            <span className="font-serif font-medium text-lg tracking-tight text-white group-hover:text-[#e07a5f] transition-colors">
+            <span
+              className={`font-serif font-medium text-lg tracking-tight transition-colors ${
+                isScrolledToLight
+                  ? "text-[#1c1917] group-hover:text-[#c96342]"
+                  : "text-white group-hover:text-[#e07a5f]"
+              }`}
+            >
               The Corner Table
             </span>
-            <span className="text-[10px] tracking-widest uppercase font-medium text-[#a8a29e]">
+            <span
+              className={`text-[10px] tracking-widest uppercase font-medium ${
+                isScrolledToLight ? "text-[#78716c]" : "text-[#a8a29e]"
+              }`}
+            >
               Kitchen & Hearth
             </span>
           </div>
@@ -82,7 +92,11 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
               key={link.label}
               href={link.href}
               onClick={(e) => handleNavClick(e, link.href)}
-              className="text-sm font-medium text-[#d6cbbe] hover:text-white transition-colors relative py-1 hover:after:w-full after:w-0 after:h-[2px] after:bg-[#c96342] after:absolute after:bottom-0 after:left-0 after:transition-all after:duration-200"
+              className={`text-sm font-medium transition-colors relative py-1 hover:after:w-full after:w-0 after:h-[2px] after:bg-[#c96342] after:absolute after:bottom-0 after:left-0 after:transition-all after:duration-200 ${
+                isScrolledToLight
+                  ? "text-[#44403c] hover:text-[#c96342]"
+                  : "text-[#d6cbbe] hover:text-white"
+              }`}
             >
               {link.label}
             </a>

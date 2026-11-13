@@ -17,7 +17,7 @@ export default function OrderingCTASection({ onOpenReservation }: OrderingCTASec
   }
 
   return (
-    <section className="py-24 bg-[#0f0e0d] border-t border-white/10 relative overflow-hidden">
+    <section className="py-20 bg-[#faf7f2] border-t border-[#e7dfd5] relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative rounded-3xl bg-gradient-to-b from-[#181614] to-[#121110] border border-white/10 p-8 sm:p-14 lg:p-16 overflow-hidden shadow-2xl text-center">
           {/* Subtle warm glow accents matching hero */}

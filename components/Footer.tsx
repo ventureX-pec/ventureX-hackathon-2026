@@ -31,9 +31,9 @@ export default function Footer({ onOpenReservation }: FooterProps) {
   }
 
   return (
-    <footer className="bg-[#0a0a09] text-[#a8a29e] border-t border-white/10 pt-16 pb-12">
+    <footer className="bg-[#f4ede4] text-[#57534e] border-t border-[#e7dfd5] pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-white/10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-[#e7dfd5]">
           {/* Column 1: Brand & Bio */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
@@ -41,7 +41,7 @@ export default function Footer({ onOpenReservation }: FooterProps) {
                 CT
               </div>
               <div>
-                <span className="font-serif text-lg font-medium text-white tracking-tight">
+                <span className="font-serif text-lg font-medium text-[#1c1917] tracking-tight">
                   The Corner Table
                 </span>
                 <span className="block text-[10px] tracking-widest uppercase font-medium text-[#78716c]">
@@ -50,7 +50,7 @@ export default function Footer({ onOpenReservation }: FooterProps) {
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm text-[#a8a29e] leading-relaxed max-w-sm mb-6 font-light">
+            <p className="text-xs sm:text-sm text-[#57534e] leading-relaxed max-w-sm mb-6 font-light">
               An independent neighborhood restaurant bringing thoughtful cooking together with a simple, personal way to enjoy hospitality.
             </p>
 
@@ -59,7 +59,7 @@ export default function Footer({ onOpenReservation }: FooterProps) {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noreferrer"
-                className="w-9 h-9 rounded-full bg-[#181614] border border-white/10 hover:bg-[#c96342] text-[#d6cbbe] hover:text-white flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-full bg-white border border-[#e7dfd5] hover:bg-[#c96342] text-[#57534e] hover:text-white flex items-center justify-center transition-colors shadow-xs"
                 aria-label="Instagram"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -70,7 +70,7 @@ export default function Footer({ onOpenReservation }: FooterProps) {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noreferrer"
-                className="w-9 h-9 rounded-full bg-[#181614] border border-white/10 hover:bg-[#c96342] text-[#d6cbbe] hover:text-white flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-full bg-white border border-[#e7dfd5] hover:bg-[#c96342] text-[#57534e] hover:text-white flex items-center justify-center transition-colors shadow-xs"
                 aria-label="Facebook"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -81,7 +81,7 @@ export default function Footer({ onOpenReservation }: FooterProps) {
                 href="https://twitter.com"
                 target="_blank"
                 rel="noreferrer"
-                className="w-9 h-9 rounded-full bg-[#181614] border border-white/10 hover:bg-[#c96342] text-[#d6cbbe] hover:text-white flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-full bg-white border border-[#e7dfd5] hover:bg-[#c96342] text-[#57534e] hover:text-white flex items-center justify-center transition-colors shadow-xs"
                 aria-label="Twitter"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -93,17 +93,17 @@ export default function Footer({ onOpenReservation }: FooterProps) {
 
           {/* Column 2: Navigation Links */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-4">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#1c1917] mb-4">
               Navigation
             </h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm text-[#a8a29e]">
+            <ul className="space-y-2.5 text-xs sm:text-sm text-[#57534e]">
               <li>
-                <a href="#hero" onClick={(e) => scrollTo(e, "#hero")} className="hover:text-white transition-colors">
+                <a href="#hero" onClick={(e) => scrollTo(e, "#hero")} className="hover:text-[#c96342] transition-colors">
                   Featured Dishes
                 </a>
               </li>
               <li>
-                <a href="#how-it-works" onClick={(e) => scrollTo(e, "#how-it-works")} className="hover:text-white transition-colors">
+                <a href="#how-it-works" onClick={(e) => scrollTo(e, "#how-it-works")} className="hover:text-[#c96342] transition-colors">
                   How It Works
                 </a>
               </li>
@@ -114,7 +114,7 @@ export default function Footer({ onOpenReservation }: FooterProps) {
                     if (onOpenReservation) onOpenReservation()
                     else if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("app:open-reservation"))
                   }}
-                  className="hover:text-white transition-colors cursor-pointer text-left"
+                  className="hover:text-[#c96342] transition-colors cursor-pointer text-left"
                 >
                   Table Reservations
                 </button>
@@ -124,16 +124,16 @@ export default function Footer({ onOpenReservation }: FooterProps) {
 
           {/* Column 3: Hours & Dining */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-4">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#1c1917] mb-4">
               Service Hours
             </h4>
-            <ul className="space-y-3 text-xs sm:text-sm text-[#a8a29e]">
+            <ul className="space-y-3 text-xs sm:text-sm text-[#57534e]">
               <li>
-                <span className="block font-medium text-white">Monday – Thursday</span>
+                <span className="block font-medium text-[#1c1917]">Monday – Thursday</span>
                 <span className="text-xs">11:30 AM – 10:00 PM</span>
               </li>
               <li>
-                <span className="block font-medium text-white">Friday – Sunday</span>
+                <span className="block font-medium text-[#1c1917]">Friday – Sunday</span>
                 <span className="text-xs">11:00 AM – 11:00 PM</span>
               </li>
               <li className="pt-2 text-xs text-[#78716c]">
@@ -144,15 +144,15 @@ export default function Footer({ onOpenReservation }: FooterProps) {
 
           {/* Column 4: Newsletter */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-4">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#1c1917] mb-4">
               Seasonal Notes
             </h4>
-            <p className="text-xs text-[#a8a29e] mb-3 leading-relaxed font-light">
+            <p className="text-xs text-[#57534e] mb-3 leading-relaxed font-light">
               Receive updates on seasonal menu arrivals, chef tastings and hearth specials.
             </p>
 
             {subscribed ? (
-              <div className="flex items-center gap-2 text-xs font-medium text-emerald-400">
+              <div className="flex items-center gap-2 text-xs font-medium text-emerald-600">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>You&apos;re on the list! Thank you.</span>
               </div>
@@ -164,12 +164,12 @@ export default function Footer({ onOpenReservation }: FooterProps) {
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     placeholder="Your email address"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#161412] border border-white/15 text-xs text-white placeholder-[#78716c] focus:outline-none focus:border-[#c96342]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#e7dfd5] text-xs text-[#1c1917] placeholder-[#a8a29e] focus:outline-none focus:border-[#c96342] shadow-xs"
                     required
                   />
                   <button
                     type="submit"
-                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-[#c96342] text-white flex items-center justify-center hover:bg-[#a84d31] transition-colors cursor-pointer"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-[#c96342] text-white flex items-center justify-center hover:bg-[#a84d31] transition-colors cursor-pointer shadow-xs"
                     aria-label="Subscribe"
                   >
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -187,9 +187,9 @@ export default function Footer({ onOpenReservation }: FooterProps) {
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#78716c]">
           <p>© 2026 The Corner Table. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <span className="hover:text-white cursor-pointer transition-colors">Privacy Policy</span>
-            <span className="hover:text-white cursor-pointer transition-colors">Terms of Service</span>
-            <span className="hover:text-white cursor-pointer transition-colors">Allergen Guide</span>
+            <span className="hover:text-[#1c1917] cursor-pointer transition-colors">Privacy Policy</span>
+            <span className="hover:text-[#1c1917] cursor-pointer transition-colors">Terms of Service</span>
+            <span className="hover:text-[#1c1917] cursor-pointer transition-colors">Allergen Guide</span>
           </div>
         </div>
       </div>
