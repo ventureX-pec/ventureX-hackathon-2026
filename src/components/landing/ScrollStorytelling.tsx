@@ -4,23 +4,12 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   motion,
   AnimatePresence,
-  useScroll,
-  useSpring,
+  useMotionValue,
   useTransform,
+  useAnimationFrame,
   MotionValue,
 } from "motion/react";
-import {
-  Compass,
-  MenuSquare,
-  ShoppingBag,
-  ChefHat,
-  CheckCircle2,
-  Clock,
-  QrCode,
-  Sparkles,
-  MapPin,
-  Check,
-} from "lucide-react";
+import { QrCode } from "lucide-react";
 
 interface StepItem {
   id: string;
@@ -80,44 +69,44 @@ const steps: StepItem[] = [
   },
 ];
 
-// Left perspective card component driven by scroll progress
-function LeftWallCard({
+// Continuous auto-flying Left Wall Card
+function AutoLeftCard({
   step,
   index,
-  totalSteps,
   progress,
 }: {
   step: StepItem;
   index: number;
-  totalSteps: number;
   progress: MotionValue<number>;
 }) {
-  const p = index / (totalSteps - 1);
-  const delta = 0.25;
+  const transform = useTransform(progress, (t) => {
+    let diff = (index - (t % 5) + 5) % 5;
+    if (diff > 2.5) diff -= 5;
 
-  const z = useTransform(
-    progress,
-    [p - delta * 1.5, p - delta, p, p + delta, p + delta * 1.5],
-    [-700, -350, 0, 350, 700]
-  );
+    const z = -diff * 350;
+    const x = diff > 0 ? diff * 35 : diff * 90;
+    const scale = diff > 0 ? Math.max(0.65, 1 - diff * 0.16) : Math.min(1.25, 1 - diff * 0.15);
 
-  const x = useTransform(
-    progress,
-    [p - delta * 1.5, p - delta, p, p + delta, p + delta * 1.5],
-    [50, 25, 0, -45, -100]
-  );
+    return `translateX(${x}px) translateZ(${z}px) rotateY(34deg) scale(${scale})`;
+  });
 
-  const scale = useTransform(
-    progress,
-    [p - delta * 1.5, p - delta, p, p + delta, p + delta * 1.5],
-    [0.7, 0.85, 1.0, 1.12, 1.25]
-  );
+  const opacity = useTransform(progress, (t) => {
+    let diff = (index - (t % 5) + 5) % 5;
+    if (diff > 2.5) diff -= 5;
 
-  const opacity = useTransform(
-    progress,
-    [p - delta * 1.5, p - delta, p, p + delta, p + delta * 1.5],
-    [0, 0.45, 1.0, 0.35, 0]
-  );
+    if (Math.abs(diff) <= 0.4) return 1;
+    if (diff > 0.4 && diff <= 1.2) return 1 - (diff - 0.4) * 0.55;
+    if (diff > 1.2 && diff <= 2.1) return 0.56 - (diff - 1.2) * 0.55;
+    if (diff > 2.1) return 0;
+    if (diff < -0.4 && diff >= -1.2) return 1 - (-diff - 0.4) * 0.8;
+    return 0;
+  });
+
+  const zIndex = useTransform(progress, (t) => {
+    let diff = (index - (t % 5) + 5) % 5;
+    if (diff > 2.5) diff -= 5;
+    return Math.round(100 - diff * 20);
+  });
 
   return (
     <motion.div
@@ -125,11 +114,9 @@ function LeftWallCard({
       style={{
         transformStyle: "preserve-3d",
         transformOrigin: "center center",
-        rotateY: 34,
-        z,
-        x,
-        scale,
+        transform,
         opacity,
+        zIndex,
       }}
     >
       {/* App Header */}
@@ -264,44 +251,44 @@ function LeftWallCard({
   );
 }
 
-// Right perspective photo card component driven by scroll progress
-function RightWallCard({
+// Continuous auto-flying Right Wall Card
+function AutoRightCard({
   step,
   index,
-  totalSteps,
   progress,
 }: {
   step: StepItem;
   index: number;
-  totalSteps: number;
   progress: MotionValue<number>;
 }) {
-  const p = index / (totalSteps - 1);
-  const delta = 0.25;
+  const transform = useTransform(progress, (t) => {
+    let diff = (index - (t % 5) + 5) % 5;
+    if (diff > 2.5) diff -= 5;
 
-  const z = useTransform(
-    progress,
-    [p - delta * 1.5, p - delta, p, p + delta, p + delta * 1.5],
-    [-700, -350, 0, 350, 700]
-  );
+    const z = -diff * 350;
+    const x = diff > 0 ? -diff * 35 : -diff * 90;
+    const scale = diff > 0 ? Math.max(0.65, 1 - diff * 0.16) : Math.min(1.25, 1 - diff * 0.15);
 
-  const x = useTransform(
-    progress,
-    [p - delta * 1.5, p - delta, p, p + delta, p + delta * 1.5],
-    [-50, -25, 0, 45, 100]
-  );
+    return `translateX(${x}px) translateZ(${z}px) rotateY(-34deg) scale(${scale})`;
+  });
 
-  const scale = useTransform(
-    progress,
-    [p - delta * 1.5, p - delta, p, p + delta, p + delta * 1.5],
-    [0.7, 0.85, 1.0, 1.12, 1.25]
-  );
+  const opacity = useTransform(progress, (t) => {
+    let diff = (index - (t % 5) + 5) % 5;
+    if (diff > 2.5) diff -= 5;
 
-  const opacity = useTransform(
-    progress,
-    [p - delta * 1.5, p - delta, p, p + delta, p + delta * 1.5],
-    [0, 0.45, 1.0, 0.35, 0]
-  );
+    if (Math.abs(diff) <= 0.4) return 1;
+    if (diff > 0.4 && diff <= 1.2) return 1 - (diff - 0.4) * 0.55;
+    if (diff > 1.2 && diff <= 2.1) return 0.56 - (diff - 1.2) * 0.55;
+    if (diff > 2.1) return 0;
+    if (diff < -0.4 && diff >= -1.2) return 1 - (-diff - 0.4) * 0.8;
+    return 0;
+  });
+
+  const zIndex = useTransform(progress, (t) => {
+    let diff = (index - (t % 5) + 5) % 5;
+    if (diff > 2.5) diff -= 5;
+    return Math.round(100 - diff * 20);
+  });
 
   return (
     <motion.div
@@ -309,11 +296,9 @@ function RightWallCard({
       style={{
         transformStyle: "preserve-3d",
         transformOrigin: "center center",
-        rotateY: -34,
-        z,
-        x,
-        scale,
+        transform,
         opacity,
+        zIndex,
       }}
     >
       <img
@@ -341,132 +326,120 @@ function RightWallCard({
 }
 
 export const ScrollStorytelling = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
   const [activeStep, setActiveStep] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const progress = useMotionValue(0);
 
-  // Pinned scroll progress across the 300vh section
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
+  // Auto-play RAF loop: smoothly advances progress continuously like a video
+  useAnimationFrame((_, delta) => {
+    if (isPaused) return;
+    // Completes 1 full loop (5 steps) in ~17.5 seconds
+    const increment = (delta / 17500) * 5;
+    const nextVal = (progress.get() + increment) % 5;
+    progress.set(nextVal);
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    damping: 24,
-    stiffness: 90,
-    mass: 0.2,
-  });
-
-  // Track active step based on scroll progress
+  // Keep center text in sync with whichever step is currently in front focus
   useEffect(() => {
-    const unsubscribe = smoothProgress.on("change", (latest) => {
-      const step = Math.min(steps.length - 1, Math.max(0, Math.round(latest * (steps.length - 1))));
-      setActiveStep(step);
+    const unsubscribe = progress.on("change", (latest) => {
+      const stepIndex = Math.floor((latest + 0.5) % 5);
+      setActiveStep((prev) => (prev !== stepIndex ? stepIndex : prev));
     });
     return () => unsubscribe();
-  }, [smoothProgress]);
+  }, [progress]);
 
   const currentStep = steps[activeStep];
 
   return (
     <section
       id="flow"
-      ref={containerRef}
-      className="relative h-[300vh] bg-[#FAF8F3]"
+      className="py-20 sm:py-28 bg-[#FAF8F3] relative overflow-hidden border-b border-[#ECE7DE]"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Pinned Sticky Viewport */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center items-center bg-[#FAF8F3] border-b border-[#ECE7DE]">
-        
-        {/* Editorial Subtitle */}
-        <div className="text-center mb-4 sm:mb-8 z-30 pointer-events-none">
-          <span className="text-xs font-bold tracking-widest uppercase text-[#D66B43]">
-            THE DINEFLOW JOURNEY
-          </span>
+      {/* Editorial Subtitle */}
+      <div className="text-center mb-6 sm:mb-10 z-30 pointer-events-none">
+        <span className="text-xs font-bold tracking-widest uppercase text-[#D66B43]">
+          THE DINEFLOW JOURNEY
+        </span>
+      </div>
+
+      {/* 3D Perspective Corridor Viewport */}
+      <div
+        className="relative w-full h-[480px] sm:h-[560px] lg:h-[620px] flex items-center justify-center overflow-hidden"
+        style={{
+          perspective: "1200px",
+          perspectiveOrigin: "50% 50%",
+        }}
+      >
+        {/* Edge Gradient Blend Masks to smoothly blend into ivory background */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-[#FAF8F3] via-[#FAF8F3]/80 to-transparent z-20" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-[#FAF8F3] via-[#FAF8F3]/80 to-transparent z-20" />
+
+        {/* Left Wall 3D Cards - Continuous auto-flying loop */}
+        <div className="absolute left-0 top-0 bottom-0 w-1/2 flex items-center pointer-events-none">
+          {steps.map((step, idx) => (
+            <AutoLeftCard
+              key={`auto-left-${step.id}`}
+              step={step}
+              index={idx}
+              progress={progress}
+            />
+          ))}
         </div>
 
-        {/* 3D Perspective Corridor Viewport */}
-        <div
-          className="relative w-full h-[480px] sm:h-[560px] lg:h-[620px] flex items-center justify-center overflow-hidden"
-          style={{
-            perspective: "1200px",
-            perspectiveOrigin: "50% 50%",
-          }}
-        >
-          {/* Edge Gradient Blend Masks to smoothly blend into ivory background */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-[#FAF8F3] via-[#FAF8F3]/80 to-transparent z-20" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-[#FAF8F3] via-[#FAF8F3]/80 to-transparent z-20" />
+        {/* Right Wall 3D Cards - Continuous auto-flying loop */}
+        <div className="absolute right-0 top-0 bottom-0 w-1/2 flex items-center pointer-events-none">
+          {steps.map((step, idx) => (
+            <AutoRightCard
+              key={`auto-right-${step.id}`}
+              step={step}
+              index={idx}
+              progress={progress}
+            />
+          ))}
+        </div>
 
-          {/* Left Wall 3D Cards */}
-          <div className="absolute left-0 top-0 bottom-0 w-1/2 flex items-center pointer-events-none">
-            {steps.map((step, idx) => (
-              <LeftWallCard
-                key={`left-${step.id}`}
-                step={step}
-                index={idx}
-                totalSteps={steps.length}
-                progress={smoothProgress}
+        {/* Center Corridor Content (Zero Clutter, No Arrows, Wide Breathing Room) */}
+        <div className="relative z-30 max-w-sm sm:max-w-md lg:max-w-lg mx-auto text-center px-4 pointer-events-none">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`center-text-${currentStep.id}`}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+              className="space-y-3"
+            >
+              {/* Step indicator */}
+              <span className="text-xs font-bold text-[#D66B43] tracking-widest uppercase block">
+                STEP {currentStep.stepNum} OF 05
+              </span>
+
+              {/* Big Elegant Headline */}
+              <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#252522] tracking-tight leading-tight">
+                {currentStep.title}
+              </h3>
+
+              {/* Single Concise Description Sentence */}
+              <p className="text-sm sm:text-base text-[#6E6D66] leading-relaxed max-w-md mx-auto">
+                {currentStep.description}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Minimalist Progress Indicator Dots */}
+          <div className="flex items-center justify-center gap-2 mt-8">
+            {steps.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  activeStep === i
+                    ? "w-8 bg-[#D66B43]"
+                    : "w-2 bg-[#ECE7DE]"
+                }`}
               />
             ))}
-          </div>
-
-          {/* Right Wall 3D Cards */}
-          <div className="absolute right-0 top-0 bottom-0 w-1/2 flex items-center pointer-events-none">
-            {steps.map((step, idx) => (
-              <RightWallCard
-                key={`right-${step.id}`}
-                step={step}
-                index={idx}
-                totalSteps={steps.length}
-                progress={smoothProgress}
-              />
-            ))}
-          </div>
-
-          {/* Center Corridor Content (Zero Clutter, No Arrows, Wide Breathing Room) */}
-          <div className="relative z-30 max-w-sm sm:max-w-md lg:max-w-lg mx-auto text-center px-4 pointer-events-none">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`center-${currentStep.id}`}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-3"
-              >
-                {/* Step indicator */}
-                <span className="text-xs font-bold text-[#D66B43] tracking-widest uppercase block">
-                  STEP {currentStep.stepNum} OF 05
-                </span>
-
-                {/* Big Elegant Headline */}
-                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#252522] tracking-tight leading-tight">
-                  {currentStep.title}
-                </h3>
-
-                {/* Single Concise Description Sentence */}
-                <p className="text-sm sm:text-base text-[#6E6D66] leading-relaxed max-w-md mx-auto">
-                  {currentStep.description}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Minimalist Progress Indicator Dots */}
-            <div className="flex items-center justify-center gap-2 mt-8">
-              {steps.map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    activeStep === i
-                      ? "w-8 bg-[#D66B43]"
-                      : "w-2 bg-[#ECE7DE]"
-                  }`}
-                />
-              ))}
-            </div>
-
-            {/* Subtle Scroll Hint */}
-            <span className="text-[11px] text-[#A8A29E] font-medium mt-3 block tracking-wide">
-              Scroll down to fly through the corridor ↓
-            </span>
           </div>
         </div>
       </div>
