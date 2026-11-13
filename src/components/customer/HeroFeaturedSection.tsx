@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowRight, Flame, Sparkles, UtensilsCrossed, Menu as MenuIcon } from "lucide-react";
+import { ArrowRight, Flame, Menu as MenuIcon, Sparkles } from "lucide-react";
 
 interface HeroFeaturedSectionProps {
   onExploreClick: () => void;
@@ -20,50 +20,53 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
     {
       id: "slide-1",
       eyebrow: "Hot, Fresh & Sizzling",
-      titleWhite: "Hot, fresh burgers",
-      titleColored: "made for any time cravings",
+      titlePrefix: "Delicious food,",
+      titleHighlight: "delivered your way.",
       subtitle:
-        "Made with fresh ingredients, juicy double patties, and soft brioche buns, grilled to perfection and served steaming hot.",
+        "Order from your favorite campus kitchens and get it fresh at your table or express pickup shelf with zero queue wait.",
       primaryCta: "Order Now",
       secondaryCta: "See Our Menu",
-      heroImage:
-        "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1000&q=85",
-      badgeText: "30% OFF Today",
-      ambientGlow: "from-[#D66B43]/30 via-[#B84E26]/15 to-transparent",
-      accentColor: "#E87A48",
+      plateImage:
+        "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=85",
+      dealBadge: "Hot Deal",
+      dealTitle: "30% OFF",
+      dealSubtitle: "on all lunch orders",
       garnishEmoji: "🌶️",
+      glowColor: "from-[#F4A261]/30 via-[#D66B43]/15 to-transparent",
     },
     {
       id: "slide-2",
       eyebrow: "48-Hour Slow Fermented",
-      titleWhite: "Woodfired pizzas",
-      titleColored: "with melting artisanal cheese",
+      titlePrefix: "Artisanal crust,",
+      titleHighlight: "baked woodfired fresh.",
       subtitle:
-        "Hand-stretched sourdough crust blistered in an 800° stone oven, topped with fior di latte mozzarella and cold-pressed olive oil.",
-      primaryCta: "Explore Slices",
+        "Hand-stretched sourdough pizzas blistered in an 800° stone oven with melting fior di latte and cold-pressed basil olive oil.",
+      primaryCta: "View Pizzas",
       secondaryCta: "See Our Menu",
-      heroImage:
-        "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1000&q=85",
-      badgeText: "BOGO Slices",
-      ambientGlow: "from-[#D66B43]/35 via-[#9E3E1C]/20 to-transparent",
-      accentColor: "#F49342",
+      plateImage:
+        "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=85",
+      dealBadge: "Chef Special",
+      dealTitle: "BOGO Slices",
+      dealSubtitle: "every weekday break",
       garnishEmoji: "🌿",
+      glowColor: "from-[#E87A48]/30 via-[#D66B43]/15 to-transparent",
     },
     {
       id: "slide-3",
       eyebrow: "Slow Dum Charcoal Cooking",
-      titleWhite: "Rich royal bowls",
-      titleColored: "steeped in fragrant saffron",
+      titlePrefix: "Fragrant royal pots,",
+      titleHighlight: "steeped in saffron dum.",
       subtitle:
         "Aged basmati rice sealed with dough dum, ghee-roasted farm vegetables, tender paneer cubes, and hand-ground spice pot aromatics.",
       primaryCta: "Taste Bowls",
       secondaryCta: "See Our Menu",
-      heroImage:
-        "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=1000&q=85",
-      badgeText: "Chef Special",
-      ambientGlow: "from-[#C45E36]/30 via-[#7E2F13]/20 to-transparent",
-      accentColor: "#F28C38",
+      plateImage:
+        "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=900&q=85",
+      dealBadge: "Campus Deal",
+      dealTitle: "₹50 OFF",
+      dealSubtitle: "on royal combo bowls",
       garnishEmoji: "✨",
+      glowColor: "from-[#D66B43]/30 via-[#F4A261]/15 to-transparent",
     },
   ];
 
@@ -76,65 +79,70 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
   }, [slides.length]);
 
   const current = slides[activeSlide];
-  const whiteWords = current.titleWhite.split(" ");
-  const coloredWords = current.titleColored.split(" ");
+  const prefixWords = current.titlePrefix.split(" ");
+  const highlightWords = current.titleHighlight.split(" ");
 
   return (
-    <section className="relative rounded-[32px] bg-gradient-to-br from-[#1C1714] via-[#181310] to-[#0E0C0A] text-[#FAF8F3] overflow-hidden shadow-2xl border border-[#38261E]">
-      {/* Cinematic Ambient Glow behind the food (inspired by the attached image) */}
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full pointer-events-none opacity-60 blur-3xl bg-radial from-[#D66B43]/40 via-[#8A3414]/20 to-transparent" />
+    <section className="relative rounded-[28px] sm:rounded-[36px] bg-gradient-to-r from-white/95 via-[#FFF9F5]/90 to-[#FDF1E7]/80 backdrop-blur-xl border border-[#EDE4D8]/80 shadow-[0_20px_50px_-12px_rgba(214,107,67,0.08)] overflow-hidden">
+      {/* Warm Ambient Radial Glow behind the food plate */}
+      <div
+        className={`absolute right-4 sm:right-10 top-1/2 -translate-y-1/2 w-[380px] sm:w-[480px] h-[380px] sm:h-[480px] rounded-full pointer-events-none opacity-70 blur-3xl bg-radial ${current.glowColor} transition-colors duration-1000`}
+      />
 
-      {/* Floating Sparkles & Garnish Embers in the background */}
+      {/* Subtle organic light wash in the top left */}
+      <div className="absolute -left-12 -top-12 w-64 h-64 rounded-full bg-gradient-to-br from-[#FAF0E6]/50 to-transparent blur-2xl pointer-events-none" />
+
+      {/* Floating Animated Garnish Embers */}
       <motion.div
-        animate={{ y: [-6, 6, -6], rotate: [0, 8, -8, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-8 right-1/3 text-2xl select-none opacity-80 pointer-events-none"
+        animate={{ y: [-5, 6, -5], rotate: [0, 8, -8, 0] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-6 sm:top-10 right-1/3 text-2xl select-none opacity-80 pointer-events-none"
       >
         {current.garnishEmoji}
       </motion.div>
 
       <motion.div
-        animate={{ y: [8, -8, 8], rotate: [-4, 4, -4] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute bottom-10 right-24 text-xl select-none opacity-70 pointer-events-none"
+        animate={{ y: [6, -6, 6], rotate: [-6, 6, -6] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+        className="absolute bottom-6 sm:bottom-10 right-28 text-lg select-none opacity-70 pointer-events-none"
       >
         🍅
       </motion.div>
 
-      <div className="relative z-10 p-6 sm:p-10 lg:p-14">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <div className="relative z-10 p-6 sm:p-10 lg:p-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           {/* Left Text Column */}
-          <div className="lg:col-span-7 space-y-5 sm:space-y-6">
-            {/* Eyebrow Pill */}
+          <div className="lg:col-span-7 space-y-4 sm:space-y-6">
+            {/* Eyebrow Tag */}
             <motion.div
-              key={`eye-${activeSlide}`}
+              key={`eyebrow-${activeSlide}`}
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#D66B43]/20 border border-[#D66B43]/30 text-[#E87A48] text-xs font-semibold"
+              transition={{ duration: 0.35 }}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D66B43]/10 border border-[#D66B43]/20 text-[#D66B43] text-xs font-semibold"
             >
-              <Flame className="w-3.5 h-3.5 fill-[#E87A48]" />
+              <Flame className="w-3.5 h-3.5 fill-[#D66B43]" />
               <span>{current.eyebrow}</span>
             </motion.div>
 
             {/* Word-by-Word Smooth Reveal Heading */}
             <h1
-              key={`heading-${activeSlide}`}
-              className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.15]"
+              key={`h1-${activeSlide}`}
+              className="font-serif text-3xl sm:text-4xl lg:text-[46px] font-bold tracking-tight text-[#252522] leading-[1.18]"
             >
-              {/* White Words */}
+              {/* Prefix Words (Deep Charcoal) */}
               <span className="block">
-                {whiteWords.map((word, i) => (
+                {prefixWords.map((word, i) => (
                   <span
-                    key={`w-${activeSlide}-${i}`}
+                    key={`p-${activeSlide}-${i}`}
                     className="inline-block overflow-hidden mr-2.5 pb-1"
                   >
                     <motion.span
                       initial={{ y: "110%", opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{
-                        duration: 0.5,
-                        delay: i * 0.07,
+                        duration: 0.45,
+                        delay: i * 0.06,
                         ease: [0.21, 0.47, 0.32, 0.98],
                       }}
                       className="inline-block"
@@ -145,22 +153,22 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
                 ))}
               </span>
 
-              {/* Glowing Warm Terracotta Words */}
-              <span className="block" style={{ color: current.accentColor }}>
-                {coloredWords.map((word, i) => (
+              {/* Highlight Words (Rich Terracotta with warm glow) */}
+              <span className="block text-[#D66B43]">
+                {highlightWords.map((word, i) => (
                   <span
-                    key={`c-${activeSlide}-${i}`}
+                    key={`h-${activeSlide}-${i}`}
                     className="inline-block overflow-hidden mr-2.5 pb-1"
                   >
                     <motion.span
                       initial={{ y: "110%", opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{
-                        duration: 0.55,
-                        delay: 0.15 + i * 0.07,
+                        duration: 0.5,
+                        delay: 0.12 + i * 0.06,
                         ease: [0.21, 0.47, 0.32, 0.98],
                       }}
-                      className="inline-block drop-shadow-[0_2px_12px_rgba(232,122,72,0.35)]"
+                      className="inline-block bg-gradient-to-r from-[#D66B43] to-[#E87A48] bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(214,107,67,0.2)]"
                     >
                       {word}
                     </motion.span>
@@ -174,99 +182,112 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
               key={`sub-${activeSlide}`}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.3 }}
-              className="text-xs sm:text-sm text-[#FAF8F3]/75 max-w-lg font-normal leading-relaxed"
+              transition={{ duration: 0.4, delay: 0.25 }}
+              className="text-xs sm:text-sm text-[#6E6D66] max-w-lg font-normal leading-relaxed"
             >
               {current.subtitle}
             </motion.p>
 
-            {/* CTAs matching the attached image ("Order now" + "See our menu") */}
-            <div className="flex flex-wrap items-center gap-3.5 pt-1">
+            {/* Dual CTAs (Order Now + See Our Menu) */}
+            <div className="flex flex-wrap items-center gap-3 pt-1">
               <motion.button
-                whileHover={{ scale: 1.03, boxShadow: "0 0 24px rgba(214,107,67,0.4)" }}
+                whileHover={{ scale: 1.03, boxShadow: "0 10px 25px rgba(214,107,67,0.35)" }}
                 whileTap={{ scale: 0.98 }}
                 onClick={onExploreClick}
-                className="px-6 py-3.5 rounded-full bg-gradient-to-r from-[#D66B43] to-[#E87A48] text-white text-xs sm:text-sm font-bold shadow-lg flex items-center gap-2 hover:brightness-110 transition-all"
+                className="px-6 py-3.5 rounded-full bg-gradient-to-r from-[#D66B43] to-[#E87A48] text-white text-xs sm:text-sm font-bold shadow-md flex items-center gap-2 hover:brightness-105 transition-all"
               >
                 <span>{current.primaryCta}</span>
                 <ArrowRight className="w-4 h-4" />
               </motion.button>
 
               <motion.button
-                whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.12)" }}
+                whileHover={{ scale: 1.02, backgroundColor: "#FFFFFF" }}
                 whileTap={{ scale: 0.98 }}
                 onClick={onHotDealClick}
-                className="px-5 py-3.5 rounded-full bg-white/5 border border-white/20 text-[#FAF8F3] text-xs sm:text-sm font-semibold hover:border-white/40 transition-all flex items-center gap-2 backdrop-blur-xs"
+                className="px-5 py-3.5 rounded-full bg-white/90 border border-[#E5DDD0] text-[#252522] text-xs sm:text-sm font-semibold hover:border-[#D66B43]/40 shadow-xs transition-all flex items-center gap-2"
               >
-                <MenuIcon className="w-4 h-4" />
+                <MenuIcon className="w-4 h-4 text-[#D66B43]" />
                 <span>{current.secondaryCta}</span>
               </motion.button>
             </div>
 
-            {/* Bottom 24-Hour / Zero Wait Delivery Service Pill */}
-            <div className="pt-2 flex items-center gap-2.5 text-xs text-[#FAF8F3]/65">
-              <div className="w-6 h-6 rounded-lg bg-[#D66B43]/20 flex items-center justify-center text-sm">
-                🛵
+            {/* Campus Express Feature Badge */}
+            <div className="pt-1 flex items-center gap-2.5 text-xs text-[#7A786F]">
+              <div className="w-6 h-6 rounded-lg bg-[#D66B43]/10 flex items-center justify-center text-sm">
+                ⚡
               </div>
               <span className="text-[11px] font-medium">
-                Live Kitchen Sync • Instant Counter Shelf Pickup & Dine-In
+                Live Kitchen Sync • Express Pickup Shelf • Zero Queue Wait
               </span>
             </div>
           </div>
 
-          {/* Right Column: Epic Gourmet Food Centerpiece with Floating Effect */}
-          <div className="lg:col-span-5 relative flex items-center justify-center min-h-[300px] sm:min-h-[380px]">
-            {/* Ambient Back Glow Ring */}
-            <div className="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-[#D66B43]/20 blur-2xl pointer-events-none" />
-
+          {/* Right Column: Gourmet Food Plate + Floating Deal Card (Foodora Reference) */}
+          <div className="lg:col-span-5 relative flex items-center justify-center min-h-[280px] sm:min-h-[340px]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`img-${activeSlide}`}
-                initial={{ opacity: 0, scale: 0.85, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: -20 }}
-                transition={{ type: "spring", damping: 20, stiffness: 200 }}
-                className="relative w-72 h-72 sm:w-96 sm:h-96 rounded-3xl overflow-hidden shadow-2xl border border-white/10 group"
+                initial={{ opacity: 0, scale: 0.88, rotate: -4 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 0.92, rotate: 4 }}
+                transition={{ type: "spring", damping: 22, stiffness: 220 }}
+                className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full overflow-hidden shadow-2xl border-4 border-white/95 group"
               >
                 <Image
-                  src={current.heroImage}
-                  alt={current.titleWhite}
+                  src={current.plateImage}
+                  alt={current.titlePrefix}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  sizes="(max-width: 640px) 288px, 384px"
+                  sizes="(max-width: 640px) 256px, 320px"
                   priority
                 />
 
-                {/* Subtle vignette on the image edges */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-
-                {/* Deal Tag badge on bottom */}
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#D66B43] text-white shadow-md">
-                    {current.badgeText}
-                  </span>
-                  <span className="text-[11px] text-white/90 font-medium bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20">
-                    Live Campus Kitchen
-                  </span>
-                </div>
+                {/* Subtle soft vignette on plate border */}
+                <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-black/5 pointer-events-none" />
               </motion.div>
             </AnimatePresence>
+
+            {/* Floating Hot Deal Card (Identical to Foodora Reference) */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              onClick={onHotDealClick}
+              className="absolute -top-2 sm:top-2 right-0 sm:-right-2 bg-white/95 backdrop-blur-md p-3.5 sm:p-4 rounded-2xl border border-[#EDE5DA] shadow-[0_10px_25px_rgba(37,37,34,0.08)] cursor-pointer hover:shadow-xl hover:scale-105 transition-all group"
+            >
+              <div className="flex items-center gap-1.5 text-[#D66B43] text-[10px] font-bold uppercase tracking-wider mb-0.5">
+                <Flame className="w-3.5 h-3.5 fill-[#D66B43]" />
+                <span>{current.dealBadge}</span>
+              </div>
+              <div className="font-serif text-lg sm:text-xl font-bold text-[#252522]">
+                {current.dealTitle}
+              </div>
+              <div className="text-[10px] text-[#6E6D66] font-medium mb-1.5">
+                {current.dealSubtitle}
+              </div>
+              <div className="inline-flex items-center gap-1 text-[11px] font-bold text-[#D66B43] group-hover:underline">
+                <span>Order Now</span>
+                <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </motion.div>
           </div>
         </div>
 
         {/* 3 Infinite Carousel Indicator Dots (Looping 1 -> 2 -> 3 -> 1) */}
-        <div className="flex items-center justify-center gap-2.5 mt-6 pt-4 border-t border-white/10">
+        <div className="flex items-center justify-center gap-2 mt-6 pt-3 border-t border-[#ECE5DA]/60">
           {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setActiveSlide(i)}
               className="group relative h-2 rounded-full overflow-hidden transition-all focus:outline-none"
-              style={{ width: activeSlide === i ? "32px" : "10px" }}
-              aria-label={`Slide ${i + 1}`}
+              style={{ width: activeSlide === i ? "28px" : "10px" }}
+              aria-label={`Go to slide ${i + 1}`}
             >
               <div
-                className={`w-full h-full rounded-full transition-colors ${
-                  activeSlide === i ? "bg-[#D66B43]" : "bg-white/20 group-hover:bg-white/40"
+                className={`w-full h-full rounded-full transition-colors duration-300 ${
+                  activeSlide === i
+                    ? "bg-[#D66B43]"
+                    : "bg-[#E8DFD3] group-hover:bg-[#D66B43]/50"
                 }`}
               />
             </button>
