@@ -438,10 +438,6 @@ export function DishOrbitCarousel({
 
         {/* Integrated Restaurant Hero Header */}
         <div className="dsh-hero-intro">
-          <div className="dsh-hero-badge">
-            <span className="dsh-hero-dot" />
-            <span>Artisanal Kitchen & Hearth · Active Service</span>
-          </div>
           <h1 className="dsh-hero-title">
             Good food. Honest ingredients.
             <br />
