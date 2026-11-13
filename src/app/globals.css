@@ -1,39 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
+  --background: #FAF8F3;
+  --foreground: #252522;
+  --muted: #6E6D66;
+  --terracotta: #D66B43;
+  --terracotta-hover: #BF5832;
+  --sage: #5F7A65;
+  --sage-light: #EBF1ED;
+  --card: #FFFFFF;
+  --border: #ECE7DE;
+  --border-subtle: #F3EFE8;
 }
 
 body {
-  background-color: #09090b;
-  color: #fafafa;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom smooth scrollbar */
+/* Custom smooth scrollbar in warm neutral */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: #FAF8F3;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: #DDD8CE;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: #C4BEB2;
 }
 
-.mono-tag {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  letter-spacing: 0.12em;
-  font-size: 0.7rem;
-  text-transform: uppercase;
+/* Editorial subtle shadows */
+.shadow-soft {
+  box-shadow: 0 4px 20px -2px rgba(37, 37, 34, 0.04), 0 2px 6px -1px rgba(37, 37, 34, 0.02);
+}
+
+.shadow-card {
+  box-shadow: 0 10px 30px -4px rgba(37, 37, 34, 0.06), 0 4px 10px -2px rgba(37, 37, 34, 0.03);
+}
+
+.shadow-elevated {
+  box-shadow: 0 20px 45px -10px rgba(37, 37, 34, 0.08), 0 8px 18px -4px rgba(37, 37, 34, 0.04);
 }

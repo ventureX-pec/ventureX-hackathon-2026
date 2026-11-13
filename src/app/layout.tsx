@@ -3,9 +3,9 @@ import "./globals.css";
 import { RestaurantProvider } from "@/context/RestaurantContext";
 
 export const metadata: Metadata = {
-  title: "DineFlow — Zero-Commission Digital OS for Local Cafes",
+  title: "DineFlow — Simple, Modern Operations for Independent Restaurants",
   description:
-    "An architectural digital restaurant operating system. Instant QR dine-in ordering, lunch rush pre-orders, and real-time kitchen displays for local eateries.",
+    "From QR-based table ordering to real-time kitchen coordination, manage your entire restaurant workflow on one elegant platform.",
 };
 
 export default function RootLayout({
@@ -14,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark h-full antialiased scroll-smooth">
-      <body className="min-h-full flex flex-col bg-[#09090b] text-[#fafafa] selection:bg-amber-500/30 selection:text-amber-200">
+    <html lang="en" className="h-full antialiased scroll-smooth">
+      <body className="min-h-full flex flex-col bg-[#FAF8F3] text-[#252522] selection:bg-[#D66B43]/15 selection:text-[#D66B43]">
         <RestaurantProvider>
           {children}
         </RestaurantProvider>

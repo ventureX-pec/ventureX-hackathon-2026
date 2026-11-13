@@ -1,22 +1,28 @@
 import React from "react";
-import { MonoNavbar } from "@/components/landing/MonoNavbar";
-import { MonoHero } from "@/components/landing/MonoHero";
-import { MonoMetrics } from "@/components/landing/MonoMetrics";
-import { MonoModels } from "@/components/landing/MonoModels";
-import { MonoPhilosophy } from "@/components/landing/MonoPhilosophy";
-import { MonoLivePreview } from "@/components/landing/MonoLivePreview";
-import { MonoFooter } from "@/components/landing/MonoFooter";
+import { Navbar } from "@/components/landing/Navbar";
+import { HeroSection } from "@/components/landing/HeroSection";
+import { ProblemSection } from "@/components/landing/ProblemSection";
+import { FeaturesSection } from "@/components/landing/FeaturesSection";
+import { HowItWorks } from "@/components/landing/HowItWorks";
+import { ProductShowcase } from "@/components/landing/ProductShowcase";
+import { PricingSection } from "@/components/landing/PricingSection";
+import { FaqSection } from "@/components/landing/FaqSection";
+import { CtaSection } from "@/components/landing/CtaSection";
+import { Footer } from "@/components/landing/Footer";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#09090b] text-[#fafafa] selection:bg-amber-500/20 selection:text-amber-200">
-      <MonoNavbar />
-      <MonoHero />
-      <MonoMetrics />
-      <MonoModels />
-      <MonoPhilosophy />
-      <MonoLivePreview />
-      <MonoFooter />
+    <main className="min-h-screen bg-[#FAF8F3] text-[#252522]">
+      <Navbar />
+      <HeroSection />
+      <ProblemSection />
+      <FeaturesSection />
+      <HowItWorks />
+      <ProductShowcase />
+      <PricingSection />
+      <FaqSection />
+      <CtaSection />
+      <Footer />
     </main>
   );
 }
