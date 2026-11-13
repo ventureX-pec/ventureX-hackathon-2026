@@ -3,6 +3,7 @@ import { Navbar } from "@/components/landing/Navbar";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { ProblemSection } from "@/components/landing/ProblemSection";
 import { SolutionSection } from "@/components/landing/SolutionSection";
+import { CulinaryShowcaseSection } from "@/components/landing/CulinaryShowcaseSection";
 import { ScrollStorytelling } from "@/components/landing/ScrollStorytelling";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { ForRestaurantsSection } from "@/components/landing/ForRestaurantsSection";
@@ -18,6 +19,7 @@ export default function Home() {
         <HeroSection />
         <ProblemSection />
         <SolutionSection />
+        <CulinaryShowcaseSection />
         <ScrollStorytelling />
         <HowItWorks />
         <ForRestaurantsSection />
