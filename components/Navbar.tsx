@@ -3,7 +3,11 @@
 import React, { useState, useEffect } from "react"
 import { CalendarClock, Menu as MenuIcon, X } from "lucide-react"
 
-export default function Navbar() {
+interface NavbarProps {
+  onOpenReservation?: () => void
+}
+
+export default function Navbar({ onOpenReservation }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolledToLight, setIsScrolledToLight] = useState(false)
 
@@ -21,7 +25,6 @@ export default function Navbar() {
     { label: "Home", href: "#hero" },
     { label: "Our Story", href: "#story" },
     { label: "How It Works", href: "#how-it-works" },
-    { label: "Contact", href: "#contact" },
   ]
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -37,11 +40,12 @@ export default function Navbar() {
   }
 
   const handleReserve = () => {
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("app:navigating"))
+    setMobileMenuOpen(false)
+    if (onOpenReservation) {
+      onOpenReservation()
+    } else if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("app:open-reservation"))
     }
-    const contactEl = document.querySelector("#contact")
-    if (contactEl) contactEl.scrollIntoView({ behavior: "smooth" })
   }
 
   return (

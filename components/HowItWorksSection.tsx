@@ -56,10 +56,8 @@ export default function HowItWorksSection() {
 
   const handleContactClick = () => {
     if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("app:navigating"))
+      window.dispatchEvent(new CustomEvent("app:open-reservation"))
     }
-    const el = document.querySelector("#contact")
-    if (el) el.scrollIntoView({ behavior: "smooth" })
   }
 
   return (

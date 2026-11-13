@@ -3,13 +3,17 @@
 import React from "react"
 import { ArrowRight, CalendarClock, UtensilsCrossed } from "lucide-react"
 
-export default function OrderingCTASection() {
+interface OrderingCTASectionProps {
+  onOpenReservation?: () => void
+}
+
+export default function OrderingCTASection({ onOpenReservation }: OrderingCTASectionProps) {
   const handleReserveClick = () => {
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("app:navigating"))
+    if (onOpenReservation) {
+      onOpenReservation()
+    } else if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("app:open-reservation"))
     }
-    const contactEl = document.querySelector("#contact")
-    if (contactEl) contactEl.scrollIntoView({ behavior: "smooth" })
   }
 
   return (

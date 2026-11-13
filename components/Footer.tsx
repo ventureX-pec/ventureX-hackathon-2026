@@ -3,7 +3,11 @@
 import React, { useState } from "react"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
 
-export default function Footer() {
+interface FooterProps {
+  onOpenReservation?: () => void
+}
+
+export default function Footer({ onOpenReservation }: FooterProps) {
   const [newsletterEmail, setNewsletterEmail] = useState("")
   const [subscribed, setSubscribed] = useState(false)
 
@@ -109,9 +113,16 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#contact" onClick={(e) => scrollTo(e, "#contact")} className="hover:text-[#c96342] transition-colors">
-                  Contact & Location
-                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onOpenReservation) onOpenReservation()
+                    else if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("app:open-reservation"))
+                  }}
+                  className="hover:text-[#c96342] transition-colors cursor-pointer text-left"
+                >
+                  Table Reservations
+                </button>
               </li>
             </ul>
           </div>
