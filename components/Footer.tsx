@@ -108,6 +108,16 @@ export default function Footer({ onOpenReservation }: FooterProps) {
                 </a>
               </li>
               <li>
+                <a href="/customer" className="hover:text-[#c96342] transition-colors">
+                  Order Online (Customer Hub)
+                </a>
+              </li>
+              <li>
+                <a href="/login" className="hover:text-[#c96342] transition-colors">
+                  Sign In / Portals
+                </a>
+              </li>
+              <li>
                 <button
                   type="button"
                   onClick={() => {

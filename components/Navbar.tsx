@@ -25,9 +25,14 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
   const navLinks = [
     { label: "Featured Dishes", href: "#hero" },
     { label: "How It Works", href: "#how-it-works" },
+    { label: "Order Online", href: "/customer" },
   ]
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!href.startsWith("#")) {
+      setMobileMenuOpen(false)
+      return
+    }
     e.preventDefault()
     setMobileMenuOpen(false)
     if (typeof window !== "undefined") {

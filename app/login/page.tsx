@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   ArrowLeft,
@@ -57,6 +58,7 @@ const SHOWCASE_SLIDES = [
 type RoleType = "customer" | "admin"
 
 export default function LoginPage() {
+  const router = useRouter()
   const [role, setRole] = useState<RoleType>("customer")
   const [activeSlide, setActiveSlide] = useState(0)
   const [username, setUsername] = useState("")
@@ -89,14 +91,31 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    const targetRoute = role === "customer" ? "/customer" : "/admin"
+    setLoginSuccess(
+      role === "customer"
+        ? "Welcome back, Alex! Redirecting to customer ordering portal..."
+        : "Admin authenticated. Redirecting to Kitchen & Restaurant Manager..."
+    )
     setTimeout(() => {
       setIsLoading(false)
-      setLoginSuccess(
-        role === "customer"
-          ? "Welcome back, Alex! Redirecting to ordering experience..."
-          : "Admin authenticated. Redirecting to Kitchen & Restaurant Manager..."
-      )
-    }, 1000)
+      router.push(targetRoute)
+    }, 600)
+  }
+
+  const handleOneTapLogin = () => {
+    fillDemoCredentials(role)
+    setIsLoading(true)
+    const targetRoute = role === "customer" ? "/customer" : "/admin"
+    setLoginSuccess(
+      role === "customer"
+        ? "1-Tap Demo authenticated! Redirecting to customer portal..."
+        : "1-Tap Demo authenticated! Redirecting to admin workspace..."
+    )
+    setTimeout(() => {
+      setIsLoading(false)
+      router.push(targetRoute)
+    }, 500)
   }
 
   const currentSlide = SHOWCASE_SLIDES[activeSlide]
@@ -416,7 +435,7 @@ export default function LoginPage() {
 
               <button
                 type="button"
-                onClick={() => fillDemoCredentials(role)}
+                onClick={handleOneTapLogin}
                 className="w-full py-2 px-2.5 rounded-xl border border-[#e7dfd5] hover:border-[#c96342]/50 bg-white hover:bg-[#faf7f2] text-xs font-medium text-[#44403c] flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
               >
                 <Sparkles className="w-3 h-3 text-[#c96342]" />
@@ -431,17 +450,25 @@ export default function LoginPage() {
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => fillDemoCredentials("customer")}
+                onClick={() => {
+                  fillDemoCredentials("customer")
+                  router.push("/customer")
+                }}
                 className="px-2 py-0.5 rounded-md bg-[#f4ede4] hover:bg-[#eae2d7] text-[#1c1917] font-medium transition-colors cursor-pointer text-[10px]"
+                title="Instant login to Customer Portal"
               >
-                Customer Fill
+                Customer Portal →
               </button>
               <button
                 type="button"
-                onClick={() => fillDemoCredentials("admin")}
+                onClick={() => {
+                  fillDemoCredentials("admin")
+                  router.push("/admin")
+                }}
                 className="px-2 py-0.5 rounded-md bg-[#f4ede4] hover:bg-[#eae2d7] text-[#1c1917] font-medium transition-colors cursor-pointer text-[10px]"
+                title="Instant login to Admin Dashboard"
               >
-                Admin Fill
+                Admin Portal →
               </button>
             </div>
           </div>
