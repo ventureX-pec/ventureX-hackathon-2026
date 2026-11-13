@@ -21,11 +21,7 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const navLinks = [
-    { label: "Home", href: "#hero" },
-    { label: "Our Story", href: "#story" },
-    { label: "How It Works", href: "#how-it-works" },
-  ]
+  const navLinks: { label: string; href: string }[] = []
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
@@ -115,17 +111,19 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
           </button>
 
           {/* Mobile Menu Toggle */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`md:hidden w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-              isScrolledToLight
-                ? "bg-[#f4ede4] border border-[#e7dfd5] text-[#1c1917] hover:bg-[#eae2d7]"
-                : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
-            }`}
-            aria-label="Toggle Navigation Menu"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
-          </button>
+          {navLinks.length > 0 && (
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`md:hidden w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+                isScrolledToLight
+                  ? "bg-[#f4ede4] border border-[#e7dfd5] text-[#1c1917] hover:bg-[#eae2d7]"
+                  : "bg-white/10 border border-white/20 text-white hover:bg-white/20"
+              }`}
+              aria-label="Toggle Navigation Menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
+            </button>
+          )}
         </div>
       </div>
 

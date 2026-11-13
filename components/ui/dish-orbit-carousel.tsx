@@ -32,6 +32,7 @@ export type Dish = {
 export type DishOrbitCarouselProps = {
   dishes: Dish[]
   height?: string
+  onReserveClick?: () => void
   onStoryClick?: () => void
   onHowItWorksClick?: () => void
   onOrder?: (dish: Dish, index: number) => void
@@ -95,19 +96,14 @@ const CSS =
   "display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:4.5rem}" +
   ".dsh-root *{box-sizing:border-box}" +
   /* Integrated Hero Header */
-  ".dsh-hero-intro{text-align:center;max-width:720px;padding:0 1rem;z-index:20;margin-bottom:0.25rem;flex-shrink:0}" +
-  ".dsh-hero-badge{display:inline-flex;align-items:center;gap:0.4rem;padding:0.25rem 0.85rem;border-radius:9999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);font-size:0.72rem;font-weight:600;color:#d6cbbe;margin-bottom:0.35rem}" +
-  ".dsh-hero-dot{width:6px;height:6px;border-radius:9999px;background:#c96342;animation:dsh-pulse 2s cubic-bezier(0.4,0,0.6,1) infinite}" +
-  "@keyframes dsh-pulse{0%,100%{opacity:1}50%{opacity:.4}}" +
+  ".dsh-hero-intro{text-align:center;max-width:760px;padding:0 1rem;z-index:20;margin-bottom:0.4rem;flex-shrink:0}" +
   ".dsh-hero-title{font-size:clamp(1.75rem,3.2vw,2.65rem);font-family:ui-serif,Georgia,Cambria,serif;font-weight:400;letter-spacing:-0.02em;line-height:1.15;color:#ffffff;margin:0}" +
   ".dsh-hero-accent{font-style:italic;font-weight:300;color:#e07a5f}" +
-  ".dsh-hero-desc{font-size:clamp(0.82rem,1.1vw,0.92rem);color:#a8a29e;margin:0.35rem auto 0.65rem;max-width:480px;line-height:1.4}" +
+  ".dsh-hero-desc{font-size:clamp(0.84rem,1.1vw,0.92rem);color:#a8a29e;margin:0.4rem auto 0.75rem;max-width:520px;line-height:1.45}" +
   ".dsh-hero-ctas{display:flex;gap:0.75rem;justify-content:center;align-items:center}" +
-  ".dsh-hero-btn-primary{display:inline-flex;align-items:center;gap:0.45rem;padding:0.5rem 1.35rem;border-radius:9999px;background:#c96342;color:#ffffff;font-weight:500;font-size:0.82rem;border:none;cursor:pointer;transition:all 0.2s ease;box-shadow:0 4px 14px -3px rgba(201,99,66,0.5)}" +
+  ".dsh-hero-btn-primary{display:inline-flex;align-items:center;gap:0.5rem;padding:0.55rem 1.6rem;border-radius:9999px;background:#c96342;color:#ffffff;font-weight:500;font-size:0.84rem;border:none;cursor:pointer;transition:all 0.2s ease;box-shadow:0 4px 14px -3px rgba(201,99,66,0.5)}" +
   ".dsh-hero-btn-primary:hover{background:#a84d31;box-shadow:0 6px 18px -3px rgba(201,99,66,0.6);transform:translateY(-1px)}" +
-  ".dsh-hero-btn-secondary{display:inline-flex;align-items:center;gap:0.45rem;padding:0.5rem 1.35rem;border-radius:9999px;background:rgba(255,255,255,0.08);color:#ffffff;font-weight:500;font-size:0.82rem;border:1px solid rgba(255,255,255,0.18);cursor:pointer;transition:all 0.2s ease;backdrop-filter:blur(8px)}" +
-  ".dsh-hero-btn-secondary:hover{background:rgba(255,255,255,0.16);border-color:rgba(255,255,255,0.3);transform:translateY(-1px)}" +
-  ".dsh-btn-icon{width:13px;height:13px}" +
+  ".dsh-btn-icon{width:14px;height:14px}" +
   /* 960 x 460 Stage */
   ".dsh-canvas{position:relative;width:960px;height:460px;margin:0 auto;transform:scale(var(--dsh-s,1));transform-origin:50% 0;flex-shrink:0}" +
   ".dsh-arc{position:absolute;left:0;top:0;width:960px;height:460px;overflow:visible;pointer-events:none}" +
@@ -124,20 +120,14 @@ const CSS =
   ".dsh-orbit{position:absolute;inset:0;transform-origin:69% -217%;visibility:hidden;will-change:transform}" +
   ".dsh-orbit>img{display:block;width:245px;height:245px;max-width:none;object-fit:cover;border-radius:9999px;border:3px solid rgba(255,255,255,0.14);box-shadow:0 25px 50px -12px rgba(0,0,0,0.8),0 0 35px rgba(201,99,66,0.22);user-select:none;-webkit-user-drag:none}" +
   /* Title & Eyebrow */
-  ".dsh-head{position:absolute;left:388px;top:45px;width:330px;height:140px}" +
+  ".dsh-head{position:absolute;left:385px;top:38px;width:340px;height:140px}" +
   ".dsh-hd{position:absolute;inset:0;visibility:hidden}" +
-  ".dsh-eye{font-size:11px;font-weight:600;letter-spacing:.02em;color:#e07a5f;margin:0 0 4px 2px;text-transform:uppercase}" +
-  ".dsh-t1,.dsh-t2{display:block;white-space:nowrap;line-height:1;text-transform:uppercase;margin:0}" +
-  ".dsh-t1{font-weight:200;letter-spacing:-.015em;margin-top:6px;color:#d6cbbe}" +
-  ".dsh-t2{font-weight:800;letter-spacing:-.025em;margin-top:6px;color:#ffffff}" +
-  /* In-Canvas Action Buttons */
-  ".dsh-acts{position:absolute;left:396px;top:210px;display:flex;gap:14px;font-size:12.5px;font-weight:500}" +
-  ".dsh-acts .dsh-btn{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:9999px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);color:#ffffff;transition:all 0.2s}" +
-  ".dsh-acts .dsh-btn:hover{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.25)}" +
-  ".dsh-acts .dsh-btn-highlight{background:#c96342 !important;color:#ffffff !important;border-color:#c96342 !important;box-shadow:0 4px 14px -3px rgba(201,99,66,0.5)}" +
-  ".dsh-acts .dsh-btn-highlight:hover{background:#a84d31 !important}" +
+  ".dsh-eye{font-size:11px;font-weight:600;letter-spacing:.04em;color:#e07a5f;margin:0 0 5px 2px;text-transform:uppercase}" +
+  ".dsh-t1,.dsh-t2{display:block;white-space:nowrap;line-height:1.05;text-transform:uppercase;margin:0}" +
+  ".dsh-t1{font-weight:200;letter-spacing:-.015em;margin-top:4px;color:#d6cbbe}" +
+  ".dsh-t2{font-weight:800;letter-spacing:-.025em;margin-top:4px;color:#ffffff}" +
   /* Frosted Glass Chef Card */
-  ".dsh-card{position:absolute;left:722px;top:45px;width:230px;padding:16px 18px;border-radius:20px;background:rgba(22,20,18,0.88) !important;border:1px solid rgba(255,255,255,0.12);box-shadow:0 20px 40px -15px rgba(0,0,0,0.7);backdrop-filter:blur(16px);color:#ffffff}" +
+  ".dsh-card{position:absolute;left:736px;top:36px;width:218px;padding:16px;border-radius:20px;background:rgba(22,20,18,0.92) !important;border:1px solid rgba(255,255,255,0.12);box-shadow:0 20px 40px -15px rgba(0,0,0,0.7);backdrop-filter:blur(16px);color:#ffffff;z-index:15}" +
   ".dsh-tabs{display:flex;justify-content:space-between;padding:0 4px;font-size:12px;margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.1)}" +
   ".dsh-tab{color:#a8a29e;font-weight:500;padding:4px 6px;border-bottom:2px solid transparent}" +
   ".dsh-tab[aria-selected=true]{color:#ffffff;font-weight:600;border-bottom-color:#c96342}" +
@@ -149,8 +139,8 @@ const CSS =
   ".dsh-num{font-size:24px;font-weight:700;letter-spacing:-.03em;line-height:1;color:#ffffff}" +
   ".dsh-chef{font-size:15px;font-weight:600;letter-spacing:-.01em;margin:0;color:#ffffff}" +
   ".dsh-kit{font-size:10.5px;color:#a8a29e;margin:2px 0 8px}" +
-  ".dsh-desc{font-size:11.5px;line-height:1.42;margin:0;min-height:50px;color:#d6cbbe}" +
-  ".dsh-ing{display:flex;flex-wrap:wrap;gap:4px;margin:0;padding:0;list-style:none;min-height:50px}" +
+  ".dsh-desc{font-size:11.5px;line-height:1.45;margin:0;min-height:52px;color:#d6cbbe}" +
+  ".dsh-ing{display:flex;flex-wrap:wrap;gap:4px;margin:0;padding:0;list-style:none;min-height:52px}" +
   ".dsh-ing li{font-size:10px;padding:2px 7px;border-radius:99px;background:rgba(255,255,255,0.08);color:#e7dfd5;border:1px solid rgba(255,255,255,0.1)}" +
   ".dsh-react{display:flex;gap:7px;margin-top:14px}" +
   ".dsh-like{display:flex;align-items:center;gap:5px;height:30px;padding:0 10px;border-radius:99px;font-size:10.5px;background:rgba(255,255,255,0.08);color:#d6cbbe;border:1px solid rgba(255,255,255,0.1);transition:background .2s}" +
@@ -166,12 +156,12 @@ const CSS =
   ".dsh-win{position:relative;width:472px;height:115px;overflow:hidden;flex:none;margin:0 4px;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}" +
   ".dsh-track{position:absolute;left:0;top:0;display:flex;transition:transform .6s cubic-bezier(.65,0,.35,1)}" +
   ".dsh-th{width:118px;height:115px;display:flex;justify-content:center;padding-top:2px}" +
-  ".dsh-th .dsh-btn{width:88px;height:108px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);transition:all .3s}" +
+  ".dsh-th .dsh-btn{width:94px;height:108px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6px 4px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);transition:all .3s}" +
   ".dsh-th .dsh-btn:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.2)}" +
   ".dsh-th .dsh-btn[aria-current]{background:rgba(255,255,255,0.16) !important;border:1.5px solid #c96342 !important;box-shadow:0 8px 24px -6px rgba(201,99,66,0.4)}" +
-  ".dsh-th img{width:48px;height:48px;border-radius:9999px;object-fit:cover;border:1.5px solid rgba(255,255,255,0.2);transition:transform .3s}" +
+  ".dsh-th img{width:46px;height:46px;border-radius:9999px;object-fit:cover;border:1.5px solid rgba(255,255,255,0.2);transition:transform .3s;flex-shrink:0}" +
   ".dsh-th .dsh-btn[aria-current] img{transform:scale(1.08);border-color:#c96342}" +
-  ".dsh-th span{font-size:10px;line-height:1.2;text-align:center;font-weight:500;color:#d6cbbe;max-width:80px}" +
+  ".dsh-th span{font-size:10.5px;line-height:1.22;text-align:center;font-weight:500;color:#d6cbbe;max-width:86px;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}" +
   /* Scroll cue bar */
   ".dsh-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;font-size:0.75rem;color:#78716c;z-index:20;pointer-events:none;letter-spacing:0.02em}" +
   ".dsh-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}" +
@@ -204,6 +194,7 @@ const Icon = {
 
 export function DishOrbitCarousel({
   dishes,
+  onReserveClick,
   onStoryClick,
   onHowItWorksClick,
   onChange,
@@ -444,30 +435,21 @@ export function DishOrbitCarousel({
             <span className="dsh-hero-accent">Made fresh for your table.</span>
           </h1>
           <p className="dsh-hero-desc">
-            Explore our story, discover our cooking craft and enjoy a simpler way to dine.
+            Artisanal hearth-fired dishes crafted with honest, seasonal ingredients.
           </p>
           <div className="dsh-hero-ctas">
             <button
               type="button"
-              onClick={onStoryClick}
+              onClick={onReserveClick}
               className="dsh-hero-btn-primary"
             >
               <svg className="dsh-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
-                <path d="M6 6h10M6 10h10" />
+                <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                <line x1="16" x2="16" y1="2" y2="6" />
+                <line x1="8" x2="8" y1="2" y2="6" />
+                <line x1="3" x2="21" y1="10" y2="10" />
               </svg>
-              <span>Our Story</span>
-            </button>
-            <button
-              type="button"
-              onClick={onHowItWorksClick}
-              className="dsh-hero-btn-secondary"
-            >
-              <svg className="dsh-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <path d="m10 15 5-3-5-3v6z" />
-              </svg>
-              <span>How It Works</span>
+              <span>Reserve a Table</span>
             </button>
           </div>
         </div>
@@ -531,36 +513,19 @@ export function DishOrbitCarousel({
                 <h2 style={{ margin: 0, font: "inherit" }}>
                   <span
                     className="dsh-t1"
-                    style={{ fontSize: fitSize(d.title.length, 50, 330, 0.56) + "px" }}
+                    style={{ fontSize: fitSize(d.title.length, 42, 320, 0.72) + "px" }}
                   >
                     {d.title}
                   </span>
                   <span
                     className="dsh-t2"
-                    style={{ fontSize: fitSize(d.subtitle.length, 56, 320, 0.64) + "px" }}
+                    style={{ fontSize: fitSize(d.subtitle.length, 38, 305, 0.72) + "px" }}
                   >
                     {d.subtitle}
                   </span>
                 </h2>
               </div>
             ))}
-          </div>
-
-          <div className="dsh-acts">
-            <button
-              type="button"
-              className="dsh-btn"
-              onClick={onStoryClick}
-            >
-              {Icon.story}Our Story
-            </button>
-            <button
-              type="button"
-              className="dsh-btn dsh-btn-highlight"
-              onClick={onHowItWorksClick}
-            >
-              {Icon.how}How It Works
-            </button>
           </div>
 
           <div className="dsh-card">

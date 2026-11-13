@@ -10,7 +10,7 @@ const FEATURED_HERO_DISHES: Dish[] = [
     subtitle: "Prime Ribeye",
     image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=700&auto=format&fit=crop&q=80",
     eyebrow: "#1 Chef's Signature Dish",
-    label: "Char-Grilled Ribeye",
+    label: "Prime Ribeye",
     rating: 4.9,
     chef: "Chef Marcus Vance",
     kitchen: "The Corner Table Hearth",
@@ -24,7 +24,7 @@ const FEATURED_HERO_DISHES: Dish[] = [
     subtitle: "Mezze & Feta Salad",
     image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=700&auto=format&fit=crop&q=80",
     eyebrow: "#2 Garden Harvest Pick",
-    label: "Mediterranean Salad",
+    label: "Mezze Salad",
     rating: 4.8,
     chef: "Chef Elena Gomez",
     kitchen: "Cold Larder & Garde Manger",
@@ -38,7 +38,7 @@ const FEATURED_HERO_DISHES: Dish[] = [
     subtitle: "Wild Atlantic Salmon",
     image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=700&auto=format&fit=crop&q=80",
     eyebrow: "#3 Seafood Atelier",
-    label: "Pan-Seared Salmon",
+    label: "Wild Salmon",
     rating: 4.9,
     chef: "Chef Kenji Sato",
     kitchen: "Sauté & Poaching Station",
@@ -63,29 +63,24 @@ const FEATURED_HERO_DISHES: Dish[] = [
   },
 ]
 
-export default function HeroSection() {
-  const handleStoryClick = () => {
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("app:navigating"))
-    }
-    const el = document.querySelector("#story")
-    if (el) el.scrollIntoView({ behavior: "smooth" })
-  }
+interface HeroSectionProps {
+  onOpenReservation?: () => void
+}
 
-  const handleHowItWorksClick = () => {
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("app:navigating"))
+export default function HeroSection({ onOpenReservation }: HeroSectionProps) {
+  const handleReserve = () => {
+    if (onOpenReservation) {
+      onOpenReservation()
+    } else if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("app:open-reservation"))
     }
-    const el = document.querySelector("#how-it-works")
-    if (el) el.scrollIntoView({ behavior: "smooth" })
   }
 
   return (
     <section id="hero" className="relative w-full bg-[#0f0e0d]">
       <DishOrbitCarousel
         dishes={FEATURED_HERO_DISHES}
-        onStoryClick={handleStoryClick}
-        onHowItWorksClick={handleHowItWorksClick}
+        onReserveClick={handleReserve}
       />
     </section>
   )

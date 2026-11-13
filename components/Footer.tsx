@@ -99,17 +99,7 @@ export default function Footer({ onOpenReservation }: FooterProps) {
             <ul className="space-y-2.5 text-xs sm:text-sm text-[#57534e]">
               <li>
                 <a href="#hero" onClick={(e) => scrollTo(e, "#hero")} className="hover:text-[#c96342] transition-colors">
-                  Home
-                </a>
-              </li>
-              <li>
-                <a href="#story" onClick={(e) => scrollTo(e, "#story")} className="hover:text-[#c96342] transition-colors">
-                  Our Story
-                </a>
-              </li>
-              <li>
-                <a href="#how-it-works" onClick={(e) => scrollTo(e, "#how-it-works")} className="hover:text-[#c96342] transition-colors">
-                  How It Works
+                  Featured Dishes
                 </a>
               </li>
               <li>

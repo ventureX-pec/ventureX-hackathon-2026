@@ -3,8 +3,6 @@
 import React, { useState, useEffect } from "react"
 import Navbar from "@/components/Navbar"
 import HeroSection from "@/components/HeroSection"
-import AboutSection from "@/components/AboutSection"
-import HowItWorksSection from "@/components/HowItWorksSection"
 import OrderingCTASection from "@/components/OrderingCTASection"
 import Footer from "@/components/Footer"
 import ReservationModal from "@/components/ReservationModal"
@@ -24,18 +22,12 @@ export default function Home() {
       <Navbar onOpenReservation={() => setReservationOpen(true)} />
 
       {/* 1. Preserved Animated Hero Section (Cinematic Dark Stage) */}
-      <HeroSection />
+      <HeroSection onOpenReservation={() => setReservationOpen(true)} />
 
-      {/* 2. Section A — Our Story */}
-      <AboutSection />
-
-      {/* 3. Section B — How It Works (4 Connected Steps & Special Capabilities) */}
-      <HowItWorksSection />
-
-      {/* 4. Section C — Final Call to Action */}
+      {/* 2. Final Call to Action */}
       <OrderingCTASection onOpenReservation={() => setReservationOpen(true)} />
 
-      {/* 5. Footer */}
+      {/* 3. Footer */}
       <Footer onOpenReservation={() => setReservationOpen(true)} />
 
       {/* Interactive Reservation Modal */}
