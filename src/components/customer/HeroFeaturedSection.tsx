@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowRight, Flame, Sparkles } from "lucide-react";
+import { ArrowRight, Flame } from "lucide-react";
 
 interface HeroFeaturedSectionProps {
   onExploreClick: () => void;
@@ -15,21 +15,24 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
   onHotDealClick,
 }) => {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   const slides = [
     {
+      id: "slide-1",
       titlePrefix: "Delicious food,",
       titleHighlight: "delivered your way.",
       subtitle:
         "Order from your favorite campus kitchens and get it fresh at your table or express pickup counter with zero queue wait.",
       buttonText: "Order Now",
       plateImage:
-        "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80", // Gourmet roasted feast plate matching reference
+        "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
       dealBadge: "Hot Deal",
       dealTitle: "30% OFF",
       dealSubtitle: "on all lunch orders",
     },
     {
+      id: "slide-2",
       titlePrefix: "Craving artisanal,",
       titleHighlight: "woodfired crust?",
       subtitle:
@@ -42,6 +45,7 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
       dealSubtitle: "every weekday break",
     },
     {
+      id: "slide-3",
       titlePrefix: "Power your day with",
       titleHighlight: "clean macro bowls.",
       subtitle:
@@ -55,33 +59,93 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
     },
   ];
 
+  // Change 6: Automatically cycle slides every 5 seconds (pause on hover)
+  useEffect(() => {
+    if (isHovered) return;
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isHovered, slides.length]);
+
   const current = slides[activeSlide];
+  const prefixWords = current.titlePrefix.split(" ");
+  const highlightWords = current.titleHighlight.split(" ");
 
   return (
-    <section className="relative rounded-3xl bg-gradient-to-br from-white via-[#FDFBF7] to-[#F5EFE6] border border-[#ECE7DE] shadow-card overflow-hidden">
+    <section
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative rounded-3xl bg-gradient-to-br from-white via-[#FDFBF7] to-[#F5EFE6] border border-[#ECE7DE] shadow-card overflow-hidden"
+    >
       <div className="p-6 sm:p-10 lg:p-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          {/* Left Text & CTA */}
+          {/* Left Text & Animated Headline */}
           <div className="lg:col-span-7 space-y-4 sm:space-y-6">
-            <AnimatePresence mode="wait">
-              <motion.div
+            <div className="space-y-3">
+              {/* Change 3: Professional Word-by-Word Reveal Text Animation */}
+              <h1
                 key={activeSlide}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.35 }}
-                className="space-y-3"
+                className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#252522] tracking-tight leading-[1.14]"
               >
-                <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#252522] tracking-tight leading-[1.12]">
-                  {current.titlePrefix} <br />
-                  <span className="text-[#D66B43]">{current.titleHighlight}</span>
-                </h1>
+                {/* Prefix Words */}
+                <span className="block">
+                  {prefixWords.map((word, i) => (
+                    <span
+                      key={`${activeSlide}-pre-${i}`}
+                      className="inline-block overflow-hidden mr-2.5 pb-1"
+                    >
+                      <motion.span
+                        initial={{ y: "115%", opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{
+                          duration: 0.55,
+                          delay: i * 0.08,
+                          ease: [0.21, 0.47, 0.32, 0.98],
+                        }}
+                        className="inline-block"
+                      >
+                        {word}
+                      </motion.span>
+                    </span>
+                  ))}
+                </span>
 
-                <p className="text-xs sm:text-sm text-[#6E6D66] max-w-md font-normal leading-relaxed pt-1">
-                  {current.subtitle}
-                </p>
-              </motion.div>
-            </AnimatePresence>
+                {/* Highlight Words in Terracotta */}
+                <span className="block text-[#D66B43]">
+                  {highlightWords.map((word, i) => (
+                    <span
+                      key={`${activeSlide}-high-${i}`}
+                      className="inline-block overflow-hidden mr-2.5 pb-1"
+                    >
+                      <motion.span
+                        initial={{ y: "115%", opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{
+                          duration: 0.6,
+                          delay: 0.18 + i * 0.08,
+                          ease: [0.21, 0.47, 0.32, 0.98],
+                        }}
+                        className="inline-block"
+                      >
+                        {word}
+                      </motion.span>
+                    </span>
+                  ))}
+                </span>
+              </h1>
+
+              {/* Smooth Subtitle Fade */}
+              <motion.p
+                key={`sub-${activeSlide}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="text-xs sm:text-sm text-[#6E6D66] max-w-md font-normal leading-relaxed pt-1"
+              >
+                {current.subtitle}
+              </motion.p>
+            </div>
 
             <div>
               <motion.button
@@ -98,15 +162,15 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
 
           {/* Right: Plate Photo & Floating Hot Deal Card (exact reference layout) */}
           <div className="lg:col-span-5 relative flex items-center justify-center">
-            {/* Round Plate */}
+            {/* Round Plate with Spring Rotation & Scale */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeSlide}
-                initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
+                initial={{ opacity: 0, scale: 0.88, rotate: -8 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ type: "spring", damping: 20, stiffness: 240 }}
-                className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full overflow-hidden shadow-2xl border-4 border-white/80"
+                exit={{ opacity: 0, scale: 0.92, rotate: 6 }}
+                transition={{ type: "spring", damping: 22, stiffness: 220 }}
+                className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full overflow-hidden shadow-2xl border-4 border-white/90"
               >
                 <Image
                   src={current.plateImage}
@@ -119,11 +183,11 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
               </motion.div>
             </AnimatePresence>
 
-            {/* Floating Hot Deal Card (matches reference floating card in top right of hero) */}
+            {/* Floating Hot Deal Card */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.25 }}
               onClick={onHotDealClick}
               className="absolute -top-3 sm:top-2 right-0 sm:-right-2 bg-white/95 backdrop-blur-md p-3.5 sm:p-4 rounded-2xl border border-[#ECE7DE] shadow-card cursor-pointer hover:shadow-xl transition-all"
             >
@@ -145,19 +209,22 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
           </div>
         </div>
 
-        {/* Carousel Indicator Dots (matches reference ● ○ ○) */}
-        <div className="flex items-center justify-center gap-2 mt-6">
+        {/* Carousel Indicator Dots with 5-Second Timer Progress */}
+        <div className="flex items-center justify-center gap-2.5 mt-6">
           {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setActiveSlide(i)}
-              className={`h-2 rounded-full transition-all ${
-                activeSlide === i
-                  ? "w-6 bg-[#D66B43]"
-                  : "w-2 bg-[#ECE7DE] hover:bg-[#D66B43]/40"
-              }`}
+              className="group relative h-2.5 rounded-full overflow-hidden transition-all focus:outline-none"
+              style={{ width: activeSlide === i ? "28px" : "10px" }}
               aria-label={`Go to slide ${i + 1}`}
-            />
+            >
+              <div
+                className={`w-full h-full rounded-full transition-colors ${
+                  activeSlide === i ? "bg-[#D66B43]" : "bg-[#ECE7DE] group-hover:bg-[#D66B43]/50"
+                }`}
+              />
+            </button>
           ))}
         </div>
       </div>

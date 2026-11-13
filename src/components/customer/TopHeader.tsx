@@ -10,6 +10,8 @@ import {
   ShoppingBag,
   Bell,
   UtensilsCrossed,
+  PanelLeftOpen,
+  PanelLeftClose,
 } from "lucide-react";
 
 interface TopHeaderProps {
@@ -18,6 +20,8 @@ interface TopHeaderProps {
   cartCount: number;
   cartTotal: number;
   onOpenCart: () => void;
+  isSidebarOpen?: boolean;
+  onToggleSidebar?: () => void;
 }
 
 export const TopHeader: React.FC<TopHeaderProps> = ({
@@ -26,6 +30,8 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   cartCount,
   cartTotal,
   onOpenCart,
+  isSidebarOpen = true,
+  onToggleSidebar,
 }) => {
   const [selectedLocation, setSelectedLocation] = useState("Main Food Court, Block A");
   const [isLocationOpen, setIsLocationOpen] = useState(false);
@@ -41,8 +47,24 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
     <header className="sticky top-0 z-30 bg-[#FAF8F3]/95 backdrop-blur-md border-b border-[#ECE7DE]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
         <div className="flex items-center justify-between gap-4">
-          {/* Left on Mobile: Logo; Left on Desktop: Location Selector */}
+          {/* Left on Mobile: Logo; Left on Desktop: Sidebar Toggle & Location */}
           <div className="flex items-center gap-3">
+            {/* Desktop Sidebar Toggle Button */}
+            {onToggleSidebar && (
+              <button
+                onClick={onToggleSidebar}
+                className="hidden lg:flex items-center justify-center w-8 h-8 rounded-xl bg-white border border-[#ECE7DE] text-[#252522] hover:text-[#D66B43] hover:border-[#D66B43]/40 shadow-xs transition-colors"
+                title={isSidebarOpen ? "Collapse Sidebar" : "Open Sidebar"}
+                aria-label={isSidebarOpen ? "Collapse Sidebar" : "Open Sidebar"}
+              >
+                {isSidebarOpen ? (
+                  <PanelLeftClose className="w-4 h-4" />
+                ) : (
+                  <PanelLeftOpen className="w-4 h-4 text-[#D66B43]" />
+                )}
+              </button>
+            )}
+
             {/* Mobile Logo */}
             <Link href="/" className="lg:hidden flex items-center gap-2">
               <div className="w-9 h-9 rounded-xl bg-[#252522] flex items-center justify-center text-white shadow-xs">
@@ -93,7 +115,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             </div>
           </div>
 
-          {/* Center Search Bar (matches reference rounded wide search input) */}
+          {/* Center Search Bar */}
           <div className="hidden md:flex items-center flex-1 max-w-lg mx-4">
             <div className="relative w-full">
               <Search className="w-4 h-4 text-[#6E6D66] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -117,7 +139,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
 
           {/* Right: Cart, Notifications & Profile */}
           <div className="flex items-center gap-3">
-            {/* Cart Icon with Orange Badge (exact match to reference) */}
+            {/* Cart Icon with Orange Badge */}
             <button
               onClick={onOpenCart}
               className="relative w-9 h-9 rounded-full bg-white border border-[#ECE7DE] flex items-center justify-center text-[#252522] hover:border-[#D66B43] hover:text-[#D66B43] shadow-xs transition-all"
@@ -140,7 +162,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
               <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#D66B43]" />
             </button>
 
-            {/* User Profile Pill (matches reference John Doe) */}
+            {/* User Profile Pill */}
             <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-[#ECE7DE]">
               <div className="relative w-8 h-8 rounded-full overflow-hidden bg-[#ECE7DE]">
                 <Image

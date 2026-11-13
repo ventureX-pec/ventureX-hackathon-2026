@@ -1,9 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Home,
   UtensilsCrossed,
@@ -12,23 +11,32 @@ import {
   Heart,
   Tag,
   HelpCircle,
-  Settings,
-  LogOut,
-  Sparkles,
-  ArrowRight,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   favoritesCount?: number;
+  width: number;
+  onWidthChange: (w: number) => void;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onTabChange,
   favoritesCount = 0,
+  width,
+  onWidthChange,
+  isOpen,
+  onToggle,
 }) => {
+  const [isDragging, setIsDragging] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement | null>(null);
+
   const navItems = [
     { id: "home", label: "Home", icon: Home },
     { id: "restaurants", label: "Restaurants", icon: UtensilsCrossed },
@@ -39,26 +47,78 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: "help", label: "Help Center", icon: HelpCircle },
   ];
 
+  // Mouse drag handler for resizing
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      const newWidth = Math.max(190, Math.min(380, e.clientX));
+      onWidthChange(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      if (isDragging) {
+        setIsDragging(false);
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      }
+    };
+
+    if (isDragging) {
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, onWidthChange]);
+
+  const handleDragStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <aside className="hidden lg:flex w-64 fixed left-0 top-0 bottom-0 bg-white border-r border-[#ECE7DE] flex-col justify-between p-6 z-40 overflow-y-auto">
-      {/* Brand Logo */}
+    <aside
+      ref={sidebarRef}
+      style={{ width: `${width}px` }}
+      className="hidden lg:flex fixed left-0 top-0 bottom-0 bg-white border-r border-[#ECE7DE] flex-col justify-between p-6 z-40 transition-all select-none"
+    >
+      {/* Top Header: Brand Logo & Collapse Button */}
       <div>
-        <Link href="/" className="flex items-center gap-2.5 mb-8 group">
-          <div className="w-10 h-10 rounded-xl bg-[#252522] flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
-            <UtensilsCrossed className="w-5 h-5 text-[#D66B43]" />
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-1.5">
-              <span className="font-serif text-xl font-bold tracking-tight text-[#252522]">
-                DINEFLOW
-              </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#D66B43]" />
+        <div className="flex items-center justify-between mb-8">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl bg-[#252522] flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform flex-shrink-0">
+              <UtensilsCrossed className="w-5 h-5 text-[#D66B43]" />
             </div>
-            <span className="text-[10px] text-[#6E6D66] font-medium tracking-wide">
-              Zero Wait Food Portal
-            </span>
-          </div>
-        </Link>
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-serif text-xl font-bold tracking-tight text-[#252522] truncate">
+                  DINEFLOW
+                </span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#D66B43] flex-shrink-0" />
+              </div>
+              <span className="text-[10px] text-[#6E6D66] font-medium tracking-wide truncate">
+                Zero Wait Food Portal
+              </span>
+            </div>
+          </Link>
+
+          {/* Complete Close / Collapse Button */}
+          <button
+            onClick={onToggle}
+            className="p-1.5 rounded-lg text-[#6E6D66] hover:text-[#252522] hover:bg-[#FAF8F3] border border-transparent hover:border-[#ECE7DE] transition-colors"
+            title="Collapse Sidebar"
+            aria-label="Collapse Sidebar"
+          >
+            <PanelLeftClose className="w-4 h-4" />
+          </button>
+        </div>
 
         {/* Navigation Items */}
         <nav className="space-y-1.5">
@@ -75,17 +135,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     : "text-[#6E6D66] hover:text-[#252522] hover:bg-[#FAF8F3]"
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 truncate">
                   <Icon
-                    className={`w-4 h-4 ${
+                    className={`w-4 h-4 flex-shrink-0 ${
                       isActive ? "text-[#D66B43]" : "text-[#6E6D66]"
                     }`}
                   />
-                  <span>{item.label}</span>
+                  <span className="truncate">{item.label}</span>
                 </div>
 
                 {item.badge !== undefined && (
-                  <span className="w-5 h-5 rounded-full bg-[#D66B43] text-white text-[10px] font-bold flex items-center justify-center shadow-xs">
+                  <span className="w-5 h-5 rounded-full bg-[#D66B43] text-white text-[10px] font-bold flex items-center justify-center shadow-xs flex-shrink-0">
                     {item.badge}
                   </span>
                 )}
@@ -95,69 +155,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
       </div>
 
-      {/* Bottom Promo Card & User Section */}
-      <div className="space-y-4 pt-6 border-t border-[#ECE7DE]">
-        {/* Promotional Offer Card */}
-        <div className="relative rounded-2xl bg-[#FAF4ED] border border-[#F0E4D8] p-4 text-center overflow-hidden">
-          <div className="relative z-10 space-y-1.5">
-            <span className="inline-block px-2 py-0.5 rounded-full bg-white text-[9px] font-bold text-[#D66B43] shadow-xs">
-              EXCLUSIVE DEAL
-            </span>
-            <h4 className="font-serif font-bold text-xs text-[#252522]">
-              Get 50% OFF on your first order
-            </h4>
-            <p className="text-[10px] text-[#6E6D66]">
-              Use code: <strong className="text-[#D66B43]">DINE50</strong>
-            </p>
+      {/* Clean Bottom Area (Removed 50% off promo & name per user request) */}
+      <div className="pt-4 border-t border-[#ECE7DE] flex items-center justify-between text-[11px] text-[#6E6D66]">
+        <span>Drag right edge to resize</span>
+        <button
+          onClick={onToggle}
+          className="text-[#D66B43] font-semibold hover:underline"
+        >
+          Hide
+        </button>
+      </div>
 
-            <div className="relative w-20 h-16 mx-auto my-2">
-              <Image
-                src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=200&q=80"
-                alt="Promo Burger"
-                fill
-                className="object-cover rounded-xl shadow-xs"
-                sizes="80px"
-              />
-            </div>
-
-            <button
-              onClick={() => onTabChange("offers")}
-              className="w-full py-2 rounded-xl bg-[#D66B43] text-white text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-[#BF5832] transition-colors shadow-xs"
-            >
-              <span>Order Now</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
-        </div>
-
-        {/* Profile Card */}
-        <div className="flex items-center justify-between p-2 rounded-xl bg-[#FAF8F3] border border-[#ECE7DE]">
-          <div className="flex items-center gap-2.5">
-            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-[#ECE7DE]">
-              <Image
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-                alt="User Profile"
-                fill
-                className="object-cover"
-                sizes="32px"
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-bold text-[#252522] leading-tight">
-                Aarav Sharma
-              </span>
-              <span className="text-[10px] text-[#6E6D66]">Campus Diner</span>
-            </div>
-          </div>
-
-          <Link
-            href="/"
-            className="p-1.5 rounded-lg text-[#6E6D66] hover:text-[#252522] hover:bg-white transition-colors"
-            title="Return Home"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-          </Link>
-        </div>
+      {/* Resizable Slider Drag Handle on the Right Edge */}
+      <div
+        onMouseDown={handleDragStart}
+        className={`absolute top-0 right-0 bottom-0 w-2 cursor-col-resize group transition-colors flex items-center justify-center ${
+          isDragging ? "bg-[#D66B43]" : "hover:bg-[#D66B43]/30"
+        }`}
+        title="Drag to resize sidebar width"
+      >
+        <div
+          className={`w-0.5 h-8 rounded-full transition-colors ${
+            isDragging ? "bg-white" : "bg-[#ECE7DE] group-hover:bg-[#D66B43]"
+          }`}
+        />
       </div>
     </aside>
   );

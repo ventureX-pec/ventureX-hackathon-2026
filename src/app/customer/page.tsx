@@ -24,7 +24,6 @@ import { TopHeader } from "@/components/customer/TopHeader";
 import { HeroFeaturedSection } from "@/components/customer/HeroFeaturedSection";
 import { CategorySection } from "@/components/customer/CategorySection";
 import { RestaurantSection } from "@/components/customer/RestaurantSection";
-import { RecentlyOrderedSection } from "@/components/customer/RecentlyOrderedSection";
 import { ActiveOrderCard } from "@/components/customer/ActiveOrderCard";
 import { CartDrawer, CartItem } from "@/components/customer/CartDrawer";
 import { CheckoutSuccessModal } from "@/components/customer/CheckoutSuccessModal";
@@ -40,6 +39,10 @@ import {
 export default function CustomerDashboardPage() {
   // Navigation & Active Tab
   const [activeTab, setActiveTab] = useState<string>("home");
+
+  // Change 1: Resizable & Collapsible Sidebar State
+  const [sidebarWidth, setSidebarWidth] = useState<number>(256);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
 
   // Search & Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -117,14 +120,6 @@ export default function CustomerDashboardPage() {
 
   const handleRemoveFromCart = (dishId: string) => {
     setCart((prev) => prev.filter((item) => item.dish.id !== dishId));
-  };
-
-  const handleReorder = (dishId: string) => {
-    const dish = MENU_ITEMS.find((d) => d.id === dishId);
-    if (dish) {
-      handleAddToCart(dish, 1);
-      setIsCartOpen(true);
-    }
   };
 
   const totalCartCount = useMemo(
@@ -206,7 +201,7 @@ export default function CustomerDashboardPage() {
       {/* Light subtle cursor trail */}
       <CursorTrail />
 
-      {/* Desktop Fixed Left Sidebar (exact reference composition) */}
+      {/* Change 1 & 2: Resizable & Collapsible Desktop Sidebar */}
       <Sidebar
         activeTab={activeTab}
         onTabChange={(tab) => {
@@ -217,22 +212,33 @@ export default function CustomerDashboardPage() {
           }
         }}
         favoritesCount={favorites.length}
+        width={sidebarWidth}
+        onWidthChange={setSidebarWidth}
+        isOpen={isSidebarOpen}
+        onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
       />
 
-      {/* Main Content Area (offset by 256px on desktop) */}
-      <div className="lg:pl-64 flex flex-col min-h-screen">
-        {/* Top Header Bar (Location, Search, Cart, Profile) */}
+      {/* Main Content Area (dynamic padding based on resizable sidebar state on desktop) */}
+      <div
+        className="flex flex-col min-h-screen transition-all"
+        style={{
+          paddingLeft: isSidebarOpen ? `${sidebarWidth}px` : "0px",
+        }}
+      >
+        {/* Top Header Bar with Sidebar Toggle Button */}
         <TopHeader
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           cartCount={totalCartCount}
           cartTotal={cartTotalAmount}
           onOpenCart={() => setIsCartOpen(true)}
+          isSidebarOpen={isSidebarOpen}
+          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         />
 
         {/* Dashboard Body */}
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 sm:space-y-10 pb-28 lg:pb-16">
-          {/* Active Order Card (shows if active order exists) */}
+          {/* Active Order Card */}
           {activeOrder && (
             <ActiveOrderCard
               tokenNumber={activeOrder.token}
@@ -243,7 +249,7 @@ export default function CustomerDashboardPage() {
             />
           )}
 
-          {/* Hero / Featured Offer Banner (matches reference hero layout) */}
+          {/* Change 3 & 6: Hero Banner with Word-by-Word Reveal & 5-Second Auto Slide */}
           <HeroFeaturedSection
             onExploreClick={() => {
               const el = document.getElementById("popular-restaurants");
@@ -256,14 +262,14 @@ export default function CustomerDashboardPage() {
             }}
           />
 
-          {/* Explore Categories (matches reference horizontal category cards) */}
+          {/* Change 4: Infinite Left-to-Right Continuous Marquee Categories without 'All' icon */}
           <CategorySection
             selectedCategory={selectedCategory}
             onSelectCategory={(catId) => setSelectedCategory(catId)}
             onViewAllClick={() => setSelectedCategory("all")}
           />
 
-          {/* Popular Restaurants Section (matches reference restaurant grid) */}
+          {/* Popular Restaurants Section */}
           <div id="popular-restaurants">
             <RestaurantSection
               restaurants={filteredRestaurants}
@@ -414,12 +420,11 @@ export default function CustomerDashboardPage() {
             </div>
           </section>
 
-          {/* Recently Ordered Section (reorder items) */}
-          <RecentlyOrderedSection onReorder={handleReorder} />
+          {/* Change 5: Recently Ordered section has been completely removed per user request */}
         </main>
       </div>
 
-      {/* Fixed Mobile Bottom Navigation (matches reference phone preview) */}
+      {/* Fixed Mobile Bottom Navigation */}
       <MobileBottomNav
         activeTab={activeTab}
         onTabChange={(tab) => {
