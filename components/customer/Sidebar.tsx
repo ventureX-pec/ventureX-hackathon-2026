@@ -9,8 +9,6 @@ import {
   LayoutGrid,
   ClipboardList,
   Heart,
-  Tag,
-  HelpCircle,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
@@ -43,8 +41,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: "categories", label: "Categories", icon: LayoutGrid },
     { id: "orders", label: "My Orders", icon: ClipboardList },
     { id: "favorites", label: "Favorites", icon: Heart, badge: favoritesCount > 0 ? favoritesCount : undefined },
-    { id: "offers", label: "Offers", icon: Tag },
-    { id: "help", label: "Help Center", icon: HelpCircle },
   ];
 
   // Mouse drag handler for resizing
