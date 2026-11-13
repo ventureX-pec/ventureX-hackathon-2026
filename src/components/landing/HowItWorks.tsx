@@ -1,48 +1,34 @@
 "use client";
 
 import React from "react";
-import { Store, QrCode, MonitorCheck, ArrowRight, Check } from "lucide-react";
+import { motion } from "motion/react";
+import { Search, ShoppingBag, Utensils, ArrowRight } from "lucide-react";
 
 export const HowItWorks = () => {
   const steps = [
     {
-      number: "01",
-      icon: Store,
-      title: "Set Up Your Restaurant",
-      tagline: "Live in less than ten minutes.",
+      step: "01",
+      icon: Search,
+      title: "Discover",
+      tagline: "Find a restaurant near you.",
       description:
-        "Input your dishes, categorize by course, set dietary tags, and customize pricing. Generate elegant, printable QR standee cards for your dining tables with a single click.",
-      details: [
-        "Simple digital menu onboarding",
-        "Configurable table count & seating maps",
-        "Instant out-of-stock toggle (86'd items)",
-      ],
+        "Open DineFlow to explore local independent eateries, compare preparation times, and browse visual digital menus right from your phone.",
     },
     {
-      number: "02",
-      icon: QrCode,
-      title: "Guests Place Orders",
-      tagline: "Zero queues, zero friction.",
+      step: "02",
+      icon: ShoppingBag,
+      title: "Order",
+      tagline: "Choose your food and place your order.",
       description:
-        "Dine-in customers scan the table QR code to browse, customize, and order instantly. Nearby students and office workers can pre-order takeaway to bypass the counter line.",
-      details: [
-        "Loads directly in mobile browsers",
-        "Custom spice levels and add-ons",
-        "Direct UPI scan or pay-at-counter",
-      ],
+        "Select takeaway pickup or your dining table, customize your dishes with special instructions, and pay seamlessly via direct UPI or at the counter.",
     },
     {
-      number: "03",
-      icon: MonitorCheck,
-      title: "Manage Everything From One Hub",
-      tagline: "Total operational harmony.",
+      step: "03",
+      icon: Utensils,
+      title: "Enjoy",
+      tagline: "Collect your food or enjoy dine-in.",
       description:
-        "Orders route automatically to the Kitchen Display System with preparation timers. The cashier terminal tracks bills, while owner analytics provide peak-hour clarity.",
-      details: [
-        "Real-time kitchen ticket Kanban",
-        "Table occupancy and billing status",
-        "Peak lunch rush volume tracking",
-      ],
+        "Step in just as your meal is ready. Skip the 15-minute ordering queue completely and spend your lunch break doing what matters: enjoying your food.",
     },
   ];
 
@@ -51,61 +37,65 @@ export const HowItWorks = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-3xl mx-auto mb-16"
+        >
           <span className="text-xs font-semibold tracking-wider uppercase text-[#D66B43]">
-            Simple Implementation
+            Simple & Effortless
           </span>
-          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-[#252522] mt-3">
-            How DineFlow Transforms Your Everyday Service
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#252522] mt-3">
+            How DINEFLOW Works
           </h2>
           <p className="mt-4 text-base sm:text-lg text-[#6E6D66] leading-relaxed">
-            No expensive hardware installations. No complex staff training manuals. 
-            A straightforward three-step transition to digital hospitality.
+            Three simple steps between deciding what to eat and savoring your meal.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Three Step Grid */}
+        {/* 3-Step Connected Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          {steps.map((step, idx) => {
-            const Icon = step.icon;
+          {steps.map((s, index) => {
+            const Icon = s.icon;
             return (
-              <div
-                key={step.number}
+              <motion.div
+                key={s.step}
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ delay: index * 0.15, duration: 0.6 }}
+                whileHover={{ y: -4 }}
                 className="bg-white rounded-3xl p-8 border border-[#ECE7DE] shadow-soft hover:shadow-card transition-all flex flex-col justify-between relative group"
               >
                 <div>
-                  {/* Step Number & Icon */}
+                  {/* Top Step Pill & Icon */}
                   <div className="flex items-center justify-between mb-6">
-                    <span className="text-3xl font-bold text-[#E2DDD3] group-hover:text-[#D66B43] transition-colors">
-                      {step.number}
+                    <span className="text-3xl font-extrabold text-[#E5E0D5] group-hover:text-[#D66B43] transition-colors">
+                      {s.step}
                     </span>
                     <div className="w-12 h-12 rounded-2xl bg-[#FAF8F3] border border-[#ECE7DE] flex items-center justify-center text-[#D66B43]">
                       <Icon className="w-5 h-5" />
                     </div>
                   </div>
 
-                  {/* Title & Narrative */}
-                  <h3 className="text-xl font-semibold text-[#252522]">
-                    {step.title}
+                  <h3 className="text-2xl font-bold text-[#252522] mb-1">
+                    {s.title}
                   </h3>
-                  <p className="text-xs font-semibold text-[#D66B43] mt-1 mb-3">
-                    {step.tagline}
+                  <p className="text-xs font-semibold text-[#D66B43] mb-3">
+                    {s.tagline}
                   </p>
                   <p className="text-sm text-[#6E6D66] leading-relaxed">
-                    {step.description}
+                    {s.description}
                   </p>
                 </div>
 
-                {/* Checklist */}
-                <div className="pt-6 mt-6 border-t border-[#F7F4EE] space-y-2.5">
-                  {step.details.map((item, i) => (
-                    <div key={i} className="flex items-center gap-2.5 text-xs text-[#252522]">
-                      <Check className="w-3.5 h-3.5 text-[#5F7A65] shrink-0" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
+                <div className="pt-6 mt-6 border-t border-[#F7F4EE] flex items-center justify-between text-xs text-[#5F7A65] font-medium">
+                  <span>Step {index + 1} of 3</span>
+                  <span className="w-2 h-2 rounded-full bg-[#5F7A65]" />
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

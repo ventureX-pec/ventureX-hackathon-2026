@@ -2,11 +2,9 @@ import React from "react";
 import { Navbar } from "@/components/landing/Navbar";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { ProblemSection } from "@/components/landing/ProblemSection";
-import { FeaturesSection } from "@/components/landing/FeaturesSection";
+import { SolutionSection } from "@/components/landing/SolutionSection";
 import { HowItWorks } from "@/components/landing/HowItWorks";
-import { ProductShowcase } from "@/components/landing/ProductShowcase";
-import { PricingSection } from "@/components/landing/PricingSection";
-import { FaqSection } from "@/components/landing/FaqSection";
+import { ForRestaurantsSection } from "@/components/landing/ForRestaurantsSection";
 import { CtaSection } from "@/components/landing/CtaSection";
 import { Footer } from "@/components/landing/Footer";
 
@@ -16,11 +14,9 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       <ProblemSection />
-      <FeaturesSection />
+      <SolutionSection />
       <HowItWorks />
-      <ProductShowcase />
-      <PricingSection />
-      <FaqSection />
+      <ForRestaurantsSection />
       <CtaSection />
       <Footer />
     </main>

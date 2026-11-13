@@ -1,144 +1,221 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import { ArrowRight, Sparkles, CheckCircle2, Clock, ChefHat, QrCode, Play } from "lucide-react";
+import { motion } from "motion/react";
+import { ArrowRight, Clock, MapPin, Store, Utensils, CheckCircle2 } from "lucide-react";
 
 export const HeroSection = () => {
+  const sampleRestaurants = [
+    {
+      name: "The Corner Café",
+      cuisine: "Bowls, Wraps & Artisan Coffee",
+      prepTime: "8 mins prep",
+      image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=400&q=80",
+      status: "Dine-in & Takeaway",
+      distance: "150m away",
+    },
+    {
+      name: "Artisan Woodfire Pizzeria",
+      cuisine: "Handcrafted Slices & Paninis",
+      prepTime: "12 mins prep",
+      image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=400&q=80",
+      status: "Dine-in & Takeaway",
+      distance: "300m away",
+    },
+  ];
+
   return (
-    <section className="relative pt-12 pb-20 sm:pt-16 sm:pb-28 lg:pt-20 lg:pb-32 overflow-hidden bg-[#FAF8F3]">
+    <section className="relative pt-10 pb-20 sm:pt-14 sm:pb-28 lg:pt-18 lg:pb-32 overflow-hidden bg-[#FAF8F3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           
-          {/* Left Column: Headline & Messaging */}
-          <div className="lg:col-span-6 space-y-8 text-center lg:text-left">
+          {/* Left Column: Headline, Narrative & CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="lg:col-span-6 space-y-8 text-center lg:text-left"
+          >
             
-            {/* Subtle Pill Tag */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF1ED] border border-[#D5E1D8] text-[#5F7A65] text-xs font-medium">
+            {/* Tagline Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF1ED] border border-[#D5E1D8] text-[#5F7A65] text-xs font-semibold"
+            >
               <span className="w-2 h-2 rounded-full bg-[#5F7A65]" />
-              <span>Independent Restaurant & Café Operating System</span>
-            </div>
+              <span>Less Waiting. More Enjoying.</span>
+            </motion.div>
 
             {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#252522] leading-[1.12]">
-              Your Restaurant Deserves a Smarter Way to Run.
-            </h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#252522] leading-[1.14]"
+            >
+              Your Next Meal. <br />
+              <span className="text-[#D66B43]">Without the Wait.</span>
+            </motion.h1>
 
             {/* Supporting Copy */}
-            <p className="text-lg sm:text-xl text-[#6E6D66] font-normal leading-relaxed max-w-xl mx-auto lg:mx-0">
-              From QR-based ordering to kitchen management, manage your restaurant operations from one simple platform.
-            </p>
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="text-lg sm:text-xl text-[#6E6D66] font-normal leading-relaxed max-w-xl mx-auto lg:mx-0"
+            >
+              Discover nearby restaurants, explore their menus, and order ahead. 
+              Spend less time waiting and more time enjoying your food.
+            </motion.p>
 
-            {/* Dual Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
-              <Link
-                href="/menu"
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#D66B43] text-white text-base font-medium hover:bg-[#BF5832] transition-all shadow-card hover:shadow-elevated active:scale-98"
+            {/* Two CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2"
+            >
+              <motion.a
+                href="#customers"
+                whileHover={{ y: -2, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-[#D66B43] text-white text-base font-medium hover:bg-[#BF5832] transition-colors shadow-soft"
               >
-                <span>Explore DineFlow</span>
+                <span>Explore Restaurants</span>
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </motion.a>
 
-              <a
-                href="#how-it-works"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white border border-[#ECE7DE] text-[#252522] text-base font-medium hover:bg-[#F7F4EE] hover:border-[#DDD8CE] transition-all shadow-soft active:scale-98"
+              <motion.a
+                href="#restaurants"
+                whileHover={{ y: -2, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white border border-[#ECE7DE] text-[#252522] text-base font-medium hover:bg-[#F3EFE8] transition-colors shadow-soft"
               >
-                <Play className="w-4 h-4 text-[#D66B43] fill-[#D66B43]" />
-                <span>See How It Works</span>
-              </a>
-            </div>
+                <span>Partner With Us</span>
+              </motion.a>
+            </motion.div>
 
-            {/* Key Value Propositions */}
-            <div className="pt-6 border-t border-[#ECE7DE] grid grid-cols-3 gap-4 text-left">
+            {/* Core Pillars */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="pt-6 border-t border-[#ECE7DE] grid grid-cols-3 gap-4 text-left"
+            >
+              <div>
+                <p className="text-xs text-[#6E6D66] font-medium">Discovery</p>
+                <p className="text-sm font-semibold text-[#252522] mt-0.5">Nearby Menus</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6E6D66] font-medium">Preparation</p>
+                <p className="text-sm font-semibold text-[#252522] mt-0.5">Live Prep Times</p>
+              </div>
               <div>
                 <p className="text-xs text-[#6E6D66] font-medium">Ordering</p>
-                <p className="text-sm font-semibold text-[#252522] mt-0.5">Contactless QR</p>
+                <p className="text-sm font-semibold text-[#252522] mt-0.5">Order Ahead</p>
               </div>
-              <div>
-                <p className="text-xs text-[#6E6D66] font-medium">Kitchen Display</p>
-                <p className="text-sm font-semibold text-[#252522] mt-0.5">Real-Time KDS</p>
-              </div>
-              <div>
-                <p className="text-xs text-[#6E6D66] font-medium">Commissions</p>
-                <p className="text-sm font-semibold text-[#252522] mt-0.5">Zero Percent</p>
-              </div>
-            </div>
+            </motion.div>
 
-          </div>
+          </motion.div>
 
-          {/* Right Column: Premium Visual Composition */}
-          <div className="lg:col-span-6 relative">
+          {/* Right Column: Split Visual Composition */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.25, duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="lg:col-span-6 relative"
+          >
             <div className="relative mx-auto max-w-md sm:max-w-xl lg:max-w-none">
               
-              {/* Main Background Image Card (Atmospheric Café) */}
-              <div className="relative rounded-3xl overflow-hidden shadow-elevated border border-[#ECE7DE] aspect-4/3 sm:aspect-16/11 bg-white">
+              {/* Primary Atmospheric Food Photography */}
+              <div className="relative rounded-3xl overflow-hidden shadow-card border border-[#ECE7DE] aspect-4/3 sm:aspect-16/11 bg-white">
                 <img
-                  src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80"
-                  alt="Cozy modern independent café interior"
+                  src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80"
+                  alt="Delicious artisan dishes served fresh at a local restaurant"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
                 
-                {/* Café Identity Tag */}
+                {/* Floating Bottom Badge */}
                 <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between text-white">
                   <div>
-                    <p className="text-xs text-white/80 font-medium">Live Partner Location</p>
-                    <p className="text-base font-semibold">The Corner Café & Bakery</p>
+                    <span className="text-[11px] font-semibold text-[#D66B43] bg-white/95 px-2 py-0.5 rounded-md">
+                      Campus Favorite
+                    </span>
+                    <p className="text-base font-bold text-white mt-1">The Corner Café • Sector 4</p>
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-medium border border-white/30">
-                    14 Tables Connected
-                  </span>
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-medium border border-white/30 text-white">
+                    <Clock className="w-3.5 h-3.5 text-white" />
+                    <span>8 mins prep</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Floating Realistic Restaurant Dashboard Card (Left Overlap) */}
-              <div className="absolute -bottom-8 -left-4 sm:-left-8 sm:-bottom-10 w-[88%] sm:w-[320px] rounded-2xl bg-white p-4 sm:p-5 shadow-elevated border border-[#ECE7DE]">
-                <div className="flex items-center justify-between pb-3 border-b border-[#F3EFE8]">
+              {/* Realistic Restaurant Discovery & Order Card (Gentle Floating Motion) */}
+              <motion.div
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -bottom-8 -left-4 sm:-left-6 w-[92%] sm:w-[340px] rounded-2xl bg-white p-4.5 shadow-card border border-[#ECE7DE]"
+              >
+                <div className="flex items-center justify-between pb-3 border-b border-[#F7F4EE]">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#5F7A65] animate-pulse" />
-                    <span className="text-xs font-semibold text-[#252522]">Active Order Flow</span>
+                    <Store className="w-4 h-4 text-[#D66B43]" />
+                    <span className="text-xs font-bold text-[#252522]">Nearby Restaurants</span>
                   </div>
-                  <span className="text-[11px] font-medium text-[#D66B43] bg-[#FAF2EE] px-2 py-0.5 rounded-md">
-                    Kitchen Sync
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#EBF1ED] text-[#5F7A65]">
+                    Order Ahead Available
                   </span>
                 </div>
 
                 <div className="mt-3 space-y-2.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <div>
-                      <p className="font-semibold text-[#252522]">Table 4 • Dine-in</p>
-                      <p className="text-[11px] text-[#6E6D66]">2 items • Paneer Bowl, Cold Brew</p>
+                  {sampleRestaurants.map((res) => (
+                    <div
+                      key={res.name}
+                      className="p-2.5 rounded-xl bg-[#FAF8F3] border border-[#ECE7DE] hover:border-[#D66B43]/30 transition-colors flex items-center gap-3"
+                    >
+                      <img
+                        src={res.image}
+                        alt={res.name}
+                        className="w-12 h-12 rounded-lg object-cover shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-[#252522] truncate">{res.name}</p>
+                        <p className="text-[10px] text-[#6E6D66] truncate">{res.cuisine}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] font-semibold text-[#D66B43] flex items-center gap-0.5">
+                            <Clock className="w-2.5 h-2.5" />
+                            {res.prepTime}
+                          </span>
+                          <span className="text-[9px] text-[#5F7A65] font-medium bg-white px-1.5 py-0.2 rounded border border-[#ECE7DE]">
+                            {res.status}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-[#EBF1ED] text-[#5F7A65]">
-                      Preparing (6m)
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs pt-2 border-t border-[#F7F4EE]">
-                    <div>
-                      <p className="font-semibold text-[#252522]">Takeaway #42 • Pickup 1:15 PM</p>
-                      <p className="text-[11px] text-[#6E6D66]">Lunch Combo • Packed</p>
-                    </div>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-[#FAF2EE] text-[#D66B43]">
-                      Ready
-                    </span>
-                  </div>
+                  ))}
                 </div>
-              </div>
+              </motion.div>
 
-              {/* Floating Metric Card (Top Right Overlap) */}
-              <div className="hidden sm:flex absolute -top-6 -right-6 rounded-2xl bg-white p-4 shadow-elevated border border-[#ECE7DE] items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#FAF2EE] flex items-center justify-center text-[#D66B43]">
-                  <Clock className="w-5 h-5" />
+              {/* Floating Live Badge (Top Right) */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                className="hidden sm:flex absolute -top-5 -right-5 rounded-2xl bg-white p-3.5 shadow-card border border-[#ECE7DE] items-center gap-3"
+              >
+                <div className="w-9 h-9 rounded-xl bg-[#FAF2EE] flex items-center justify-center text-[#D66B43]">
+                  <CheckCircle2 className="w-5 h-5 text-[#D66B43]" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-medium text-[#6E6D66]">Average Order Time</p>
-                  <p className="text-base font-bold text-[#252522]">8.4 mins <span className="text-xs font-normal text-[#5F7A65]">(-65%)</span></p>
+                  <p className="text-[11px] font-medium text-[#6E6D66]">Lunch Break Ready</p>
+                  <p className="text-xs font-bold text-[#252522]">Pick Up Without Queues</p>
                 </div>
-              </div>
+              </motion.div>
 
             </div>
-          </div>
+          </motion.div>
 
         </div>
       </div>

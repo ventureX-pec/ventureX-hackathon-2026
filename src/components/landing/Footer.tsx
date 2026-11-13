@@ -2,128 +2,160 @@
 
 import React from "react";
 import Link from "next/link";
-import { Utensils, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { Utensils, Mail, Phone, MapPin, Globe, Share2 } from "lucide-react";
 
 export const Footer = () => {
   return (
-    <footer className="bg-[#FAF8F3] border-t border-[#ECE7DE] text-[#6E6D66] text-sm">
+    <footer id="about" className="bg-[#FAF8F3] border-t border-[#ECE7DE] text-[#6E6D66] text-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-12 border-b border-[#ECE7DE]">
           
-          {/* Brand Info */}
+          {/* Logo & Tagline */}
           <div className="lg:col-span-2 space-y-4">
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 rounded-xl bg-[#252522] flex items-center justify-center text-[#FAF8F3]">
+              <div className="w-9 h-9 rounded-xl bg-[#252522] flex items-center justify-center text-[#FAF8F3]">
                 <Utensils className="w-4 h-4 text-[#D66B43]" />
               </div>
               <div className="flex items-baseline">
-                <span className="font-semibold text-base text-[#252522]">DineFlow</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#D66B43] ml-0.5" />
+                <span className="font-bold text-lg text-[#252522]">DINEFLOW</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#D66B43] ml-1" />
               </div>
             </Link>
 
-            <p className="text-xs text-[#6E6D66] leading-relaxed max-w-sm">
-              The modern restaurant management platform designed specifically for independent cafes, 
-              local diners, and family-owned eateries. Zero commissions. Simple operations.
+            <p className="text-sm font-semibold text-[#252522]">
+              &ldquo;Less Waiting. More Enjoying.&rdquo;
             </p>
 
-            <div className="space-y-1.5 text-xs text-[#6E6D66]">
-              <p className="flex items-center gap-2">
-                <Mail className="w-3.5 h-3.5 text-[#D66B43]" />
-                <span>support@dineflow.hospitality</span>
-              </p>
-              <p className="flex items-center gap-2">
-                <Phone className="w-3.5 h-3.5 text-[#D66B43]" />
-                <span>+91 98765 43210 (Mon–Sun, 8 AM–11 PM)</span>
-              </p>
+            <p className="text-xs text-[#6E6D66] leading-relaxed max-w-sm">
+              Discover local restaurants, order ahead, and enjoy a faster dining experience. 
+              We help local restaurants serve smarter and customers eat better.
+            </p>
+
+            {/* Social Placeholders with Clean SVGs */}
+            <div className="flex items-center gap-3 pt-2">
+              <a
+                href="#"
+                aria-label="Instagram"
+                className="w-8 h-8 rounded-lg bg-white border border-[#ECE7DE] flex items-center justify-center text-[#6E6D66] hover:text-[#D66B43] hover:border-[#D66B43] transition-colors"
+              >
+                <svg className="w-3.5 h-3.5 fill-currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+              </a>
+              <a
+                href="#"
+                aria-label="X (Twitter)"
+                className="w-8 h-8 rounded-lg bg-white border border-[#ECE7DE] flex items-center justify-center text-[#6E6D66] hover:text-[#D66B43] hover:border-[#D66B43] transition-colors"
+              >
+                <svg className="w-3.5 h-3.5 fill-currentColor" viewBox="0 0 24 24">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+              </a>
+              <a
+                href="#"
+                aria-label="LinkedIn"
+                className="w-8 h-8 rounded-lg bg-white border border-[#ECE7DE] flex items-center justify-center text-[#6E6D66] hover:text-[#D66B43] hover:border-[#D66B43] transition-colors"
+              >
+                <svg className="w-3.5 h-3.5 fill-currentColor" viewBox="0 0 24 24">
+                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                </svg>
+              </a>
+              <a
+                href="#"
+                aria-label="Website"
+                className="w-8 h-8 rounded-lg bg-white border border-[#ECE7DE] flex items-center justify-center text-[#6E6D66] hover:text-[#D66B43] hover:border-[#D66B43] transition-colors"
+              >
+                <Globe className="w-4 h-4" />
+              </a>
             </div>
           </div>
 
-          {/* Product Links */}
+          {/* For Customers */}
           <div>
-            <p className="text-xs font-semibold text-[#252522] uppercase tracking-wider mb-4">
-              Platform
+            <p className="text-xs font-bold text-[#252522] uppercase tracking-wider mb-4">
+              For Customers
             </p>
             <ul className="space-y-2.5 text-xs">
               <li>
-                <Link href="/menu?table=4" className="hover:text-[#252522] transition-colors">
-                  Contactless QR Menu
-                </Link>
+                <a href="#customers" className="hover:text-[#252522] transition-colors">
+                  Explore Nearby Menus
+                </a>
               </li>
               <li>
-                <Link href="/kitchen" className="hover:text-[#252522] transition-colors">
+                <a href="#customers" className="hover:text-[#252522] transition-colors">
+                  Order Ahead for Pickup
+                </a>
+              </li>
+              <li>
+                <a href="#customers" className="hover:text-[#252522] transition-colors">
+                  Contactless Table Dine-In
+                </a>
+              </li>
+              <li>
+                <a href="#customers" className="hover:text-[#252522] transition-colors">
+                  Live Preparation Times
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* For Restaurants */}
+          <div>
+            <p className="text-xs font-bold text-[#252522] uppercase tracking-wider mb-4">
+              For Restaurants
+            </p>
+            <ul className="space-y-2.5 text-xs">
+              <li>
+                <a href="#restaurants" className="hover:text-[#252522] transition-colors">
+                  Digital Menu Management
+                </a>
+              </li>
+              <li>
+                <a href="#restaurants" className="hover:text-[#252522] transition-colors">
                   Kitchen Display System
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/pos" className="hover:text-[#252522] transition-colors">
-                  Counter POS Terminal
-                </Link>
+                <a href="#restaurants" className="hover:text-[#252522] transition-colors">
+                  Centralised Order Flow
+                </a>
               </li>
               <li>
-                <Link href="/admin" className="hover:text-[#252522] transition-colors">
-                  Restaurant Dashboard
-                </Link>
+                <a href="#restaurants" className="hover:text-[#252522] transition-colors">
+                  Peak Rush Analytics
+                </a>
               </li>
               <li>
-                <Link href="/menu" className="hover:text-[#252522] transition-colors">
-                  Lunch Pre-Order Hub
-                </Link>
+                <a href="#restaurants" className="hover:text-[#252522] transition-colors">
+                  Zero Commission Policy
+                </a>
               </li>
             </ul>
           </div>
 
-          {/* Solutions & Resources */}
-          <div>
-            <p className="text-xs font-semibold text-[#252522] uppercase tracking-wider mb-4">
-              Hospitality
+          {/* Contact & About */}
+          <div id="contact">
+            <p className="text-xs font-bold text-[#252522] uppercase tracking-wider mb-4">
+              Contact & About
             </p>
             <ul className="space-y-2.5 text-xs">
-              <li>
-                <a href="#how-it-works" className="hover:text-[#252522] transition-colors">
-                  How It Works
-                </a>
+              <li className="flex items-center gap-2">
+                <Mail className="w-3.5 h-3.5 text-[#D66B43]" />
+                <span>hello@dineflow.hospitality</span>
               </li>
-              <li>
-                <a href="#problem" className="hover:text-[#252522] transition-colors">
-                  The Corner Café Story
-                </a>
+              <li className="flex items-center gap-2">
+                <Phone className="w-3.5 h-3.5 text-[#D66B43]" />
+                <span>+91 98765 43210</span>
               </li>
-              <li>
-                <a href="#pricing" className="hover:text-[#252522] transition-colors">
-                  Pricing Plans
-                </a>
+              <li className="flex items-start gap-2 pt-1">
+                <MapPin className="w-3.5 h-3.5 text-[#D66B43] shrink-0 mt-0.5" />
+                <span>University Sector Commercial Hub</span>
               </li>
-              <li>
-                <a href="#faq" className="hover:text-[#252522] transition-colors">
-                  Setup FAQ
-                </a>
-              </li>
-              <li>
-                <Link href="/admin" className="hover:text-[#252522] transition-colors">
-                  Table QR Generator
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <p className="text-xs font-semibold text-[#252522] uppercase tracking-wider mb-4">
-              Company
-            </p>
-            <ul className="space-y-2.5 text-xs">
-              <li>
-                <span className="text-[#252522] font-medium">Built for VentureX 2026</span>
-              </li>
-              <li>
-                <span>Problem Statement 1: Local Restaurants</span>
-              </li>
-              <li>
-                <span>Zero Commission Guarantee</span>
-              </li>
-              <li>
-                <span>Privacy & Data Ownership</span>
+              <li className="pt-2">
+                <span className="text-[11px] text-[#5F7A65] font-semibold bg-[#EBF1ED] px-2 py-0.5 rounded">
+                  Built for VentureX 2026
+                </span>
               </li>
             </ul>
           </div>
@@ -132,19 +164,20 @@ export const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#6E6D66] gap-4">
-          <p>© 2026 DineFlow Platform. Empowering independent hospitality.</p>
+          <p>© 2026 DINEFLOW. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <a href="#features" className="hover:text-[#252522] transition-colors">
-              Features
+            <a href="#" className="hover:text-[#252522] transition-colors">
+              Privacy Policy
             </a>
-            <a href="#pricing" className="hover:text-[#252522] transition-colors">
-              Pricing
+            <a href="#" className="hover:text-[#252522] transition-colors">
+              Terms of Service
             </a>
-            <Link href="/menu" className="hover:text-[#252522] transition-colors">
-              Launch Demo
-            </Link>
+            <a href="#restaurants" className="hover:text-[#252522] transition-colors">
+              Partner Portal
+            </a>
           </div>
         </div>
+
       </div>
     </footer>
   );
