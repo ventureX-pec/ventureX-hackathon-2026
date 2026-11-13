@@ -20,7 +20,7 @@ export const Navbar = () => {
   const navLinks = [
     { label: "Home", href: "#" },
     { label: "Curated Dishes", href: "#showcase" },
-    { label: "How It Works", href: "#flow" },
+    { label: "Get Started", href: "#cta" },
   ];
 
   return (
