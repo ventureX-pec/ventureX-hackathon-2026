@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react"
 import Navbar from "@/components/Navbar"
 import HeroSection from "@/components/HeroSection"
+import HowItWorksStacked from "@/components/HowItWorksStacked"
 import OrderingCTASection from "@/components/OrderingCTASection"
 import Footer from "@/components/Footer"
 import ReservationModal from "@/components/ReservationModal"
@@ -24,10 +25,13 @@ export default function Home() {
       {/* 1. Preserved Animated Hero Section (Cinematic Dark Stage) */}
       <HeroSection onOpenReservation={() => setReservationOpen(true)} />
 
-      {/* 2. Final Call to Action */}
+      {/* 2. Interactive How It Works Stacked Cards Section */}
+      <HowItWorksStacked />
+
+      {/* 3. Final Call to Action */}
       <OrderingCTASection onOpenReservation={() => setReservationOpen(true)} />
 
-      {/* 3. Footer */}
+      {/* 4. Footer */}
       <Footer onOpenReservation={() => setReservationOpen(true)} />
 
       {/* Interactive Reservation Modal */}
