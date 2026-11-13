@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { QrCode } from "lucide-react";
 
@@ -66,6 +66,83 @@ export const ScrollStorytelling = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
+  // References to the native DOM elements for hardware-accelerated animations
+  const leftCardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const rightCardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const activeAnimationsRef = useRef<Animation[]>([]);
+
+  // Initialize native Web Animations API directly on the GPU compositor
+  useEffect(() => {
+    const duration = 16000; // 16 seconds full loop
+    const count = steps.length; // 5 steps
+
+    const leftKeyframes: Keyframe[] = [
+      { transform: "translate3d(50px, 0, -800px) rotateY(32deg) scale(0.65)", opacity: 0, offset: 0 },
+      { opacity: 0.4, offset: 0.15 },
+      { transform: "translate3d(20px, 0, -250px) rotateY(32deg) scale(0.88)", opacity: 0.85, offset: 0.4 },
+      { transform: "translate3d(0, 0, 0) rotateY(32deg) scale(1.0)", opacity: 1, offset: 0.55 },
+      { transform: "translate3d(-35px, 0, 260px) rotateY(32deg) scale(1.12)", opacity: 0.55, offset: 0.7 },
+      { transform: "translate3d(-80px, 0, 520px) rotateY(32deg) scale(1.22)", opacity: 0, offset: 0.85 },
+      { transform: "translate3d(-120px, 0, 750px) rotateY(32deg) scale(1.32)", opacity: 0, offset: 1 },
+    ];
+
+    const rightKeyframes: Keyframe[] = [
+      { transform: "translate3d(-50px, 0, -800px) rotateY(-32deg) scale(0.65)", opacity: 0, offset: 0 },
+      { opacity: 0.4, offset: 0.15 },
+      { transform: "translate3d(-20px, 0, -250px) rotateY(-32deg) scale(0.88)", opacity: 0.85, offset: 0.4 },
+      { transform: "translate3d(0, 0, 0) rotateY(-32deg) scale(1.0)", opacity: 1, offset: 0.55 },
+      { transform: "translate3d(35px, 0, 260px) rotateY(-32deg) scale(1.12)", opacity: 0.55, offset: 0.7 },
+      { transform: "translate3d(80px, 0, 520px) rotateY(-32deg) scale(1.22)", opacity: 0, offset: 0.85 },
+      { transform: "translate3d(120px, 0, 750px) rotateY(-32deg) scale(1.32)", opacity: 0, offset: 1 },
+    ];
+
+    const anims: Animation[] = [];
+
+    // Left wall cards
+    leftCardsRef.current.forEach((el, i) => {
+      if (!el) return;
+      const anim = el.animate(leftKeyframes, {
+        duration,
+        iterations: Infinity,
+        easing: "linear",
+      });
+      // Guarantee exact, staggered start time along the corridor
+      anim.currentTime = (i * duration) / count;
+      anims.push(anim);
+    });
+
+    // Right wall cards
+    rightCardsRef.current.forEach((el, i) => {
+      if (!el) return;
+      const anim = el.animate(rightKeyframes, {
+        duration,
+        iterations: Infinity,
+        easing: "linear",
+      });
+      // Guarantee exact, staggered start time along the corridor
+      anim.currentTime = (i * duration) / count;
+      anims.push(anim);
+    });
+
+    activeAnimationsRef.current = anims;
+
+    return () => {
+      anims.forEach((a) => a.cancel());
+      activeAnimationsRef.current = [];
+    };
+  }, []);
+
+  // Handle pause / resume on hover
+  useEffect(() => {
+    activeAnimationsRef.current.forEach((anim) => {
+      if (isPaused) {
+        anim.pause();
+      } else {
+        anim.play();
+      }
+    });
+  }, [isPaused]);
+
   // Synchronize center text with card cycle (16s loop / 5 cards = 3.2s per card)
   useEffect(() => {
     if (isPaused) return;
@@ -84,69 +161,6 @@ export const ScrollStorytelling = () => {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Inline Hardware GPU Keyframes for 100% reliable execution */}
-      <style>{`
-        @keyframes corridorLeft {
-          0% {
-            transform: translate3d(50px, 0, -800px) rotateY(32deg) scale(0.65);
-            opacity: 0;
-          }
-          15% {
-            opacity: 0.4;
-          }
-          40% {
-            transform: translate3d(20px, 0, -250px) rotateY(32deg) scale(0.88);
-            opacity: 0.85;
-          }
-          55% {
-            transform: translate3d(0, 0, 0) rotateY(32deg) scale(1.0);
-            opacity: 1;
-          }
-          70% {
-            transform: translate3d(-35px, 0, 260px) rotateY(32deg) scale(1.12);
-            opacity: 0.55;
-          }
-          85% {
-            transform: translate3d(-80px, 0, 520px) rotateY(32deg) scale(1.22);
-            opacity: 0;
-          }
-          100% {
-            transform: translate3d(-120px, 0, 750px) rotateY(32deg) scale(1.32);
-            opacity: 0;
-          }
-        }
-
-        @keyframes corridorRight {
-          0% {
-            transform: translate3d(-50px, 0, -800px) rotateY(-32deg) scale(0.65);
-            opacity: 0;
-          }
-          15% {
-            opacity: 0.4;
-          }
-          40% {
-            transform: translate3d(-20px, 0, -250px) rotateY(-32deg) scale(0.88);
-            opacity: 0.85;
-          }
-          55% {
-            transform: translate3d(0, 0, 0) rotateY(-32deg) scale(1.0);
-            opacity: 1;
-          }
-          70% {
-            transform: translate3d(35px, 0, 260px) rotateY(-32deg) scale(1.12);
-            opacity: 0.55;
-          }
-          85% {
-            transform: translate3d(80px, 0, 520px) rotateY(-32deg) scale(1.22);
-            opacity: 0;
-          }
-          100% {
-            transform: translate3d(120px, 0, 750px) rotateY(-32deg) scale(1.32);
-            opacity: 0;
-          }
-        }
-      `}</style>
-
       {/* Editorial Subtitle */}
       <div className="text-center mb-6 sm:mb-10 z-30 pointer-events-none">
         <span className="text-xs font-bold tracking-widest uppercase text-[#D66B43]">
@@ -171,11 +185,11 @@ export const ScrollStorytelling = () => {
           {steps.map((step, idx) => (
             <div
               key={`left-card-${step.id}`}
+              ref={(el) => {
+                leftCardsRef.current[idx] = el;
+              }}
               className="absolute left-2 sm:left-6 lg:left-12 w-[260px] sm:w-[320px] lg:w-[360px] h-[360px] sm:h-[430px] rounded-3xl bg-white border border-[#ECE7DE] shadow-md p-5 sm:p-6 flex flex-col justify-between overflow-hidden pointer-events-none select-none"
               style={{
-                animation: "corridorLeft 16s linear infinite",
-                animationDelay: `${-idx * 3.2}s`,
-                animationPlayState: isPaused ? "paused" : "running",
                 transformStyle: "preserve-3d",
                 willChange: "transform, opacity",
               }}
@@ -315,11 +329,11 @@ export const ScrollStorytelling = () => {
           {steps.map((step, idx) => (
             <div
               key={`right-card-${step.id}`}
+              ref={(el) => {
+                rightCardsRef.current[idx] = el;
+              }}
               className="absolute right-2 sm:right-6 lg:right-12 w-[260px] sm:w-[320px] lg:w-[360px] h-[360px] sm:h-[430px] rounded-3xl overflow-hidden border border-[#ECE7DE] shadow-md pointer-events-none select-none"
               style={{
-                animation: "corridorRight 16s linear infinite",
-                animationDelay: `${-idx * 3.2}s`,
-                animationPlayState: isPaused ? "paused" : "running",
                 transformStyle: "preserve-3d",
                 willChange: "transform, opacity",
               }}
