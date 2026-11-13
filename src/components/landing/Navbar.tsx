@@ -18,10 +18,10 @@ export const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { label: "Home", href: "#" },
-    { label: "How It Works", href: "#how-it-works" },
-    { label: "3D Showcase", href: "#showcase" },
-    { label: "Get Started", href: "#cta" },
+    { label: "Home", href: "/" },
+    { label: "How It Works", href: "/#how-it-works" },
+    { label: "3D Showcase", href: "/#showcase" },
+    { label: "Customer Hub", href: "/customer" },
   ];
 
   return (
@@ -69,15 +69,13 @@ export const Navbar = () => {
 
             {/* Right Action CTAs */}
             <div className="hidden sm:flex items-center gap-3">
-              <motion.a
-                href="#cta"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+              <Link
+                href="/customer"
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D66B43] text-white text-sm font-medium hover:bg-[#BF5832] transition-colors shadow-soft"
               >
-                <span>Get Started</span>
+                <span>Order Ahead</span>
                 <ArrowRight className="w-4 h-4" />
-              </motion.a>
+              </Link>
             </div>
 
             {/* Mobile Menu Hamburger */}

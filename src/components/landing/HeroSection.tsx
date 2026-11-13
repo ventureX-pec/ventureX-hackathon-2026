@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { motion } from "motion/react";
 import { WordReveal } from "@/components/motion/WordReveal";
 import { MagneticButton } from "@/components/motion/MagneticButton";
@@ -80,15 +81,13 @@ export const HeroSection = () => {
               className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2"
             >
               <MagneticButton strength={14}>
-                <motion.a
-                  href="#customers"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
+                <Link
+                  href="/customer"
                   className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#D66B43] text-white text-base font-medium hover:bg-[#BF5832] transition-colors shadow-soft"
                 >
                   <span>Explore Restaurants</span>
                   <ArrowRight className="w-4 h-4" />
-                </motion.a>
+                </Link>
               </MagneticButton>
 
               <MagneticButton strength={12}>

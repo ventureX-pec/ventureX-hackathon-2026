@@ -6,10 +6,12 @@ import { CulinaryShowcaseSection } from "@/components/landing/CulinaryShowcaseSe
 import { CtaSection } from "@/components/landing/CtaSection";
 import { Footer } from "@/components/landing/Footer";
 import { SmoothScrollProvider } from "@/components/common/SmoothScrollProvider";
+import { CursorTrail } from "@/components/motion/CursorTrail";
 
 export default function Home() {
   return (
     <SmoothScrollProvider>
+      <CursorTrail />
       <main className="min-h-screen bg-[#FAF8F3] text-[#252522]">
         <Navbar />
         <HeroSection />
