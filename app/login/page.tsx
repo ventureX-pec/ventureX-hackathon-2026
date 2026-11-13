@@ -18,6 +18,8 @@ import {
   User,
   UtensilsCrossed,
   Sparkles,
+  UserPlus,
+  LogIn,
 } from "lucide-react"
 import { signInUser, signUpUser } from "@/lib/auth"
 import { isSupabaseConfigured } from "@/lib/supabase"
@@ -282,8 +284,45 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Role Switcher Tabs (Customer vs Admin) */}
-            <div className="mb-3">
+            {/* Mode Switcher Tabs (Sign In vs Create Account) & Role Switcher */}
+            <div className="space-y-2 mb-3">
+              {/* Sign In vs Create Account Mode Pills */}
+              <div className="grid grid-cols-2 p-1 bg-[#ede4d8] rounded-xl border border-[#dbcbb9]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSignUp(false)
+                    setAuthError(null)
+                    setLoginSuccess(null)
+                  }}
+                  className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    !isSignUp
+                      ? "bg-[#c96342] text-white shadow-sm"
+                      : "text-[#57534e] hover:text-[#1c1917]"
+                  }`}
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>Sign In</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSignUp(true)
+                    setAuthError(null)
+                    setLoginSuccess(null)
+                  }}
+                  className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    isSignUp
+                      ? "bg-[#c96342] text-white shadow-sm"
+                      : "text-[#57534e] hover:text-[#1c1917]"
+                  }`}
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Create Account</span>
+                </button>
+              </div>
+
+              {/* Role Switcher Tabs (Customer vs Admin) */}
               <div className="grid grid-cols-2 p-1 bg-[#f4ede4] rounded-xl border border-[#e7dfd5]">
                 <button
                   type="button"
@@ -291,14 +330,14 @@ export default function LoginPage() {
                     setRole("customer")
                     setAuthError(null)
                   }}
-                  className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                  className={`flex items-center justify-center gap-1.5 py-1 px-2.5 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
                     role === "customer"
                       ? "bg-white text-[#1c1917] shadow-xs font-semibold"
-                      : "text-[#57534e] hover:text-[#1c1917]"
+                      : "text-[#78716c] hover:text-[#1c1917]"
                   }`}
                 >
-                  <User className="w-3.5 h-3.5 text-[#c96342]" />
-                  <span>Customer</span>
+                  <User className="w-3 h-3 text-[#c96342]" />
+                  <span>Customer Portal</span>
                 </button>
                 <button
                   type="button"
@@ -306,13 +345,13 @@ export default function LoginPage() {
                     setRole("admin")
                     setAuthError(null)
                   }}
-                  className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                  className={`flex items-center justify-center gap-1.5 py-1 px-2.5 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
                     role === "admin"
                       ? "bg-white text-[#1c1917] shadow-xs font-semibold"
-                      : "text-[#57534e] hover:text-[#1c1917]"
+                      : "text-[#78716c] hover:text-[#1c1917]"
                   }`}
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#c96342]" />
+                  <ShieldCheck className="w-3 h-3 text-[#c96342]" />
                   <span>Restaurant Admin</span>
                 </button>
               </div>
@@ -486,8 +525,8 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* Toggle between Sign In & Sign Up */}
-            <div className="mt-2 text-center">
+            {/* Prominent Action Toggle Button (Create Account vs Sign In) */}
+            <div className="mt-2.5">
               <button
                 type="button"
                 onClick={() => {
@@ -495,11 +534,24 @@ export default function LoginPage() {
                   setAuthError(null)
                   setLoginSuccess(null)
                 }}
-                className="text-[11px] font-medium text-[#c96342] hover:text-[#a84d31] transition-colors cursor-pointer"
+                className={`w-full py-2.5 px-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer shadow-sm group ${
+                  !isSignUp
+                    ? "border-2 border-[#c96342] bg-[#fdf8f5] hover:bg-[#faede5] text-[#c96342] hover:text-[#a84d31]"
+                    : "border-2 border-[#78716c]/40 bg-[#fbf9f6] hover:bg-[#f4ede4] text-[#1c1917]"
+                }`}
               >
-                {isSignUp
-                  ? "Already have an account? Sign In"
-                  : "New to ServeZa? Create an account"}
+                {!isSignUp ? (
+                  <>
+                    <UserPlus className="w-4 h-4 text-[#c96342] group-hover:scale-110 transition-transform shrink-0" />
+                    <span>Don&apos;t have an account? <u>Create Account here</u></span>
+                    <ArrowRight className="w-3.5 h-3.5 text-[#c96342] group-hover:translate-x-0.5 transition-transform shrink-0" />
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4 text-[#57534e] group-hover:-translate-x-0.5 transition-transform shrink-0" />
+                    <span>Already registered? <u>Sign In to your account</u></span>
+                  </>
+                )}
               </button>
             </div>
 
