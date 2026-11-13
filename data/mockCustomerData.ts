@@ -26,6 +26,7 @@ export interface MenuItem {
 export interface Restaurant {
   id: string;
   name: string;
+  slug?: string;
   tagline: string;
   cuisine: string;
   prepTime: string;

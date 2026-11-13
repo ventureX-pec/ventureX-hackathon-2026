@@ -18,6 +18,10 @@ export interface AdminOrder {
   timeAgo: string;
   createdAt: string;
   image: string;
+  restaurantId?: string;
+  restaurantName?: string;
+  tableNumber?: string;
+  tableId?: string;
 }
 
 export interface AdminIngredient {

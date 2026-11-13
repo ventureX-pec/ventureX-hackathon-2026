@@ -12,6 +12,8 @@ import {
   ChefHat,
   PackageCheck,
   Eye,
+  QrCode,
+  MapPin,
 } from "lucide-react";
 import { AdminOrder } from "@/data/mockAdminData";
 
@@ -147,12 +149,19 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
               <div>
                 <div className="flex items-center justify-between gap-2 pb-3 border-b border-[#F2ECE2]">
                   <div>
-                    <span className="font-serif text-lg font-bold text-[#252522]">
-                      {order.orderNumber}
-                    </span>
-                    <span className="ml-2 px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#D66B43]/10 text-[#D66B43]">
-                      Token #{order.tokenNumber}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-serif text-lg font-bold text-[#252522]">
+                        {order.orderNumber}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#D66B43]/10 text-[#D66B43]">
+                        Token #{order.tokenNumber}
+                      </span>
+                    </div>
+                    {order.restaurantName && (
+                      <div className="text-[11px] font-bold text-[#c96342] uppercase tracking-wide mt-0.5">
+                        {order.restaurantName}
+                      </div>
+                    )}
                   </div>
 
                   <span
@@ -173,8 +182,9 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                 {/* Customer & Location */}
                 <div className="mt-3 text-xs text-[#736E65] flex items-center justify-between">
                   <span className="font-semibold text-[#252522]">{order.customerName}</span>
-                  <span className="px-2 py-0.5 rounded-md bg-[#FAF8F5] border border-[#ECE5DA] text-[10px] font-medium">
-                    {order.tableOrShelf}
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FAF8F5] border border-[#ECE5DA] text-[11px] font-bold text-[#252522] shadow-xs">
+                    <QrCode className="w-3.5 h-3.5 text-[#c96342]" />
+                    <span>{order.tableNumber ? `Table ${order.tableNumber}` : order.tableOrShelf}</span>
                   </span>
                 </div>
 

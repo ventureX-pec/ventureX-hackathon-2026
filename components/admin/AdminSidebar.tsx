@@ -17,6 +17,7 @@ import {
   Flame,
   PanelLeftClose,
   ChevronRight,
+  QrCode,
 } from "lucide-react";
 
 export type AdminTab =
@@ -24,6 +25,7 @@ export type AdminTab =
   | "orders"
   | "kitchen"
   | "pickup"
+  | "tables"
   | "menu"
   | "ingredients"
   | "revenue"
@@ -87,6 +89,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     {
       group: "RESTAURANT",
       items: [
+        { id: "tables" as AdminTab, label: "Table QR Codes", icon: QrCode },
         { id: "menu" as AdminTab, label: "Menu Management", icon: UtensilsCrossed },
         { id: "ingredients" as AdminTab, label: "Ingredients", icon: Layers },
         { id: "revenue" as AdminTab, label: "Revenue", icon: BarChart3 },
