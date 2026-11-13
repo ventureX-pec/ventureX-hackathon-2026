@@ -92,23 +92,6 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
       {/* Subtle organic light wash in the top left */}
       <div className="absolute -left-12 -top-12 w-64 h-64 rounded-full bg-gradient-to-br from-[#FAF0E6]/50 to-transparent blur-2xl pointer-events-none" />
 
-      {/* Floating Animated Garnish Embers */}
-      <motion.div
-        animate={{ y: [-5, 6, -5], rotate: [0, 8, -8, 0] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-6 sm:top-10 right-1/3 text-2xl select-none opacity-80 pointer-events-none"
-      >
-        {current.garnishEmoji}
-      </motion.div>
-
-      <motion.div
-        animate={{ y: [6, -6, 6], rotate: [-6, 6, -6] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
-        className="absolute bottom-6 sm:bottom-10 right-28 text-lg select-none opacity-70 pointer-events-none"
-      >
-        🍅
-      </motion.div>
-
       <div className="relative z-10 p-6 sm:p-10 lg:p-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           {/* Left Text Column */}

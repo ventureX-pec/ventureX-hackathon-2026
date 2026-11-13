@@ -18,6 +18,7 @@ import {
   Heart,
 } from "lucide-react";
 import { CursorTrail } from "@/components/motion/CursorTrail";
+import { FoodPhotographyBackdrop } from "@/components/customer/FoodPhotographyBackdrop";
 import { Sidebar } from "@/components/customer/Sidebar";
 import { MobileBottomNav } from "@/components/customer/MobileBottomNav";
 import { TopHeader } from "@/components/customer/TopHeader";
@@ -40,9 +41,9 @@ export default function CustomerDashboardPage() {
   // Navigation & Active Tab
   const [activeTab, setActiveTab] = useState<string>("home");
 
-  // Change 1: Resizable & Collapsible Sidebar State
+  // Change 1: Resizable & Collapsible Sidebar State (defaults to collapsed as in visual reference)
   const [sidebarWidth, setSidebarWidth] = useState<number>(256);
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
   // Search & Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -197,11 +198,9 @@ export default function CustomerDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-[#252522] selection:bg-[#D66B43]/20 selection:text-[#D66B43] relative overflow-x-hidden">
-      {/* Natural Atmospheric Backdrop (Warm peach, soft cream, and delicate sage ambient aura inspired by Foodora) */}
-      <div className="fixed -top-32 -right-32 w-[750px] h-[750px] rounded-full bg-gradient-to-br from-[#FDE8DC]/65 via-[#FDF3EC]/35 to-transparent blur-3xl pointer-events-none -z-10" />
-      <div className="fixed top-1/3 -left-32 w-[600px] h-[600px] rounded-full bg-gradient-to-tr from-[#F5ECE0]/45 via-[#FAF6EE]/30 to-transparent blur-3xl pointer-events-none -z-10" />
-      <div className="fixed bottom-10 right-1/4 w-[520px] h-[520px] rounded-full bg-gradient-to-t from-[#EAF1EC]/40 to-transparent blur-3xl pointer-events-none -z-10" />
+    <div className="min-h-screen bg-[#FAF8F3] text-[#252522] selection:bg-[#D66B43]/20 selection:text-[#D66B43] relative overflow-x-hidden">
+      {/* Editorial Food Photography Background Layer */}
+      <FoodPhotographyBackdrop />
 
       {/* Light subtle cursor trail */}
       <CursorTrail />
