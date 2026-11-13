@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { motion } from "motion/react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   ChefHat,
   MenuSquare,
@@ -11,9 +11,25 @@ import {
   CheckCircle2,
   ArrowRight,
   TrendingUp,
+  Sparkles,
+  BellRing,
 } from "lucide-react";
 
 export const ForRestaurantsSection = () => {
+  const [operationsStage, setOperationsStage] = useState<"received" | "preparing" | "ready">("preparing");
+
+  // Cycle through operations lifecycle every 4 seconds to demonstrate live KDS workflow
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setOperationsStage((prev) => {
+        if (prev === "received") return "preparing";
+        if (prev === "preparing") return "ready";
+        return "received";
+      });
+    }, 4200);
+    return () => clearInterval(interval);
+  }, []);
+
   const features = [
     {
       icon: MenuSquare,
@@ -86,7 +102,7 @@ export const ForRestaurantsSection = () => {
           </motion.div>
         </div>
 
-        {/* Feature Highlights Grid */}
+        {/* 6 Feature Highlights Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {features.map((feat, index) => {
             const Icon = feat.icon;
@@ -96,7 +112,8 @@ export const ForRestaurantsSection = () => {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
+                transition={{ delay: index * 0.08, duration: 0.5 }}
+                whileHover={{ y: -4 }}
                 className="p-6 rounded-2xl bg-white border border-[#ECE7DE] shadow-soft hover:shadow-card transition-all"
               >
                 <div className="w-10 h-10 rounded-xl bg-[#FAF2EE] flex items-center justify-center text-[#D66B43] mb-4">
@@ -113,7 +130,8 @@ export const ForRestaurantsSection = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-40px" }}
-            transition={{ delay: 0.5, duration: 0.5 }}
+            transition={{ delay: 0.45, duration: 0.5 }}
+            whileHover={{ y: -4 }}
             className="p-6 rounded-2xl bg-[#EBF1ED] border border-[#D5E1D8] flex flex-col justify-between"
           >
             <div>
@@ -131,7 +149,7 @@ export const ForRestaurantsSection = () => {
           </motion.div>
         </div>
 
-        {/* Elegant Dashboard Visual Mockup (Non-Functional Visual Preview) */}
+        {/* Animated Visual Representation of Restaurant Operations */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -144,87 +162,136 @@ export const ForRestaurantsSection = () => {
             <div>
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#5F7A65]" />
-                <h3 className="text-base font-bold text-[#252522]">Kitchen Display & Table Management Console</h3>
+                <h3 className="text-base font-bold text-[#252522]">Live Kitchen Coordination Workflow</h3>
               </div>
-              <p className="text-xs text-[#6E6D66] mt-0.5">Sample live view for The Corner Café</p>
+              <p className="text-xs text-[#6E6D66] mt-0.5">Automated ticket progression demonstration</p>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium px-3 py-1 rounded-full bg-[#EBF1ED] text-[#5F7A65] border border-[#D5E1D8]">
-                3 Active Kitchen Tickets
-              </span>
-              <span className="text-xs font-medium px-3 py-1 rounded-full bg-[#FAF2EE] text-[#D66B43] border border-[#F3DFD8]">
-                9/14 Tables Occupied
-              </span>
+
+            {/* Stage Selector Pills */}
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#FAF8F3] border border-[#ECE7DE]">
+              <button
+                onClick={() => setOperationsStage("received")}
+                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                  operationsStage === "received" ? "bg-[#FAF2EE] text-[#D66B43] shadow-xs" : "text-[#6E6D66]"
+                }`}
+              >
+                1. New Order
+              </button>
+              <button
+                onClick={() => setOperationsStage("preparing")}
+                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                  operationsStage === "preparing" ? "bg-[#FAF2EE] text-[#D66B43] shadow-xs" : "text-[#6E6D66]"
+                }`}
+              >
+                2. In Kitchen
+              </button>
+              <button
+                onClick={() => setOperationsStage("ready")}
+                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                  operationsStage === "ready" ? "bg-[#EBF1ED] text-[#5F7A65] shadow-xs" : "text-[#6E6D66]"
+                }`}
+              >
+                3. Ready
+              </button>
             </div>
           </div>
 
-          {/* Mockup Ticket Board (3 Tickets) */}
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* Animated Coordinated Order Ticket Showcase */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            {/* Ticket 1: Preparing */}
-            <div className="rounded-2xl p-5 bg-[#FAF8F3] border border-[#ECE7DE] space-y-3.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#252522]">#TK-41 • TABLE 3</span>
-                <span className="text-[11px] font-semibold text-[#D66B43] flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  <span>4:20 elapsed</span>
+            {/* STAGE 1: ORDER ENTRY */}
+            <motion.div
+              animate={{
+                borderColor: operationsStage === "received" ? "#D66B43" : "#ECE7DE",
+                scale: operationsStage === "received" ? 1.02 : 1.0,
+              }}
+              transition={{ duration: 0.3 }}
+              className={`rounded-2xl p-5 border transition-all ${
+                operationsStage === "received" ? "bg-[#FAF8F3] shadow-card ring-1 ring-[#D66B43]/30" : "bg-white"
+              }`}
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-[#F7F4EE]">
+                <div className="flex items-center gap-2">
+                  <BellRing className={`w-4 h-4 ${operationsStage === "received" ? "text-[#D66B43] animate-bounce" : "text-[#6E6D66]"}`} />
+                  <span className="text-xs font-bold text-[#252522]">Step 1: Order Intake</span>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#FAF2EE] text-[#D66B43]">
+                  Guest QR Scanned
                 </span>
               </div>
-              <div className="text-xs text-[#252522] space-y-1.5 border-t border-[#ECE7DE] pt-2.5">
-                <p className="font-semibold">1x Crispy Paneer Makhani Bowl</p>
-                <p className="text-[11px] text-[#D66B43]">Note: Medium spice requested</p>
-                <p className="font-semibold pt-1">1x Iced Hazelnut Cold Coffee</p>
+              <div className="mt-3 text-xs text-[#252522] space-y-1.5">
+                <p className="font-semibold text-sm">Table #4 • Order #TK-44</p>
+                <p className="text-[#6E6D66]">1x Crispy Paneer Makhani Bowl</p>
+                <p className="text-[#6E6D66]">1x Iced Hazelnut Cold Coffee</p>
               </div>
-              <div className="pt-2 border-t border-[#ECE7DE] flex items-center justify-between text-xs">
-                <span className="font-bold text-[#252522]">₹320.25</span>
-                <span className="px-2 py-0.5 rounded bg-[#FAF2EE] text-[#D66B43] font-semibold text-[10px]">
-                  Cooking
-                </span>
+              <div className="mt-4 pt-3 border-t border-[#F7F4EE] flex justify-between items-center text-xs">
+                <span className="text-[#6E6D66]">Routed to line</span>
+                <span className="font-bold text-[#5F7A65]">Instant &lt;0.2s</span>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Ticket 2: Takeaway Pre-order */}
-            <div className="rounded-2xl p-5 bg-[#FAF8F3] border border-[#ECE7DE] space-y-3.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#252522]">#TK-42 • TAKEAWAY</span>
-                <span className="text-[11px] font-semibold text-[#5F7A65] flex items-center gap-1">
+            {/* STAGE 2: KITCHEN DISPLAY */}
+            <motion.div
+              animate={{
+                borderColor: operationsStage === "preparing" ? "#D66B43" : "#ECE7DE",
+                scale: operationsStage === "preparing" ? 1.02 : 1.0,
+              }}
+              transition={{ duration: 0.3 }}
+              className={`rounded-2xl p-5 border transition-all ${
+                operationsStage === "preparing" ? "bg-[#FAF8F3] shadow-card ring-1 ring-[#D66B43]/30" : "bg-white"
+              }`}
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-[#F7F4EE]">
+                <div className="flex items-center gap-2">
+                  <ChefHat className={`w-4 h-4 ${operationsStage === "preparing" ? "text-[#D66B43]" : "text-[#6E6D66]"}`} />
+                  <span className="text-xs font-bold text-[#252522]">Step 2: Active Prep</span>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#FAF2EE] text-[#D66B43] flex items-center gap-1">
                   <Clock className="w-3 h-3" />
-                  <span>Pickup 1:15 PM</span>
+                  <span>Cooking (4m)</span>
                 </span>
               </div>
-              <div className="text-xs text-[#252522] space-y-1.5 border-t border-[#ECE7DE] pt-2.5">
-                <p className="font-semibold">2x Double Decker Veg Burger</p>
-                <p className="font-semibold">1x Cheesy Loaded Truffle Fries</p>
-                <p className="text-[11px] text-[#6E6D66]">Pack ketchup packets</p>
+              <div className="mt-3 text-xs text-[#252522] space-y-1.5">
+                <p className="font-semibold text-sm">Line 1: Hot Station</p>
+                <p className="text-[#D66B43] font-medium bg-white px-2 py-1 rounded border border-[#ECE7DE]">
+                  Chef Note: Medium spice requested
+                </p>
               </div>
-              <div className="pt-2 border-t border-[#ECE7DE] flex items-center justify-between text-xs">
-                <span className="font-bold text-[#252522]">₹554.40</span>
-                <span className="px-2 py-0.5 rounded bg-[#EBF1ED] text-[#5F7A65] font-semibold text-[10px]">
-                  Scheduled (Ready in 3m)
-                </span>
+              <div className="mt-4 pt-3 border-t border-[#F7F4EE] flex justify-between items-center text-xs">
+                <span className="text-[#6E6D66]">Timer Pacing</span>
+                <span className="font-bold text-[#D66B43]">On Target</span>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Ticket 3: Ready for Table 7 */}
-            <div className="rounded-2xl p-5 bg-[#FAF8F3] border border-[#ECE7DE] space-y-3.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#252522]">#TK-40 • TABLE 7</span>
-                <span className="text-[11px] font-semibold text-[#5F7A65] flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" />
-                  <span>Ready</span>
+            {/* STAGE 3: ORDER READY */}
+            <motion.div
+              animate={{
+                borderColor: operationsStage === "ready" ? "#5F7A65" : "#ECE7DE",
+                scale: operationsStage === "ready" ? 1.02 : 1.0,
+              }}
+              transition={{ duration: 0.3 }}
+              className={`rounded-2xl p-5 border transition-all ${
+                operationsStage === "ready" ? "bg-[#EBF1ED] shadow-card ring-1 ring-[#5F7A65]/30" : "bg-white"
+              }`}
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-[#D5E1D8]">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className={`w-4 h-4 ${operationsStage === "ready" ? "text-[#5F7A65]" : "text-[#6E6D66]"}`} />
+                  <span className="text-xs font-bold text-[#252522]">Step 3: Service Call</span>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#5F7A65] text-white">
+                  Ready for Guest
                 </span>
               </div>
-              <div className="text-xs text-[#252522] space-y-1.5 border-t border-[#ECE7DE] pt-2.5">
-                <p className="font-semibold">2x Peri-Peri Chicken Burger</p>
-                <p className="font-semibold">2x Mint Mojito Fizz</p>
+              <div className="mt-3 text-xs text-[#252522] space-y-1.5">
+                <p className="font-semibold text-sm">Table #4 Alert Sent</p>
+                <p className="text-[#5F7A65] font-medium">Food plated & served without delay</p>
               </div>
-              <div className="pt-2 border-t border-[#ECE7DE] flex items-center justify-between text-xs">
-                <span className="font-bold text-[#252522]">₹546.00</span>
-                <span className="px-2 py-0.5 rounded bg-[#5F7A65] text-white font-semibold text-[10px]">
-                  Served to Table
-                </span>
+              <div className="mt-4 pt-3 border-t border-[#D5E1D8] flex justify-between items-center text-xs">
+                <span className="text-[#5F7A65]">Total Turnaround</span>
+                <span className="font-bold text-[#5F7A65]">7.8 Minutes</span>
               </div>
-            </div>
+            </motion.div>
 
           </div>
         </motion.div>
