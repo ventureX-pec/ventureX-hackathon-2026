@@ -47,20 +47,6 @@ const FEATURED_HERO_DISHES: Dish[] = [
     ingredients: ["Wild Salmon", "Arborio Rice", "Lemon Zest", "Baby Asparagus", "Dill Oil"],
     accent: "#e07a5f",
   },
-  {
-    title: "Artisanal",
-    subtitle: "Avocado & Egg Tartine",
-    image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=700&auto=format&fit=crop&q=80",
-    eyebrow: "#4 All-Day Breakfast Favorite",
-    label: "Avocado Tartine",
-    rating: 4.7,
-    chef: "Chef Maya Patel",
-    kitchen: "Bakery & Griddle",
-    description: "Thick-cut country sourdough with crushed ripe Hass avocado, pasture-raised poached eggs, microgreens and chili flakes.",
-    likes: 512,
-    ingredients: ["Country Sourdough", "Hass Avocado", "Organic Farm Eggs", "Microgreens", "Aleppo Chili"],
-    accent: "#b45309",
-  },
 ]
 
 interface HeroSectionProps {

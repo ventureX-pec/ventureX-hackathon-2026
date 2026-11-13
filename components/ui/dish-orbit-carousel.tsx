@@ -73,7 +73,7 @@ export function arcPath(a0: number, a1: number, cx: number, cy: number, r: numbe
   return "M" + outer.join("L") + "L" + inner.reverse().join("L") + "Z"
 }
 
-export const ARC_REST = [[50, 98], [46, 124], [60, 126], [40, 100]]
+export const ARC_REST = [[50, 98], [46, 124], [60, 126]]
 export function arcRest(index: number): number[] {
   return ARC_REST[((index % ARC_REST.length) + ARC_REST.length) % ARC_REST.length]
 }
@@ -83,9 +83,9 @@ export const ARC_SWEEP = [38, 146]
 const ORBIT_X = 299
 const ORBIT_Y = -450
 const ORBIT_R = 650
-const SWING = 50
+const SWING = 38
 const ITEM = 118
-const VISIBLE = 4
+const VISIBLE = 3
 
 const FONT = "dsh-face"
 
@@ -149,11 +149,11 @@ const CSS =
   ".dsh-meh:hover{background:rgba(255,255,255,0.16);color:#ffffff}" +
   ".dsh-react .dsh-ico{width:13px;height:13px}" +
   /* Thumbnail Carousel Strip */
-  ".dsh-strip{position:absolute;left:130px;top:295px;width:550px;height:115px;display:flex;align-items:center}" +
+  ".dsh-strip{position:absolute;left:130px;top:295px;width:450px;height:115px;display:flex;align-items:center}" +
   ".dsh-arrow{width:30px;height:30px;display:grid;place-items:center;flex:none;border-radius:99px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:#e7dfd5;transition:all 0.2s}" +
   ".dsh-arrow:hover{background:rgba(255,255,255,0.18);color:#ffffff}" +
   ".dsh-arrow svg{width:10px;height:13px;fill:currentColor}" +
-  ".dsh-win{position:relative;width:472px;height:115px;overflow:hidden;flex:none;margin:0 4px;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}" +
+  ".dsh-win{position:relative;width:366px;height:115px;overflow:hidden;flex:none;margin:0 4px}" +
   ".dsh-track{position:absolute;left:0;top:0;display:flex;transition:transform .6s cubic-bezier(.65,0,.35,1)}" +
   ".dsh-th{width:118px;height:115px;display:flex;justify-content:center;padding-top:2px}" +
   ".dsh-th .dsh-btn{width:94px;height:108px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6px 4px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);transition:all .3s}" +
@@ -313,30 +313,51 @@ export function DishOrbitCarousel({
     const tl = gsap.timeline({ onComplete: () => { tlRef.current = null } })
     tlRef.current = tl
 
-    // Orbit swing
-    tl.to(a.orbit, { rotation: SWING * d, duration: 0.62, ease: "power2.in" }, 0)
-      .set(a.orbit, { autoAlpha: 0, rotation: 0 }, 0.62)
-      .fromTo(b.orbit, { autoAlpha: 1, rotation: -SWING * d }, { rotation: 0, duration: 0.95, ease: "power3.out" }, 0.3)
+    // Smooth overlapping orbit swing
+    tl.to(a.orbit, { rotation: SWING * d, autoAlpha: 0, duration: 0.46, ease: "power2.inOut" }, 0)
+      .fromTo(
+        b.orbit,
+        { autoAlpha: 0, rotation: -SWING * d },
+        { autoAlpha: 1, rotation: 0, duration: 0.6, ease: "power2.out" },
+        0.06
+      )
 
-    // Title wipe
-    tl.to(a.t1, { clipPath: HIDE_1, duration: 0.42, ease: "power2.in" }, 0)
-      .to(a.t2, { clipPath: HIDE_2, duration: 0.42, ease: "power2.in" }, 0.06)
-      .to(a.eye, { autoAlpha: 0, duration: 0.25 }, 0)
-      .set(a.head, { autoAlpha: 0 }, 0.5)
-      .set(b.head, { autoAlpha: 1 }, 0.5)
-      .fromTo(b.eye, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.55)
-      .fromTo(b.t1, { clipPath: HIDE_1 }, { clipPath: SHOW, duration: 0.7, ease: "power3.out" }, 0.55)
-      .fromTo(b.t2, { clipPath: HIDE_2 }, { clipPath: SHOW, duration: 0.7, ease: "power3.out" }, 0.62)
+    // Fluid title transition: slide and reveal without blank dead pause
+    tl.to(a.head, { autoAlpha: 0, y: -12 * d, duration: 0.28, ease: "power2.in" }, 0)
+      .set(a.head, { y: 0 }, 0.32)
+      .set(b.head, { autoAlpha: 1, y: 0 }, 0.14)
+      .set([b.t1, b.t2], { clipPath: SHOW }, 0.14)
+      .fromTo(b.eye, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: "power2.out" }, 0.16)
+      .fromTo(b.t1, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.42, ease: "power2.out" }, 0.16)
+      .fromTo(b.t2, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.44, ease: "power2.out" }, 0.2)
 
-    // Chef card cross-fade
-    tl.to(a.body, { autoAlpha: 0, y: -6, duration: 0.3, ease: "power1.in" }, 0.05)
-      .set(b.body, { autoAlpha: 1, y: 0 }, 0.4)
-    if (b.body) tl.fromTo(b.body.children, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power2.out" }, 0.4)
+    // Chef card cross-fade: fluid overlap
+    tl.to(a.body, { autoAlpha: 0, y: -6, duration: 0.24, ease: "power1.in" }, 0)
+      .set(b.body, { autoAlpha: 1, y: 0 }, 0.14)
+    if (b.body) {
+      tl.fromTo(
+        b.body.children,
+        { autoAlpha: 0, y: 8 },
+        { autoAlpha: 1, y: 0, duration: 0.42, stagger: 0.04, ease: "power2.out" },
+        0.16
+      )
+    }
 
-    // Glowing arc trail
-    tl.to(arc.current, { a0: ARC_SWEEP[0], a1: ARC_SWEEP[1], duration: 0.6, ease: "power2.inOut", onUpdate: drawArc }, 0)
-      .to(arc.current, { a0: rest[0], a1: rest[1], duration: 0.85, ease: "power3.out", onUpdate: drawArc }, 0.6)
-    if (arcRef.current) tl.to(arcRef.current, { fill: tint, duration: 1.1, ease: "power1.inOut" }, 0.1)
+    // Glowing organic backdrop shape: single continuous smooth morph
+    tl.to(
+      arc.current,
+      {
+        a0: rest[0],
+        a1: rest[1],
+        duration: 0.58,
+        ease: "power2.out",
+        onUpdate: drawArc,
+      },
+      0
+    )
+    if (arcRef.current) {
+      tl.to(arcRef.current, { fill: tint, duration: 0.58, ease: "power1.out" }, 0)
+    }
     shown.current = to
   }, [index, n, dishes])
 
@@ -408,7 +429,7 @@ export function DishOrbitCarousel({
   const dish = dishes[index]
 
   // Track height gives enough scroll room for each dish to play before unpinning to the rest of the site
-  const trackHeight = `${100 + (n - 1) * 70}vh`
+  const trackHeight = `${100 + (n - 1) * 60}vh`
 
   return (
     <div
