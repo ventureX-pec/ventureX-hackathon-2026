@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { CalendarClock, Menu as MenuIcon, X } from "lucide-react"
+import Link from "next/link"
+import { CalendarClock, LogIn, Menu as MenuIcon, X } from "lucide-react"
 
 interface NavbarProps {
   onOpenReservation?: () => void
@@ -105,6 +106,18 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
 
         {/* Right CTA Button: Reserve / Contact */}
         <div className="flex items-center gap-3">
+          <Link
+            href="/login"
+            className={`hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all ${
+              isScrolledToLight
+                ? "text-[#44403c] hover:text-[#1c1917] hover:bg-[#f4ede4] border border-[#e7dfd5]"
+                : "text-[#d6cbbe] hover:text-white hover:bg-white/10 border border-white/15"
+            }`}
+          >
+            <LogIn className="w-3.5 h-3.5 text-[#c96342]" />
+            <span>Sign In</span>
+          </Link>
+
           <button
             onClick={handleReserve}
             className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#c96342] hover:bg-[#a84d31] text-white text-xs sm:text-sm font-medium transition-all shadow-xs hover:shadow active:scale-95 cursor-pointer"
@@ -149,7 +162,15 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
               {link.label}
             </a>
           ))}
-          <div className="pt-3 border-t border-white/10">
+          <div className="pt-3 border-t border-white/10 space-y-2">
+            <Link
+              href="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full py-2.5 rounded-full border border-[#e7dfd5] text-[#1c1917] bg-[#f4ede4] font-medium text-sm flex items-center justify-center gap-2"
+            >
+              <LogIn className="w-4 h-4 text-[#c96342]" />
+              <span>Sign In (Customer / Admin)</span>
+            </Link>
             <button
               onClick={() => {
                 setMobileMenuOpen(false)
