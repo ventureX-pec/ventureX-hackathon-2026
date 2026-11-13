@@ -1,12 +1,15 @@
 "use client"
 
 import React from "react"
-import { ArrowRight, ShoppingBag, UtensilsCrossed } from "lucide-react"
+import { ArrowRight, CalendarClock, UtensilsCrossed } from "lucide-react"
 
 export default function OrderingCTASection() {
-  const handleOrderNow = () => {
-    const menuEl = document.querySelector("#menu")
-    if (menuEl) menuEl.scrollIntoView({ behavior: "smooth" })
+  const handleReserveClick = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("app:navigating"))
+    }
+    const contactEl = document.querySelector("#contact")
+    if (contactEl) contactEl.scrollIntoView({ behavior: "smooth" })
   }
 
   return (
@@ -31,17 +34,17 @@ export default function OrderingCTASection() {
 
             {/* Prescribed Supporting Text */}
             <p className="mt-4 text-sm sm:text-base text-[#57534e] leading-relaxed max-w-lg mx-auto">
-              Explore the menu, find your favourite and let us take care of the rest.
+              Join us at The Corner Table for an exceptional dining experience, or get in touch for reservations and private gatherings.
             </p>
 
-            {/* Prescribed Order Now Button */}
+            {/* Action Button */}
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <button
-                onClick={handleOrderNow}
+                onClick={handleReserveClick}
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#c96342] hover:bg-[#a84d31] text-white font-medium text-sm transition-all shadow-xs hover:shadow active:scale-95 cursor-pointer"
               >
-                <ShoppingBag className="w-4 h-4" />
-                <span>Order Now</span>
+                <CalendarClock className="w-4 h-4" />
+                <span>Reserve a Table</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

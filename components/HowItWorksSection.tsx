@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Compass, Sliders, CalendarClock, Heart, ArrowRight } from "lucide-react"
+import { Compass, Sliders, CalendarClock, Heart, ArrowRight, ShieldCheck, Activity } from "lucide-react"
 
 export default function HowItWorksSection() {
   const steps = [
@@ -31,8 +31,34 @@ export default function HowItWorksSection() {
     },
   ]
 
-  const handleStartOrder = () => {
-    const el = document.querySelector("#menu")
+  const features = [
+    {
+      title: "Smart Pickup Scheduling",
+      description: "Select an exact pickup slot down to 10-minute intervals so your hot meal is never left sweating under heat lamps.",
+      icon: <CalendarClock className="w-4 h-4 text-[#c96342]" />,
+    },
+    {
+      title: "Ingredient-Aware Availability",
+      description: "Live inventory tracking from our kitchen line ensures sold-out items update instantly, avoiding order disappointments.",
+      icon: <ShieldCheck className="w-4 h-4 text-[#c96342]" />,
+    },
+    {
+      title: "Personalized Ordering",
+      description: "Filter effortlessly by vegan, vegetarian, or gluten-free preferences, or specify exact seasonings with a single tap.",
+      icon: <Sliders className="w-4 h-4 text-[#c96342]" />,
+    },
+    {
+      title: "Live Order Updates",
+      description: "Watch your ticket move transparently through our brigade from ticket fire to plating and ready-for-pass.",
+      icon: <Activity className="w-4 h-4 text-[#c96342]" />,
+    },
+  ]
+
+  const handleContactClick = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("app:navigating"))
+    }
+    const el = document.querySelector("#contact")
     if (el) el.scrollIntoView({ behavior: "smooth" })
   }
 
@@ -53,7 +79,7 @@ export default function HowItWorksSection() {
         </div>
 
         {/* 4 Connected Timeline Steps */}
-        <div className="relative">
+        <div className="relative mb-20">
           {/* Subtle connecting line for desktop timeline */}
           <div className="hidden lg:block absolute top-[52px] left-[10%] right-[10%] h-[2px] bg-[#e7dfd5] z-0" />
 
@@ -86,13 +112,44 @@ export default function HowItWorksSection() {
           </div>
         </div>
 
-        {/* Prescribed Start Your Order Button */}
-        <div className="mt-14 text-center">
+        {/* Supporting Special Capabilities Grid */}
+        <div className="mt-12 pt-12 border-t border-[#e7dfd5]/80">
+          <div className="text-center mb-8">
+            <h3 className="font-serif text-2xl font-medium text-[#1c1917]">
+              More Than Just Online Ordering
+            </h3>
+            <p className="text-xs sm:text-sm text-[#57534e] mt-1">
+              Thoughtfully engineered hospitality from the first tap to the final bite.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feat) => (
+              <div
+                key={feat.title}
+                className="bg-white rounded-xl border border-[#e7dfd5] p-6 hover:shadow-2xs transition-all"
+              >
+                <div className="w-8 h-8 rounded-lg bg-[#f4ede4] flex items-center justify-center mb-3">
+                  {feat.icon}
+                </div>
+                <h4 className="font-serif text-sm font-semibold text-[#1c1917] mb-1.5">
+                  {feat.title}
+                </h4>
+                <p className="text-xs text-[#57534e] leading-relaxed font-light">
+                  {feat.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Action Button: Get in Touch / Reserve */}
+        <div className="mt-16 text-center">
           <button
-            onClick={handleStartOrder}
+            onClick={handleContactClick}
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#c96342] hover:bg-[#a84d31] text-white font-medium text-sm transition-all shadow-xs hover:shadow active:scale-95 cursor-pointer"
           >
-            <span>Start Your Order</span>
+            <span>Plan Your Visit or Order</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

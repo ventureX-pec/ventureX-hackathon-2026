@@ -2,8 +2,6 @@
 
 import React from "react"
 import DishOrbitCarousel, { type Dish } from "@/components/ui/dish-orbit-carousel"
-import { useCart } from "@/context/CartContext"
-import { MENU_ITEMS } from "@/data/menuData"
 
 // Featured artisanal dishes for the hero orbit carousel
 const FEATURED_HERO_DISHES: Dish[] = [
@@ -66,41 +64,28 @@ const FEATURED_HERO_DISHES: Dish[] = [
 ]
 
 export default function HeroSection() {
-  const { addItem, setIsCartOpen } = useCart()
-
-  const handleCarouselOrder = (dish: Dish) => {
-    const found = MENU_ITEMS.find(
-      (m) =>
-        m.name.toLowerCase().includes(dish.subtitle.toLowerCase()) ||
-        dish.subtitle.toLowerCase().includes(m.name.toLowerCase())
-    )
-    if (found) {
-      addItem(found, 1)
-      setIsCartOpen(true)
-    } else {
-      const menuEl = document.querySelector("#menu")
-      if (menuEl) menuEl.scrollIntoView({ behavior: "smooth" })
+  const handleStoryClick = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("app:navigating"))
     }
-  }
-
-  const handleExploreMenu = () => {
-    const el = document.querySelector("#menu")
+    const el = document.querySelector("#story")
     if (el) el.scrollIntoView({ behavior: "smooth" })
   }
 
-  const handleOrderFood = () => {
-    const el = document.querySelector("#menu")
+  const handleHowItWorksClick = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("app:navigating"))
+    }
+    const el = document.querySelector("#how-it-works")
     if (el) el.scrollIntoView({ behavior: "smooth" })
-    setIsCartOpen(true)
   }
 
   return (
     <section id="hero" className="relative w-full bg-[#0f0e0d]">
       <DishOrbitCarousel
         dishes={FEATURED_HERO_DISHES}
-        onOrder={handleCarouselOrder}
-        onExploreMenu={handleExploreMenu}
-        onOrderFood={handleOrderFood}
+        onStoryClick={handleStoryClick}
+        onHowItWorksClick={handleHowItWorksClick}
       />
     </section>
   )

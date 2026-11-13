@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { MapPin, Phone, Mail, Clock, ArrowRight, CheckCircle2 } from "lucide-react"
+import { ArrowRight, CheckCircle2 } from "lucide-react"
 
 export default function Footer() {
   const [newsletterEmail, setNewsletterEmail] = useState("")
@@ -9,6 +9,9 @@ export default function Footer() {
 
   const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("app:navigating"))
+    }
     const target = document.querySelector(href)
     if (target) {
       target.scrollIntoView({ behavior: "smooth" })
@@ -44,7 +47,7 @@ export default function Footer() {
             </div>
 
             <p className="text-xs sm:text-sm text-[#57534e] leading-relaxed max-w-sm mb-6 font-light">
-              An independent neighborhood restaurant bringing thoughtful cooking together with a simple, personal way to order and enjoy your favourites.
+              An independent neighborhood restaurant bringing thoughtful cooking together with a simple, personal way to enjoy hospitality.
             </p>
 
             <div className="flex items-center gap-3">
@@ -84,7 +87,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Quick Links */}
+          {/* Column 2: Navigation Links (No detailed menu) */}
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-wider text-[#1c1917] mb-4">
               Navigation
@@ -93,11 +96,6 @@ export default function Footer() {
               <li>
                 <a href="#hero" onClick={(e) => scrollTo(e, "#hero")} className="hover:text-[#c96342] transition-colors">
                   Home
-                </a>
-              </li>
-              <li>
-                <a href="#menu" onClick={(e) => scrollTo(e, "#menu")} className="hover:text-[#c96342] transition-colors">
-                  Our Menu
                 </a>
               </li>
               <li>
@@ -111,13 +109,8 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#features" onClick={(e) => scrollTo(e, "#features")} className="hover:text-[#c96342] transition-colors">
-                  Special Features
-                </a>
-              </li>
-              <li>
                 <a href="#contact" onClick={(e) => scrollTo(e, "#contact")} className="hover:text-[#c96342] transition-colors">
-                  Contact
+                  Contact & Location
                 </a>
               </li>
             </ul>
@@ -184,7 +177,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar: Copyright & Badges */}
+        {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#78716c]">
           <p>© 2026 The Corner Table. All rights reserved.</p>
           <div className="flex items-center gap-6">

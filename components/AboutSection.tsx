@@ -4,8 +4,11 @@ import React from "react"
 import { ArrowRight } from "lucide-react"
 
 export default function AboutSection() {
-  const scrollToMenu = () => {
-    const el = document.querySelector("#menu")
+  const scrollToHowItWorks = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("app:navigating"))
+    }
+    const el = document.querySelector("#how-it-works")
     if (el) el.scrollIntoView({ behavior: "smooth" })
   }
 
@@ -18,7 +21,7 @@ export default function AboutSection() {
             <div className="relative rounded-3xl overflow-hidden border border-[#e7dfd5] shadow-sm aspect-[4/5] max-h-[540px] w-full bg-[#f4ede4]">
               <img
                 src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=900&auto=format&fit=crop&q=80"
-                alt="Chef plating food in the kitchen"
+                alt="Chefs carefully preparing dishes in the kitchen"
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
@@ -51,13 +54,13 @@ export default function AboutSection() {
               </p>
             </div>
 
-            {/* Explore Our Menu button */}
+            {/* Action button leading to How It Works */}
             <div className="mt-8">
               <button
-                onClick={scrollToMenu}
+                onClick={scrollToHowItWorks}
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#c96342] hover:bg-[#a84d31] text-white font-medium text-sm transition-all shadow-xs hover:shadow active:scale-95 cursor-pointer"
               >
-                <span>Explore Our Menu</span>
+                <span>See How It Works</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

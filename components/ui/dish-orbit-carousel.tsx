@@ -7,13 +7,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 gsap.registerPlugin(ScrollTrigger)
 
 /*
- * Dish Orbit Carousel: a smart-kitchen-display menu.
- * High-contrast dark luxury hero stage with circular plated gourmet cutouts,
- * two-weight title wipe, GSAP orbit swing physics, dynamic glowing accent arc,
- * and frosted glass chef card.
- *
- * Page scroll drives the dishes until all dishes are viewed, after which
- * the hero unpins smoothly to allow scrolling down to the rest of the website.
+ * Dish Orbit Carousel: High-contrast luxury landing hero.
+ * The hero pins on screen while the user scrolls through the chef's signature dishes.
+ * When all dish scrolls are finished, the section unpins smoothly to allow the user
+ * to scroll down through Our Story, How It Works, and Contact.
  */
 
 export type Dish = {
@@ -35,8 +32,10 @@ export type Dish = {
 export type DishOrbitCarouselProps = {
   dishes: Dish[]
   height?: string
-  onPlay?: (dish: Dish, index: number) => void
+  onStoryClick?: () => void
+  onHowItWorksClick?: () => void
   onOrder?: (dish: Dish, index: number) => void
+  onPlay?: (dish: Dish, index: number) => void
   onExploreMenu?: () => void
   onOrderFood?: () => void
   onChange?: (index: number) => void
@@ -93,7 +92,7 @@ const CSS =
   ".dsh-trk{position:relative;width:100%}" +
   ".dsh-root{position:sticky;top:0;overflow:hidden;width:100%;height:100vh;background:#0f0e0d !important;color:#ffffff !important;" +
   "font-family:" + FONT + ",ui-sans-serif,system-ui,sans-serif;container-type:inline-size;-webkit-tap-highlight-color:transparent;" +
-  "display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:4.75rem}" +
+  "display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:4.5rem}" +
   ".dsh-root *{box-sizing:border-box}" +
   /* Integrated Hero Header */
   ".dsh-hero-intro{text-align:center;max-width:720px;padding:0 1rem;z-index:20;margin-bottom:0.25rem;flex-shrink:0}" +
@@ -109,21 +108,18 @@ const CSS =
   ".dsh-hero-btn-secondary{display:inline-flex;align-items:center;gap:0.45rem;padding:0.5rem 1.35rem;border-radius:9999px;background:rgba(255,255,255,0.08);color:#ffffff;font-weight:500;font-size:0.82rem;border:1px solid rgba(255,255,255,0.18);cursor:pointer;transition:all 0.2s ease;backdrop-filter:blur(8px)}" +
   ".dsh-hero-btn-secondary:hover{background:rgba(255,255,255,0.16);border-color:rgba(255,255,255,0.3);transform:translateY(-1px)}" +
   ".dsh-btn-icon{width:13px;height:13px}" +
-  /* 960 x 460 Canvas */
+  /* 960 x 460 Stage */
   ".dsh-canvas{position:relative;width:960px;height:460px;margin:0 auto;transform:scale(var(--dsh-s,1));transform-origin:50% 0;flex-shrink:0}" +
   ".dsh-arc{position:absolute;left:0;top:0;width:960px;height:460px;overflow:visible;pointer-events:none}" +
   ".dsh-btn{appearance:none;border:0;background:none;color:inherit;font:inherit;padding:0;margin:0;cursor:pointer}" +
   ".dsh-btn:focus-visible{outline:2px solid #c96342;outline-offset:3px;border-radius:10px}" +
   ".dsh-ico{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}" +
-  ".dsh-top{position:absolute;left:820px;top:10px;display:flex;gap:10px}" +
-  ".dsh-top .dsh-btn{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#d6cbbe;transition:all 0.2s}" +
-  ".dsh-top .dsh-btn:hover{background:rgba(255,255,255,0.15);color:#ffffff}" +
   ".dsh-pager{position:absolute;left:76px;top:110px;display:flex;flex-direction:column;align-items:center;gap:7px}" +
   ".dsh-dot{width:14px;height:10px;display:grid;place-items:center}" +
   ".dsh-dot i{display:block;width:4px;height:4px;border-radius:4px;background:#78716c;opacity:.5;transition:height .45s cubic-bezier(.3,.7,.2,1),opacity .3s}" +
   ".dsh-dot[aria-current] i{height:22px;opacity:1;background:#c96342}" +
   ".dsh-dot[aria-current]{height:26px}" +
-  /* Plated Dish Cutout */
+  /* Plated Circular Dish Cutout */
   ".dsh-plates{position:absolute;left:130px;top:30px;width:245px;height:245px;touch-action:pan-y}" +
   ".dsh-orbit{position:absolute;inset:0;transform-origin:69% -217%;visibility:hidden;will-change:transform}" +
   ".dsh-orbit>img{display:block;width:245px;height:245px;max-width:none;object-fit:cover;border-radius:9999px;border:3px solid rgba(255,255,255,0.14);box-shadow:0 25px 50px -12px rgba(0,0,0,0.8),0 0 35px rgba(201,99,66,0.22);user-select:none;-webkit-user-drag:none}" +
@@ -183,7 +179,6 @@ const CSS =
   ".dsh-root{height:auto !important;min-height:100vh;position:relative !important;padding:5rem 1rem 2rem}" +
   ".dsh-canvas{position:relative;left:auto;top:auto;width:100%;height:auto;transform:none;display:flex;flex-direction:column;align-items:center;padding:0}" +
   ".dsh-arc{width:160%;height:auto;left:-30%;top:-20px}" +
-  ".dsh-top{position:relative;left:auto;top:auto;align-self:flex-end;margin-bottom:0.5rem}" +
   ".dsh-pager{left:8px;top:100px}" +
   ".dsh-plates{position:relative;left:auto;top:auto;width:min(52vw,230px);height:min(52vw,230px);margin-top:0}" +
   ".dsh-orbit>img{width:100%;height:100%}" +
@@ -201,19 +196,16 @@ const HIDE_2 = "inset(0% 100% 0% 0%)"
 const SHOW = "inset(0% 0% 0% 0%)"
 
 const Icon = {
-  search: <svg className="dsh-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg>,
-  menu: <svg className="dsh-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16" /></svg>,
-  explore: <svg className="dsh-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2" /><path d="M12 2v20" /><path d="M6 2v6a3 3 0 0 0 3 3 3 3 0 0 0 3-3V2" /></svg>,
-  order: <svg className="dsh-ico" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2c.5 3 2 4.5 4 6 1.5 1 2 2.5 2 4a6 6 0 1 1-12 0c0-2.5 2-4.5 3.5-6.5C11 3.5 11.5 2.5 12 2z" /></svg>,
+  story: <svg className="dsh-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>,
+  how: <svg className="dsh-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6z"/></svg>,
   up: <svg className="dsh-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10v10H3.5V10zM7 10l4-7c1.6 0 2.6 1.2 2.2 2.8L12.6 9H19a2 2 0 0 1 2 2.3l-1.3 7A2 2 0 0 1 17.7 20H7" /></svg>,
   down: <svg className="dsh-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 14V4h3.5v10zM17 14l-4 7c-1.6 0-2.6-1.2-2.2-2.8l.6-3.2H5a2 2 0 0 1-2-2.3l1.3-7A2 2 0 0 1 6.3 4H17" /></svg>,
 }
 
 export function DishOrbitCarousel({
   dishes,
-  onOrder,
-  onExploreMenu,
-  onOrderFood,
+  onStoryClick,
+  onHowItWorksClick,
   onChange,
   className,
 }: DishOrbitCarouselProps) {
@@ -227,6 +219,7 @@ export function DishOrbitCarousel({
   const rootRef = useRef(null as HTMLDivElement | null)
   const stRef = useRef(null as ScrollTrigger | null)
   const indexRef = useRef(0)
+  const isNavigatingRef = useRef(false)
   const onChangeRef = useRef(onChange)
   onChangeRef.current = onChange
   const orbits = useRef([] as (HTMLDivElement | null)[])
@@ -239,6 +232,18 @@ export function DishOrbitCarousel({
   const tlRef = useRef(null as gsap.core.Timeline | null)
   const reducedRef = useRef(false)
   const swipe = useRef(null as { x: number; y: number } | null)
+
+  // Listen to navigation events so smooth scrolling doesn't rapidly thrash the carousel
+  useEffect(() => {
+    const onNavigating = () => {
+      isNavigatingRef.current = true
+      setTimeout(() => {
+        isNavigatingRef.current = false
+      }, 950)
+    }
+    window.addEventListener("app:navigating", onNavigating)
+    return () => window.removeEventListener("app:navigating", onNavigating)
+  }, [])
 
   // Fit the 960 x 460 design canvas smoothly to the root viewport
   useLayoutEffect(() => {
@@ -282,7 +287,19 @@ export function DishOrbitCarousel({
     const drawArc = () => arcRef.current?.setAttribute("d", arcPath(arc.current.a0, arc.current.a1, ORBIT_X, ORBIT_Y, ORBIT_R, 118))
     const rest = arcRest(to)
     const tint = dishes[to] ? dishes[to].accent : "#c96342"
-    if (tlRef.current) tlRef.current.progress(1).kill()
+    if (tlRef.current) {
+      tlRef.current.kill()
+      tlRef.current = null
+    }
+
+    // Immediately hide all inactive dishes to prevent any visual overlap or glitch
+    for (let i = 0; i < n; i++) {
+      if (i !== to && i !== from) {
+        const p = parts(i)
+        gsap.set([p.orbit, p.head, p.body], { autoAlpha: 0 })
+      }
+    }
+
     const b = parts(to)
     if (from === -1 || from === to || reducedRef.current) {
       for (let i = 0; i < n; i++) if (i !== to) {
@@ -299,6 +316,7 @@ export function DishOrbitCarousel({
       shown.current = to
       return
     }
+
     const a = parts(from)
     const d = dirRef.current
     const tl = gsap.timeline({ onComplete: () => { tlRef.current = null } })
@@ -341,7 +359,7 @@ export function DishOrbitCarousel({
     onChangeRef.current?.(next)
   }
 
-  // Scroll distance: 750px per dish step. The hero stays pinned until all dishes are orbited!
+  // Scroll distance: 70vh per dish. The hero stays pinned until all dishes are orbited!
   useEffect(() => {
     const track = trackRef.current
     if (!track || n <= 1) return
@@ -351,6 +369,7 @@ export function DishOrbitCarousel({
       start: "top top",
       end: "bottom bottom",
       onUpdate: (self) => {
+        if (isNavigatingRef.current) return
         // Map self.progress (0.0 to 1.0) evenly across dishes (0 to n - 1)
         const raw = self.progress * (n - 1)
         const target = Math.min(n - 1, Math.max(0, Math.round(raw)))
@@ -398,7 +417,7 @@ export function DishOrbitCarousel({
   const dish = dishes[index]
 
   // Track height gives enough scroll room for each dish to play before unpinning to the rest of the site
-  const trackHeight = `${100 + (n - 1) * 75}vh`
+  const trackHeight = `${100 + (n - 1) * 70}vh`
 
   return (
     <div
@@ -429,30 +448,30 @@ export function DishOrbitCarousel({
             <span className="dsh-hero-accent">Made fresh for your table.</span>
           </h1>
           <p className="dsh-hero-desc">
-            Explore our menu, customize your favourites and enjoy a simpler way to order.
+            Explore our story, discover our cooking craft and enjoy a simpler way to dine.
           </p>
           <div className="dsh-hero-ctas">
             <button
               type="button"
-              onClick={onExploreMenu}
+              onClick={onStoryClick}
               className="dsh-hero-btn-primary"
             >
               <svg className="dsh-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2" />
-                <path d="M12 2v20" />
-                <path d="M6 2v6a3 3 0 0 0 3 3 3 3 0 0 0 3-3V2" />
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
+                <path d="M6 6h10M6 10h10" />
               </svg>
-              <span>Explore Menu</span>
+              <span>Our Story</span>
             </button>
             <button
               type="button"
-              onClick={onOrderFood}
+              onClick={onHowItWorksClick}
               className="dsh-hero-btn-secondary"
             >
-              <svg className="dsh-btn-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2c.5 3 2 4.5 4 6 1.5 1 2 2.5 2 4a6 6 0 1 1-12 0c0-2.5 2-4.5 3.5-6.5C11 3.5 11.5 2.5 12 2z" />
+              <svg className="dsh-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <path d="m10 15 5-3-5-3v6z" />
               </svg>
-              <span>Order Your Food</span>
+              <span>How It Works</span>
             </button>
           </div>
         </div>
@@ -462,25 +481,6 @@ export function DishOrbitCarousel({
           <svg className="dsh-arc" viewBox="0 0 960 460" aria-hidden="true">
             <path ref={arcRef} style={{ opacity: 0.45 }} />
           </svg>
-
-          <div className="dsh-top">
-            <button
-              type="button"
-              className="dsh-btn"
-              aria-label="Search Menu"
-              onClick={onExploreMenu}
-            >
-              {Icon.search}
-            </button>
-            <button
-              type="button"
-              className="dsh-btn"
-              aria-label="View Menu"
-              onClick={onExploreMenu}
-            >
-              {Icon.menu}
-            </button>
-          </div>
 
           <div className="dsh-pager" role="tablist" aria-label="Choose a dish">
             {dishes.map((d, i) => (
@@ -554,16 +554,16 @@ export function DishOrbitCarousel({
             <button
               type="button"
               className="dsh-btn"
-              onClick={onExploreMenu}
+              onClick={onStoryClick}
             >
-              {Icon.explore}Explore Menu
+              {Icon.story}Our Story
             </button>
             <button
               type="button"
               className="dsh-btn dsh-btn-highlight"
-              onClick={() => dish && onOrder?.(dish, index)}
+              onClick={onHowItWorksClick}
             >
-              {Icon.order}Order This Dish
+              {Icon.how}How It Works
             </button>
           </div>
 
@@ -696,7 +696,7 @@ export function DishOrbitCarousel({
 
         {/* Ambient bottom cue indicating scroll down */}
         <div className="dsh-scroll-cue">
-          <span>Scroll down to explore all creations · Then menu reveals below</span>
+          <span>Scroll to explore signature dishes · Then discover our story below</span>
           <svg className="w-3.5 h-3.5 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="m6 9 6 6 6-6" />
           </svg>

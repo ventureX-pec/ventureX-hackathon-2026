@@ -1,11 +1,9 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { useCart } from "@/context/CartContext"
-import { ShoppingBag, Search, Menu as MenuIcon, X } from "lucide-react"
+import { CalendarClock, Menu as MenuIcon, X } from "lucide-react"
 
 export default function Navbar() {
-  const { totalItems, setIsCartOpen } = useCart()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolledToLight, setIsScrolledToLight] = useState(false)
 
@@ -21,7 +19,6 @@ export default function Navbar() {
 
   const navLinks = [
     { label: "Home", href: "#hero" },
-    { label: "Menu", href: "#menu" },
     { label: "Our Story", href: "#story" },
     { label: "How It Works", href: "#how-it-works" },
     { label: "Contact", href: "#contact" },
@@ -30,15 +27,21 @@ export default function Navbar() {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
     setMobileMenuOpen(false)
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("app:navigating"))
+    }
     const target = document.querySelector(href)
     if (target) {
       target.scrollIntoView({ behavior: "smooth" })
     }
   }
 
-  const handleOrderNow = () => {
-    const menuEl = document.querySelector("#menu")
-    if (menuEl) menuEl.scrollIntoView({ behavior: "smooth" })
+  const handleReserve = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("app:navigating"))
+    }
+    const contactEl = document.querySelector("#contact")
+    if (contactEl) contactEl.scrollIntoView({ behavior: "smooth" })
   }
 
   return (
@@ -80,7 +83,7 @@ export default function Navbar() {
         </a>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8" aria-label="Main Navigation">
+        <nav className="hidden md:flex items-center gap-9" aria-label="Main Navigation">
           {navLinks.map((link) => (
             <a
               key={link.label}
@@ -97,41 +100,14 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Right Actions: Search + Order Now / Cart */}
+        {/* Right CTA Button: Reserve / Contact */}
         <div className="flex items-center gap-3">
-          {/* Quick Search Shortcut */}
-          <a
-            href="#menu"
-            onClick={(e) => handleNavClick(e, "#menu")}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-              isScrolledToLight
-                ? "text-[#57534e] hover:text-[#1c1917] hover:bg-[#f4ede4]"
-                : "text-[#d6cbbe] hover:text-white hover:bg-white/10"
-            }`}
-            title="Search Menu"
-            aria-label="Search Menu"
-          >
-            <Search className="w-4 h-4" />
-          </a>
-
-          {/* Order Now / Cart Button */}
           <button
-            onClick={() => {
-              if (totalItems > 0) {
-                setIsCartOpen(true)
-              } else {
-                handleOrderNow()
-              }
-            }}
-            className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-[#c96342] hover:bg-[#a84d31] text-white text-xs sm:text-sm font-medium transition-all shadow-xs hover:shadow active:scale-95 cursor-pointer"
+            onClick={handleReserve}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#c96342] hover:bg-[#a84d31] text-white text-xs sm:text-sm font-medium transition-all shadow-xs hover:shadow active:scale-95 cursor-pointer"
           >
-            <ShoppingBag className="w-4 h-4" />
-            <span>Order Now</span>
-            {totalItems > 0 && (
-              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-white text-[#c96342] text-[11px] font-bold">
-                {totalItems}
-              </span>
-            )}
+            <CalendarClock className="w-4 h-4" />
+            <span>Reserve Table</span>
           </button>
 
           {/* Mobile Menu Toggle */}
@@ -172,11 +148,11 @@ export default function Navbar() {
             <button
               onClick={() => {
                 setMobileMenuOpen(false)
-                handleOrderNow()
+                handleReserve()
               }}
               className="w-full py-3 rounded-full bg-[#c96342] text-white font-medium text-sm text-center"
             >
-              Explore Full Menu & Order
+              Reserve a Table
             </button>
           </div>
         </div>
