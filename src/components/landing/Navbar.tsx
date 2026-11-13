@@ -19,9 +19,8 @@ export const Navbar = () => {
 
   const navLinks = [
     { label: "Home", href: "#" },
-    { label: "How It Works", href: "#how-it-works" },
-    { label: "Menu Showcase", href: "#showcase" },
-    { label: "Interactive Flow", href: "#flow" },
+    { label: "Curated Dishes", href: "#showcase" },
+    { label: "How It Works", href: "#flow" },
   ];
 
   return (

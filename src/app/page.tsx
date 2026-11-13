@@ -1,7 +1,6 @@
 import React from "react";
 import { Navbar } from "@/components/landing/Navbar";
 import { HeroSection } from "@/components/landing/HeroSection";
-import { HowItWorks } from "@/components/landing/HowItWorks";
 import { CulinaryShowcaseSection } from "@/components/landing/CulinaryShowcaseSection";
 import { ScrollStorytelling } from "@/components/landing/ScrollStorytelling";
 import { CtaSection } from "@/components/landing/CtaSection";
@@ -14,7 +13,6 @@ export default function Home() {
       <main className="min-h-screen bg-[#FAF8F3] text-[#252522]">
         <Navbar />
         <HeroSection />
-        <HowItWorks />
         <CulinaryShowcaseSection />
         <ScrollStorytelling />
         <CtaSection />
