@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { CATEGORIES } from "@/data/mockCustomerData";
@@ -28,7 +28,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
             Explore Categories
           </h2>
           <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#D66B43]/10 text-[#D66B43]">
-            Infinite Discovery
+            Curated Kitchens
           </span>
         </div>
 
@@ -40,15 +40,15 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
         </button>
       </div>
 
-      {/* Infinite Horizontal Marquee moving continuously from Left to Right */}
+      {/* Infinite Horizontal Marquee moving smoothly from Right to Left */}
       <div className="relative w-full overflow-hidden py-1 group">
-        {/* Left & Right subtle gradient fade masks */}
+        {/* Left & Right subtle gradient fade masks matching warm ivory background */}
         <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-r from-[#FAF8F3] to-transparent" />
         <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-l from-[#FAF8F3] to-transparent" />
 
-        {/* Animated Marquee Strip (Left-to-Right infinite movement, pauses on hover) */}
+        {/* Animated Marquee Strip: 0% -> -33.333% moves RIGHT TO LEFT continuously */}
         <motion.div
-          animate={{ x: ["-33.333%", "0%"] }}
+          animate={{ x: ["0%", "-33.333%"] }}
           transition={{
             repeat: Infinity,
             repeatType: "loop",
