@@ -7,7 +7,9 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
   ArrowLeft,
   ArrowRight,
+  AlertCircle,
   CheckCircle2,
+  Database,
   Eye,
   EyeOff,
   Lock,
@@ -17,6 +19,8 @@ import {
   UtensilsCrossed,
   Sparkles,
 } from "lucide-react"
+import { signInUser, signUpUser } from "@/lib/auth"
+import { isSupabaseConfigured } from "@/lib/supabase"
 
 // Curated signature dishes for the left-side food showcase
 const SHOWCASE_SLIDES = [
@@ -60,13 +64,21 @@ type RoleType = "customer" | "admin"
 export default function LoginPage() {
   const router = useRouter()
   const [role, setRole] = useState<RoleType>("customer")
+  const [isSignUp, setIsSignUp] = useState(false)
   const [activeSlide, setActiveSlide] = useState(0)
+  const [fullName, setFullName] = useState("")
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [loginSuccess, setLoginSuccess] = useState<string | null>(null)
+  const [authError, setAuthError] = useState<string | null>(null)
+  const [supabaseReady, setSupabaseReady] = useState(false)
+
+  useEffect(() => {
+    setSupabaseReady(isSupabaseConfigured())
+  }, [])
 
   // Auto-cycle showcase dishes every 5 seconds
   useEffect(() => {
@@ -79,6 +91,7 @@ export default function LoginPage() {
   // Auto-fill demo credentials
   const fillDemoCredentials = (targetRole: RoleType) => {
     setRole(targetRole)
+    setAuthError(null)
     if (targetRole === "customer") {
       setUsername("alex.morgan@serveza.com")
       setPassword("customer123")
@@ -88,24 +101,48 @@ export default function LoginPage() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    const targetRoute = role === "customer" ? "/customer" : "/admin"
-    setLoginSuccess(
-      role === "customer"
-        ? "Welcome back, Alex! Redirecting to customer ordering portal..."
-        : "Admin authenticated. Redirecting to Kitchen & Restaurant Manager..."
-    )
-    setTimeout(() => {
+    setAuthError(null)
+
+    if (isSignUp) {
+      const res = await signUpUser(username, password, fullName || username.split("@")[0], role)
       setIsLoading(false)
-      router.push(targetRoute)
-    }, 600)
+      if (!res.success) {
+        setAuthError(res.error || "Failed to create account.")
+        return
+      }
+      setLoginSuccess(
+        supabaseReady
+          ? "Account created in Supabase! Signing you into portal..."
+          : "Account registered! Redirecting to your workspace..."
+      )
+      setTimeout(() => {
+        router.push(res.redirect || (role === "admin" ? "/admin" : "/customer"))
+      }, 700)
+    } else {
+      const res = await signInUser(username, password, role)
+      setIsLoading(false)
+      if (!res.success) {
+        setAuthError(res.error || "Invalid username or password.")
+        return
+      }
+      setLoginSuccess(
+        role === "customer"
+          ? "Welcome back! Redirecting to customer ordering portal..."
+          : "Admin authenticated! Redirecting to Kitchen & Restaurant Manager..."
+      )
+      setTimeout(() => {
+        router.push(res.redirect || (role === "admin" ? "/admin" : "/customer"))
+      }, 600)
+    }
   }
 
-  const handleOneTapLogin = () => {
+  const handleOneTapLogin = async () => {
     fillDemoCredentials(role)
     setIsLoading(true)
+    setAuthError(null)
     const targetRoute = role === "customer" ? "/customer" : "/admin"
     setLoginSuccess(
       role === "customer"
@@ -240,17 +277,20 @@ export default function LoginPage() {
 
               {/* Status Indicator */}
               <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#f4ede4] border border-[#e7dfd5] text-[10px] font-semibold text-[#57534e]">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Kitchen Online</span>
+                <Database className="w-3 h-3 text-[#c96342]" />
+                <span>{supabaseReady ? "Supabase Live" : "Demo Mode"}</span>
               </div>
             </div>
 
             {/* Role Switcher Tabs (Customer vs Admin) */}
-            <div className="mb-3.5">
+            <div className="mb-3">
               <div className="grid grid-cols-2 p-1 bg-[#f4ede4] rounded-xl border border-[#e7dfd5]">
                 <button
                   type="button"
-                  onClick={() => setRole("customer")}
+                  onClick={() => {
+                    setRole("customer")
+                    setAuthError(null)
+                  }}
                   className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                     role === "customer"
                       ? "bg-white text-[#1c1917] shadow-xs font-semibold"
@@ -262,7 +302,10 @@ export default function LoginPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setRole("admin")}
+                  onClick={() => {
+                    setRole("admin")
+                    setAuthError(null)
+                  }}
                   className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                     role === "admin"
                       ? "bg-white text-[#1c1917] shadow-xs font-semibold"
@@ -276,34 +319,76 @@ export default function LoginPage() {
             </div>
 
             {/* Greeting & Headline */}
-            <div className="mb-3.5">
+            <div className="mb-3">
               <h1
                 className="text-xl sm:text-2xl font-serif font-bold text-[#1c1917] tracking-tight leading-tight"
                 style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
               >
-                {role === "customer" ? "Customer Login" : "Staff & Admin Login"}
+                {isSignUp
+                  ? role === "customer"
+                    ? "Create Customer Account"
+                    : "Register Admin Account"
+                  : role === "customer"
+                  ? "Customer Login"
+                  : "Staff & Admin Login"}
               </h1>
               <p className="mt-1 text-xs text-[#57534e] leading-snug">
-                {role === "customer"
+                {isSignUp
+                  ? "Sign up with Supabase authentication to save preferences and order history."
+                  : role === "customer"
                   ? "Enter your credentials to pre-order and reserve your table."
                   : "Enter your staff credentials to manage orders, live KDS, and menus."}
               </p>
             </div>
+
+            {/* Error Feedback Banner */}
+            {authError && (
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-2.5 p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2"
+              >
+                <AlertCircle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                <span>{authError}</span>
+              </motion.div>
+            )}
 
             {/* Success Feedback Banner */}
             {loginSuccess && (
               <motion.div
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-3 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2"
+                className="mb-2.5 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2"
               >
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>{loginSuccess}</span>
               </motion.div>
             )}
 
-            {/* Sign In Form */}
-            <form onSubmit={handleSubmit} className="space-y-3">
+            {/* Sign In / Sign Up Form */}
+            <form onSubmit={handleSubmit} className="space-y-2.5">
+              {/* Full Name Field (Sign Up Only) */}
+              {isSignUp && (
+                <div>
+                  <label className="block text-[11px] font-medium text-[#44403c] mb-1">
+                    Full Name
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#a8a29e]">
+                      <User className="w-3.5 h-3.5" />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Aarav Sharma"
+                      className="w-full pl-9 pr-3.5 py-2 bg-[#fbf9f6] border border-[#e7dfd5] rounded-xl text-xs text-[#1c1917] placeholder-[#a8a29e] focus:outline-none focus:border-[#c96342] focus:ring-1 focus:ring-[#c96342] transition-colors"
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Username / Email Field */}
               <div>
                 <label className="block text-[11px] font-medium text-[#44403c] mb-1">
@@ -357,24 +442,26 @@ export default function LoginPage() {
               </div>
 
               {/* Utilities Row: Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between text-[11px] pt-0.5">
-                <label className="flex items-center gap-1.5 cursor-pointer select-none text-[#57534e]">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-3.5 h-3.5 rounded text-[#c96342] focus:ring-[#c96342] border-[#e7dfd5] accent-[#c96342]"
-                  />
-                  <span>Remember me</span>
-                </label>
-                <button
-                  type="button"
-                  onClick={() => alert("Password reset link sent to your email!")}
-                  className="font-medium text-[#c96342] hover:text-[#a84d31] transition-colors cursor-pointer"
-                >
-                  Forgot Password?
-                </button>
-              </div>
+              {!isSignUp && (
+                <div className="flex items-center justify-between text-[11px] pt-0.5">
+                  <label className="flex items-center gap-1.5 cursor-pointer select-none text-[#57534e]">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="w-3.5 h-3.5 rounded text-[#c96342] focus:ring-[#c96342] border-[#e7dfd5] accent-[#c96342]"
+                    />
+                    <span>Remember me</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => alert("Password reset link sent to your email!")}
+                    className="font-medium text-[#c96342] hover:text-[#a84d31] transition-colors cursor-pointer"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
 
               {/* Submit Button (Terracotta styled per brand) */}
               <button
@@ -387,13 +474,34 @@ export default function LoginPage() {
                 ) : (
                   <>
                     <span>
-                      {role === "customer" ? "Sign In as Customer" : "Sign In as Admin"}
+                      {isSignUp
+                        ? `Create ${role === "customer" ? "Customer" : "Admin"} Account`
+                        : role === "customer"
+                        ? "Sign In as Customer"
+                        : "Sign In as Admin"}
                     </span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </>
                 )}
               </button>
             </form>
+
+            {/* Toggle between Sign In & Sign Up */}
+            <div className="mt-2 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUp(!isSignUp)
+                  setAuthError(null)
+                  setLoginSuccess(null)
+                }}
+                className="text-[11px] font-medium text-[#c96342] hover:text-[#a84d31] transition-colors cursor-pointer"
+              >
+                {isSignUp
+                  ? "Already have an account? Sign In"
+                  : "New to ServeZa? Create an account"}
+              </button>
+            </div>
 
             {/* Alternative Divider */}
             <div className="relative my-3.5 text-center">
