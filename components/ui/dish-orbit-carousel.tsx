@@ -97,8 +97,8 @@ const CSS =
   ".dsh-root *{box-sizing:border-box}" +
   /* Integrated Hero Header */
   ".dsh-hero-intro{text-align:center;max-width:760px;padding:0 1rem;z-index:20;margin-bottom:0.4rem;flex-shrink:0}" +
-  ".dsh-hero-title{font-size:clamp(1.75rem,3.2vw,2.65rem);font-family:ui-serif,Georgia,Cambria,serif;font-weight:400;letter-spacing:-0.02em;line-height:1.15;color:#ffffff;margin:0}" +
-  ".dsh-hero-accent{font-style:italic;font-weight:300;color:#e07a5f}" +
+  ".dsh-hero-title{font-size:clamp(1.85rem,3.2vw,2.75rem);font-family:Georgia,\"Times New Roman\",Times,serif;font-weight:400;letter-spacing:-0.01em;line-height:1.25;color:#ffffff;margin:0;padding-top:0.2rem}" +
+  ".dsh-hero-accent{font-style:italic;font-weight:400;color:#e07a5f}" +
   ".dsh-hero-desc{font-size:clamp(0.84rem,1.1vw,0.92rem);color:#a8a29e;margin:0.4rem auto 0.75rem;max-width:520px;line-height:1.45}" +
   ".dsh-hero-ctas{display:flex;gap:0.75rem;justify-content:center;align-items:center}" +
   ".dsh-hero-btn-primary{display:inline-flex;align-items:center;gap:0.5rem;padding:0.55rem 1.6rem;border-radius:9999px;background:#c96342;color:#ffffff;font-weight:500;font-size:0.84rem;border:none;cursor:pointer;transition:all 0.2s ease;box-shadow:0 4px 14px -3px rgba(201,99,66,0.5)}" +
