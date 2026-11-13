@@ -1,11 +1,25 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { AdminSidebar, AdminTab } from "@/components/admin/AdminSidebar";
 import { AdminTopHeader } from "@/components/admin/AdminTopHeader";
 import { AdminBackdrop } from "@/components/admin/AdminBackdrop";
 import { CursorTrail } from "@/components/motion/CursorTrail";
+
+// Data & Persistence Service
+import {
+  fetchLiveOrders,
+  getStoredOrders,
+  updateLiveOrderStatus,
+  getStoredDishes,
+  saveStoredDishes,
+  getStoredIngredients,
+  saveStoredIngredients,
+  getStoredStaff,
+  saveStoredStaff,
+  subscribeToDataChanges,
+} from "@/lib/dataService";
 
 // Views
 import { OverviewView } from "@/components/admin/views/OverviewView";
@@ -46,13 +60,44 @@ export default function AdminDashboardPage() {
   const [sidebarWidth, setSidebarWidth] = useState<number>(260);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
 
-  // Core Kitchen State
+  // Core Kitchen State (Hydrated from persistent storage & Supabase)
   const [orders, setOrders] = useState<AdminOrder[]>(INITIAL_ADMIN_ORDERS);
   const [dishes, setDishes] = useState<MenuItem[]>(MENU_ITEMS);
   const [ingredients, setIngredients] =
     useState<AdminIngredient[]>(INITIAL_ADMIN_INGREDIENTS);
   const [staffList, setStaffList] =
     useState<AdminStaffMember[]>(INITIAL_ADMIN_STAFF);
+
+  // Hydrate persistent state on mount & fetch live Supabase orders
+  useEffect(() => {
+    // 1. Instantly load locally saved state so there is zero flicker or hardcoded reset
+    setOrders(getStoredOrders());
+    setDishes(getStoredDishes());
+    setIngredients(getStoredIngredients());
+    setStaffList(getStoredStaff());
+
+    // 2. Fetch live database orders from Supabase
+    fetchLiveOrders().then((liveOrders) => {
+      if (liveOrders && liveOrders.length > 0) {
+        setOrders(liveOrders);
+      }
+    });
+
+    // 3. Listen to cross-tab updates (e.g. customer places an order on /customer)
+    const unsubscribe = subscribeToDataChanges((event) => {
+      if (event.type === "ORDERS_UPDATED" && Array.isArray(event.payload)) {
+        setOrders(event.payload);
+      } else if (event.type === "DISHES_UPDATED" && Array.isArray(event.payload)) {
+        setDishes(event.payload);
+      } else if (event.type === "INGREDIENTS_UPDATED" && Array.isArray(event.payload)) {
+        setIngredients(event.payload);
+      } else if (event.type === "STAFF_UPDATED" && Array.isArray(event.payload)) {
+        setStaffList(event.payload);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Modals Open State
   const [isAddDishOpen, setIsAddDishOpen] = useState(false);
@@ -83,56 +128,48 @@ export default function AdminDashboardPage() {
     };
   }, [orders]);
 
-  // Order status transitions
+  // Order status transitions (Persisted to Supabase Database + LocalStorage)
   const handleUpdateOrderStatus = (
     orderId: string,
     newStatus: AdminOrder["status"]
   ) => {
-    setOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id === orderId) {
-          return {
-            ...ord,
-            status: newStatus,
-            prepTimeEstimate:
-              newStatus === "ready"
-                ? "Ready for shelf"
-                : newStatus === "completed"
-                ? "Handed over"
-                : ord.prepTimeEstimate,
-          };
-        }
-        return ord;
-      })
-    );
+    updateLiveOrderStatus(orderId, newStatus).then((updated) => {
+      setOrders(updated);
+    });
   };
 
-  // Toggle dish availability
+  // Toggle dish availability (Persisted across refreshes)
   const handleToggleDishAvailability = (dishId: string) => {
-    setDishes((prev) =>
-      prev.map((d) => {
+    setDishes((prev) => {
+      const updated = prev.map((d) => {
         if (d.id === dishId) {
           const current = (d as any).isAvailable !== false;
           return { ...d, isAvailable: !current };
         }
         return d;
-      })
-    );
+      });
+      saveStoredDishes(updated);
+      return updated;
+    });
   };
 
-  // Add new dish
+  // Add new dish (Persisted across refreshes)
   const handleAddDish = (newDish: MenuItem) => {
-    setDishes((prev) => [newDish, ...prev]);
+    setDishes((prev) => {
+      const updated = [newDish, ...prev];
+      saveStoredDishes(updated);
+      return updated;
+    });
   };
 
-  // Update ingredient stock
+  // Update ingredient stock (Persisted across refreshes)
   const handleUpdateStock = (
     id: string,
     newStock: string,
     status: AdminIngredient["status"]
   ) => {
-    setIngredients((prev) =>
-      prev.map((item) =>
+    setIngredients((prev) => {
+      const updated = prev.map((item) =>
         item.id === id
           ? {
               ...item,
@@ -141,13 +178,19 @@ export default function AdminDashboardPage() {
               lastUpdated: "Just now",
             }
           : item
-      )
-    );
+      );
+      saveStoredIngredients(updated);
+      return updated;
+    });
   };
 
-  // Add staff member
+  // Add staff member (Persisted across refreshes)
   const handleAddStaff = (newStaff: AdminStaffMember) => {
-    setStaffList((prev) => [...prev, newStaff]);
+    setStaffList((prev) => {
+      const updated = [...prev, newStaff];
+      saveStoredStaff(updated);
+      return updated;
+    });
   };
 
   // Quick Action Handler from Overview

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -36,6 +36,18 @@ import {
   MenuItem,
   Restaurant,
 } from "@/data/mockCustomerData";
+import { AdminOrder } from "@/data/mockAdminData";
+import {
+  createLiveOrder,
+  getStoredActiveOrder,
+  saveStoredActiveOrder,
+  getStoredCart,
+  saveStoredCart,
+  getStoredFavorites,
+  saveStoredFavorites,
+  getStoredDishes,
+  subscribeToDataChanges,
+} from "@/lib/dataService";
 
 export default function CustomerDashboardPage() {
   // Navigation & Active Tab
@@ -51,47 +63,92 @@ export default function CustomerDashboardPage() {
   const [restaurantFilter, setRestaurantFilter] = useState<string>("all");
   const [favorites, setFavorites] = useState<string[]>(["burger-house", "pizza-palace"]);
 
+  // Menu Dishes State (Hydrated from persistent storage)
+  const [dishes, setDishes] = useState<MenuItem[]>(MENU_ITEMS);
+
   // Cart & Order State
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [inspectingDish, setInspectingDish] = useState<MenuItem | null>(null);
 
-  // Active Placed Order State
+  // Active Placed Order State (Hydrated from persistent storage)
   const [activeOrder, setActiveOrder] = useState<{
+    id?: string;
     token: string;
+    tokenNumber?: string;
     items: CartItem[];
     total: number;
     orderType: "dine-in" | "takeaway";
     tableOrShelf: string;
     pickupSlot: string;
-  } | null>({
-    token: "42",
-    items: [
-      {
-        dish: MENU_ITEMS[0],
-        quantity: 1,
-      },
-    ],
-    total: 190,
-    orderType: "takeaway",
-    tableOrShelf: "Shelf B • Express Shelf",
-    pickupSlot: "⚡ Instant (~8 min)",
-  });
+    status?: string;
+  } | null>(null);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+
+  // Hydrate persistent customer state & subscribe to live updates
+  useEffect(() => {
+    // 1. Load active order from storage
+    const storedOrder = getStoredActiveOrder();
+    if (storedOrder) {
+      setActiveOrder(storedOrder);
+    }
+
+    // 2. Load cart & favorites
+    setCart(getStoredCart());
+    const storedFavs = getStoredFavorites();
+    if (storedFavs && storedFavs.length > 0) {
+      setFavorites(storedFavs);
+    }
+
+    // 3. Load dishes
+    setDishes(getStoredDishes());
+
+    // 4. Subscribe to cross-tab & Supabase live sync
+    const unsubscribe = subscribeToDataChanges((event) => {
+      if (event.type === "DISHES_UPDATED" && Array.isArray(event.payload)) {
+        setDishes(event.payload);
+      } else if (event.type === "ORDERS_UPDATED" && Array.isArray(event.payload)) {
+        // Check if our active order had its status updated in the kitchen
+        const current = getStoredActiveOrder();
+        if (current) {
+          const match = event.payload.find(
+            (o: AdminOrder) =>
+              o.id === current.id || o.tokenNumber === current.token
+          );
+          if (match && match.status !== current.status) {
+            const updated = {
+              ...current,
+              status: match.status,
+              prepTimeEstimate: match.prepTimeEstimate,
+            };
+            setActiveOrder(updated);
+            saveStoredActiveOrder(updated);
+          }
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Toggle favorite
   const handleToggleFavorite = (id: string) => {
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setFavorites((prev) => {
+      const updated = prev.includes(id)
+        ? prev.filter((item) => item !== id)
+        : [...prev, id];
+      saveStoredFavorites(updated);
+      return updated;
+    });
   };
 
   // Cart operations
   const handleAddToCart = (dish: MenuItem, quantity = 1, instructions?: string) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.dish.id === dish.id);
+      let updated: CartItem[];
       if (existing) {
-        return prev.map((item) =>
+        updated = prev.map((item) =>
           item.dish.id === dish.id
             ? {
                 ...item,
@@ -100,14 +157,17 @@ export default function CustomerDashboardPage() {
               }
             : item
         );
+      } else {
+        updated = [...prev, { dish, quantity, instructions }];
       }
-      return [...prev, { dish, quantity, instructions }];
+      saveStoredCart(updated);
+      return updated;
     });
   };
 
   const handleUpdateQuantity = (dishId: string, delta: number) => {
-    setCart((prev) =>
-      prev
+    setCart((prev) => {
+      const updated = prev
         .map((item) => {
           if (item.dish.id === dishId) {
             const newQty = item.quantity + delta;
@@ -115,12 +175,18 @@ export default function CustomerDashboardPage() {
           }
           return item;
         })
-        .filter(Boolean) as CartItem[]
-    );
+        .filter(Boolean) as CartItem[];
+      saveStoredCart(updated);
+      return updated;
+    });
   };
 
   const handleRemoveFromCart = (dishId: string) => {
-    setCart((prev) => prev.filter((item) => item.dish.id !== dishId));
+    setCart((prev) => {
+      const updated = prev.filter((item) => item.dish.id !== dishId);
+      saveStoredCart(updated);
+      return updated;
+    });
   };
 
   const totalCartCount = useMemo(
@@ -160,9 +226,13 @@ export default function CustomerDashboardPage() {
     });
   }, [selectedCategory, activeTab, favorites, restaurantFilter, searchQuery]);
 
-  // Filtered Menu Items
+  // Filtered Menu Items (Dynamically reflects live dishes from database & storage)
   const filteredDishes = useMemo(() => {
-    return MENU_ITEMS.filter((dish) => {
+    return dishes.filter((dish) => {
+      // Respect item availability toggled by admin
+      if ((dish as any).isAvailable === false) {
+        return false;
+      }
       if (selectedCategory !== "all" && dish.category !== selectedCategory) {
         return false;
       }
@@ -175,9 +245,9 @@ export default function CustomerDashboardPage() {
       }
       return true;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [dishes, selectedCategory, searchQuery]);
 
-  // Checkout trigger
+  // Checkout trigger (Saves to Supabase Database, syncs with Admin KDS, & persists locally)
   const handleCheckout = (details: {
     orderType: "dine-in" | "takeaway";
     tableOrShelf: string;
@@ -185,16 +255,72 @@ export default function CustomerDashboardPage() {
     notes: string;
   }) => {
     const randomToken = Math.floor(10 + Math.random() * 89).toString();
+    const orderTotal = cartTotalAmount + Math.round(cartTotalAmount * 0.05);
+    const orderId = `ord-${Date.now()}`;
+    const orderNumber = `#D${Math.floor(1000 + Math.random() * 9000)}`;
+
     const orderData = {
+      id: orderId,
+      orderNumber,
       token: randomToken,
+      tokenNumber: randomToken,
       items: [...cart],
-      total: cartTotalAmount + Math.round(cartTotalAmount * 0.05),
+      total: orderTotal,
+      totalAmount: orderTotal,
+      customerName: "Alex Morgan",
+      customerPhone: "+91 98765 43210",
+      status: "new",
+      prepTimeEstimate: "~ 12 min",
+      timeAgo: "Just now",
+      createdAt: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      image:
+        cart[0]?.dish.image ||
+        "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80",
       ...details,
     };
+
+    // 1. Immediately persist active order for zero-flicker resilience
     setActiveOrder(orderData);
+    saveStoredActiveOrder(orderData);
+
+    // 2. Clear customer cart and persist
     setCart([]);
+    saveStoredCart([]);
     setIsCartOpen(false);
     setIsSuccessModalOpen(true);
+
+    // 3. Persist order to Supabase Database (syncs live with Admin Kitchen KDS)
+    const adminOrderPayload: AdminOrder = {
+      id: orderId,
+      orderNumber,
+      tokenNumber: randomToken,
+      customerName: "Alex Morgan",
+      customerPhone: "+91 98765 43210",
+      orderType: details.orderType,
+      tableOrShelf: details.tableOrShelf,
+      items: cart.map((c) => ({
+        dishName: c.dish.name,
+        quantity: c.quantity,
+        price: c.dish.price,
+        notes: details.notes || c.instructions,
+      })),
+      totalAmount: orderTotal,
+      status: "new",
+      prepTimeEstimate: "~ 12 min",
+      timeAgo: "Just now",
+      createdAt: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      image:
+        cart[0]?.dish.image ||
+        "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80",
+    };
+
+    createLiveOrder(adminOrderPayload);
   };
 
   return (
