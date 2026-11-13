@@ -5,9 +5,10 @@ import { CartProvider } from "@/context/CartContext"
 import Navbar from "@/components/Navbar"
 import HeroSection from "@/components/HeroSection"
 import MenuSection from "@/components/MenuSection"
-import HowItWorksSection from "@/components/HowItWorksSection"
-import WhyDineSection from "@/components/WhyDineSection"
 import AboutSection from "@/components/AboutSection"
+import HowItWorksSection from "@/components/HowItWorksSection"
+import SpecialFeaturesSection from "@/components/SpecialFeaturesSection"
+import ContactSection from "@/components/ContactSection"
 import OrderingCTASection from "@/components/OrderingCTASection"
 import Footer from "@/components/Footer"
 import CartDrawer from "@/components/CartDrawer"
@@ -16,35 +17,38 @@ import FloatingCartButton from "@/components/FloatingCartButton"
 export default function Home() {
   return (
     <CartProvider>
-      <div className="min-h-screen bg-[#fbf9f5] text-[#1c1917] selection:bg-[#c25e3e]/20 selection:text-[#c25e3e]">
-        {/* Top Sticky Navigation */}
+      <div className="min-h-screen bg-[#faf7f2] text-[#1c1917] selection:bg-[#c96342]/20 selection:text-[#c96342]">
+        {/* Navigation Bar */}
         <Navbar />
 
-        {/* Section A: Preserved Animated Hero Section with DishOrbitCarousel */}
+        {/* 1. Preserved Animated Hero Section (Single Unified Hero) */}
         <HeroSection />
 
-        {/* Section B: Interactive Seasonal Menu with Category Filters & Search */}
+        {/* 2. Our Menu Section */}
         <MenuSection />
 
-        {/* Section C: How Ordering Works in 3 Steps */}
-        <HowItWorksSection />
-
-        {/* Section D: Why Dine With Us (5 Pillars) */}
-        <WhyDineSection />
-
-        {/* Section E: Editorial About & Food Philosophy */}
+        {/* 3. Section A — Our Story */}
         <AboutSection />
 
-        {/* Section F: Ordering CTA */}
+        {/* 4. Section B — How It Works */}
+        <HowItWorksSection />
+
+        {/* 5. Section C — Our Special Features */}
+        <SpecialFeaturesSection />
+
+        {/* 6. Section D — Contact */}
+        <ContactSection />
+
+        {/* 7. Section E — Final CTA */}
         <OrderingCTASection />
 
-        {/* Section G: Footer with Restaurant Information & Hours */}
+        {/* 8. Section F — Footer */}
         <Footer />
 
-        {/* Slide-over Cart & Order Confirmation Modal */}
+        {/* Interactive Slide-over Cart Drawer */}
         <CartDrawer />
 
-        {/* Persistent Floating Order Indicator */}
+        {/* Persistent Floating Cart Button */}
         <FloatingCartButton />
       </div>
     </CartProvider>

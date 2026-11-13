@@ -1,9 +1,12 @@
 "use client"
 
-import React from "react"
-import { MapPin, Phone, Mail, Clock } from "lucide-react"
+import React, { useState } from "react"
+import { MapPin, Phone, Mail, Clock, ArrowRight, CheckCircle2 } from "lucide-react"
 
 export default function Footer() {
+  const [newsletterEmail, setNewsletterEmail] = useState("")
+  const [subscribed, setSubscribed] = useState(false)
+
   const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
     const target = document.querySelector(href)
@@ -12,28 +15,36 @@ export default function Footer() {
     }
   }
 
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (newsletterEmail.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newsletterEmail)) {
+      setSubscribed(true)
+      setNewsletterEmail("")
+    }
+  }
+
   return (
-    <footer id="contact" className="bg-[#1c1917] text-stone-300 border-t border-stone-800 pt-16 pb-12">
+    <footer className="bg-[#f4ede4] text-[#57534e] border-t border-[#e7dfd5] pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-stone-800">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-[#e7dfd5]">
           {/* Column 1: Brand & Bio */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-[#c25e3e] text-white flex items-center justify-center font-bold text-base shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-[#c96342] text-white flex items-center justify-center font-serif font-bold text-base shadow-xs">
                 CT
               </div>
               <div>
-                <span className="font-serif text-lg font-medium text-white tracking-tight">
+                <span className="font-serif text-lg font-medium text-[#1c1917] tracking-tight">
                   The Corner Table
                 </span>
-                <span className="block text-[10px] tracking-widest uppercase text-stone-400">
-                  Kitchen & Café · Est. 2021
+                <span className="block text-[10px] tracking-widest uppercase font-medium text-[#78716c]">
+                  Kitchen & Hearth
                 </span>
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm text-stone-400 leading-relaxed max-w-sm mb-6">
-              A cozy, independent neighborhood restaurant bringing slow scratch cooking together with fast, seamless digital ordering.
+            <p className="text-xs sm:text-sm text-[#57534e] leading-relaxed max-w-sm mb-6 font-light">
+              An independent neighborhood restaurant bringing thoughtful cooking together with a simple, personal way to order and enjoy your favourites.
             </p>
 
             <div className="flex items-center gap-3">
@@ -41,7 +52,7 @@ export default function Footer() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noreferrer"
-                className="w-9 h-9 rounded-full bg-stone-800 hover:bg-[#c25e3e] text-stone-300 hover:text-white flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-full bg-white border border-[#e7dfd5] hover:bg-[#c96342] text-[#57534e] hover:text-white flex items-center justify-center transition-colors"
                 aria-label="Instagram"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -52,7 +63,7 @@ export default function Footer() {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noreferrer"
-                className="w-9 h-9 rounded-full bg-stone-800 hover:bg-[#c25e3e] text-stone-300 hover:text-white flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-full bg-white border border-[#e7dfd5] hover:bg-[#c96342] text-[#57534e] hover:text-white flex items-center justify-center transition-colors"
                 aria-label="Facebook"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -63,7 +74,7 @@ export default function Footer() {
                 href="https://twitter.com"
                 target="_blank"
                 rel="noreferrer"
-                className="w-9 h-9 rounded-full bg-stone-800 hover:bg-[#c25e3e] text-stone-300 hover:text-white flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-full bg-white border border-[#e7dfd5] hover:bg-[#c96342] text-[#57534e] hover:text-white flex items-center justify-center transition-colors"
                 aria-label="Twitter"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -75,115 +86,111 @@ export default function Footer() {
 
           {/* Column 2: Quick Links */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-widest text-white mb-4">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#1c1917] mb-4">
               Navigation
             </h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm text-stone-400">
+            <ul className="space-y-2.5 text-xs sm:text-sm text-[#57534e]">
               <li>
-                <a href="#hero" onClick={(e) => scrollTo(e, "#hero")} className="hover:text-white transition-colors">
+                <a href="#hero" onClick={(e) => scrollTo(e, "#hero")} className="hover:text-[#c96342] transition-colors">
                   Home
                 </a>
               </li>
               <li>
-                <a href="#menu" onClick={(e) => scrollTo(e, "#menu")} className="hover:text-white transition-colors">
+                <a href="#menu" onClick={(e) => scrollTo(e, "#menu")} className="hover:text-[#c96342] transition-colors">
                   Our Menu
                 </a>
               </li>
               <li>
-                <a href="#about" onClick={(e) => scrollTo(e, "#about")} className="hover:text-white transition-colors">
+                <a href="#story" onClick={(e) => scrollTo(e, "#story")} className="hover:text-[#c96342] transition-colors">
                   Our Story
                 </a>
               </li>
               <li>
-                <a href="#how-it-works" onClick={(e) => scrollTo(e, "#how-it-works")} className="hover:text-white transition-colors">
+                <a href="#how-it-works" onClick={(e) => scrollTo(e, "#how-it-works")} className="hover:text-[#c96342] transition-colors">
                   How It Works
                 </a>
               </li>
               <li>
-                <a href="#contact" onClick={(e) => scrollTo(e, "#contact")} className="hover:text-white transition-colors">
-                  Contact & Hours
+                <a href="#features" onClick={(e) => scrollTo(e, "#features")} className="hover:text-[#c96342] transition-colors">
+                  Special Features
+                </a>
+              </li>
+              <li>
+                <a href="#contact" onClick={(e) => scrollTo(e, "#contact")} className="hover:text-[#c96342] transition-colors">
+                  Contact
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Column 3: Menu Categories */}
+          {/* Column 3: Hours & Dining */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-widest text-white mb-4">
-              Menu Categories
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#1c1917] mb-4">
+              Service Hours
             </h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm text-stone-400">
+            <ul className="space-y-3 text-xs sm:text-sm text-[#57534e]">
               <li>
-                <a href="#menu" onClick={(e) => scrollTo(e, "#menu")} className="hover:text-white transition-colors">
-                  Chef&apos;s Specials
-                </a>
+                <span className="block font-medium text-[#1c1917]">Monday – Thursday</span>
+                <span className="text-xs">11:30 AM – 10:00 PM</span>
               </li>
               <li>
-                <a href="#menu" onClick={(e) => scrollTo(e, "#menu")} className="hover:text-white transition-colors">
-                  Main Course
-                </a>
+                <span className="block font-medium text-[#1c1917]">Friday – Sunday</span>
+                <span className="text-xs">11:00 AM – 11:00 PM</span>
               </li>
-              <li>
-                <a href="#menu" onClick={(e) => scrollTo(e, "#menu")} className="hover:text-white transition-colors">
-                  Starters & Plates
-                </a>
-              </li>
-              <li>
-                <a href="#menu" onClick={(e) => scrollTo(e, "#menu")} className="hover:text-white transition-colors">
-                  Artisanal Desserts
-                </a>
-              </li>
-              <li>
-                <a href="#menu" onClick={(e) => scrollTo(e, "#menu")} className="hover:text-white transition-colors">
-                  Signature Beverages
-                </a>
+              <li className="pt-2 text-xs text-[#78716c]">
+                Kitchen fires last order 30 mins prior to close.
               </li>
             </ul>
           </div>
 
-          {/* Column 4: Contact & Opening Hours */}
+          {/* Column 4: Newsletter */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-widest text-white mb-4">
-              Hours & Location
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#1c1917] mb-4">
+              Seasonal Notes
             </h4>
-            <div className="space-y-3 text-xs sm:text-sm text-stone-400">
-              <div className="flex items-start gap-2.5">
-                <Clock className="w-4 h-4 text-[#e07a5f] shrink-0 mt-0.5" />
-                <div>
-                  <span className="block font-medium text-stone-200">Mon – Fri</span>
-                  <span className="text-xs text-stone-400">8:00 AM – 10:30 PM</span>
-                  <span className="block font-medium text-stone-200 mt-1">Sat – Sun</span>
-                  <span className="text-xs text-stone-400">8:30 AM – 11:30 PM</span>
+            <p className="text-xs text-[#57534e] mb-3 leading-relaxed font-light">
+              Receive updates on seasonal menu arrivals, chef tastings and hearth specials.
+            </p>
+
+            {subscribed ? (
+              <div className="flex items-center gap-2 text-xs font-medium text-[#2e7d32]">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>You&apos;re on the list! Thank you.</span>
+              </div>
+            ) : (
+              <form onSubmit={handleSubscribe} className="space-y-2">
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    placeholder="Your email address"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#e7dfd5] text-xs text-[#1c1917] placeholder-[#a8a29e] focus:outline-none focus:border-[#c96342]"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-[#c96342] text-white flex items-center justify-center hover:bg-[#a84d31] transition-colors"
+                    aria-label="Subscribe"
+                  >
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
-              </div>
-
-              <div className="flex items-start gap-2.5 pt-2">
-                <MapPin className="w-4 h-4 text-[#e07a5f] shrink-0 mt-0.5" />
-                <span className="text-xs">
-                  142 University Boulevard, Corner Block, Sector 4
+                <span className="block text-[10px] text-[#78716c]">
+                  Zero spam. Unsubscribe at any time.
                 </span>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-[#e07a5f] shrink-0" />
-                <span className="text-xs">+91 98765 43210</span>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-[#e07a5f] shrink-0" />
-                <span className="text-xs">hello@thecornertable.com</span>
-              </div>
-            </div>
+              </form>
+            )}
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-400">
-          <p>© 2026 The Corner Table Kitchen. All rights reserved.</p>
+        {/* Bottom Bar: Copyright & Badges */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#78716c]">
+          <p>© 2026 The Corner Table. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <span>Built for VentureX Hackathon 2026</span>
-            <span className="w-1 h-1 rounded-full bg-stone-700" />
-            <span>Digital Empowerment for Local Restaurants</span>
+            <span className="hover:text-[#1c1917] cursor-pointer">Privacy Policy</span>
+            <span className="hover:text-[#1c1917] cursor-pointer">Terms of Service</span>
+            <span className="hover:text-[#1c1917] cursor-pointer">Allergen Guide</span>
           </div>
         </div>
       </div>
