@@ -28,6 +28,8 @@ import { TopHeader } from "@/components/customer/TopHeader";
 import { HeroFeaturedSection } from "@/components/customer/HeroFeaturedSection";
 import { CategorySection } from "@/components/customer/CategorySection";
 import { RestaurantSection } from "@/components/customer/RestaurantSection";
+import { RestaurantMenuView } from "@/components/customer/RestaurantMenuView";
+import { CustomerFavoritesView } from "@/components/customer/CustomerFavoritesView";
 import { ActiveOrderCard } from "@/components/customer/ActiveOrderCard";
 import { CartDrawer, CartItem } from "@/components/customer/CartDrawer";
 import { CheckoutSuccessModal } from "@/components/customer/CheckoutSuccessModal";
@@ -49,6 +51,10 @@ export default function CustomerDashboardPage() {
   // Navigation & Active Tab ("home", "categories", "restaurants", "orders", "favorites")
   const [activeTab, setActiveTab] = useState<string>("home");
 
+  // Selected Restaurant for In-Depth Menu View
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
+  const [highlightedDishId, setHighlightedDishId] = useState<string | null>(null);
+
   // Resizable & Collapsible Sidebar State
   const [sidebarWidth, setSidebarWidth] = useState<number>(256);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
@@ -57,7 +63,17 @@ export default function CustomerDashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [restaurantFilter, setRestaurantFilter] = useState<string>("all");
-  const [favorites, setFavorites] = useState<string[]>(["burger-house", "pizza-palace"]);
+  const [restaurantFavorites, setRestaurantFavorites] = useState<string[]>([
+    "burger-house",
+    "pizza-palace",
+  ]);
+
+  // Dish-Level Favorites (Persisted in localStorage)
+  const [favoriteDishIds, setFavoriteDishIds] = useState<string[]>([
+    "bh-1",
+    "th-1",
+    "pp-1",
+  ]);
 
   // Cart State
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -77,7 +93,7 @@ export default function CustomerDashboardPage() {
   const [selectedOrderForModal, setSelectedOrderForModal] =
     useState<CustomerOrderRecord | null>(null);
 
-  // Active Placed Order State (for top live-token banner)
+  // Active Placed Order State
   const [activeOrder, setActiveOrder] = useState<{
     token: string;
     items: CartItem[];
@@ -93,7 +109,7 @@ export default function CustomerDashboardPage() {
   const isManualScrolling = useRef(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load customer profile and real placed orders on mount
+  // Load user profile, orders, and favorite dishes from localStorage on mount
   useEffect(() => {
     try {
       const savedUser = localStorage.getItem("serveza_customer_user");
@@ -108,59 +124,100 @@ export default function CustomerDashboardPage() {
         } catch (e) {}
       }
 
-      // Check customer-specific storage
+      // Load persistent dish favorites for this customer
+      const favKey = `serveza_fav_dishes_${currentUser.email}`;
+      const savedFavs =
+        localStorage.getItem(favKey) || localStorage.getItem("serveza_favorite_dishes");
+      if (savedFavs) {
+        try {
+          const parsedFavs = JSON.parse(savedFavs);
+          if (Array.isArray(parsedFavs)) {
+            setFavoriteDishIds(parsedFavs);
+          }
+        } catch (e) {}
+      }
+
+      // Load persistent customer orders
       const storageKey = `serveza_orders_${currentUser.email}`;
       const savedOrders =
         localStorage.getItem(storageKey) || localStorage.getItem("serveza_customer_orders");
       if (savedOrders) {
-        const parsed = JSON.parse(savedOrders);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setCustomerOrders(parsed);
+        try {
+          const parsed = JSON.parse(savedOrders);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCustomerOrders(parsed);
 
-          // Find any active order to show in the live card
-          const latestActive = parsed.find((o: CustomerOrderRecord) =>
-            ["pending", "confirmed", "preparing", "out_for_delivery"].includes(o.status)
-          );
-          if (latestActive) {
-            setActiveOrder({
-              token: latestActive.tokenNumber,
-              items: latestActive.items.map((i: any) => ({
-                dish:
-                  MENU_ITEMS.find((m) => m.name === i.dishName) || {
-                    id: "custom",
-                    name: i.dishName,
-                    restaurantId: "custom",
-                    restaurantName: latestActive.restaurantName,
-                    category: "all",
-                    description: "",
-                    price: i.price,
-                    image: i.image || "",
-                    isVeg: true,
-                    prepTimeMinutes: 15,
-                    rating: 4.8,
-                    tags: [],
-                  },
-                quantity: i.quantity,
-                instructions: i.instructions,
-              })),
-              total: latestActive.totalAmount,
-              orderType: latestActive.orderType,
-              tableOrShelf: latestActive.tableOrShelf,
-              pickupSlot: latestActive.pickupSlot,
-            });
+            const latestActive = parsed.find((o: CustomerOrderRecord) =>
+              ["pending", "confirmed", "preparing", "out_for_delivery"].includes(o.status)
+            );
+            if (latestActive) {
+              setActiveOrder({
+                token: latestActive.tokenNumber,
+                items: latestActive.items.map((i: any) => ({
+                  dish:
+                    MENU_ITEMS.find((m) => m.name === i.dishName) || {
+                      id: "custom",
+                      name: i.dishName,
+                      restaurantId: "custom",
+                      restaurantName: latestActive.restaurantName,
+                      category: "all",
+                      description: "",
+                      price: i.price,
+                      image: i.image || "",
+                      isVeg: true,
+                      prepTimeMinutes: 15,
+                      rating: 4.8,
+                      tags: [],
+                    },
+                  quantity: i.quantity,
+                  instructions: i.instructions,
+                })),
+                total: latestActive.totalAmount,
+                orderType: latestActive.orderType,
+                tableOrShelf: latestActive.tableOrShelf,
+                pickupSlot: latestActive.pickupSlot,
+              });
+            }
           }
-        }
+        } catch (e) {}
       }
     } catch (e) {
-      console.warn("Could not load customer orders", e);
+      console.warn("Could not load stored data", e);
     }
   }, []);
 
+  // Dish-Level Favorite Toggle (Persists to database/localStorage)
+  const handleToggleFavoriteDish = (dishId: string) => {
+    setFavoriteDishIds((prev) => {
+      const next = prev.includes(dishId)
+        ? prev.filter((id) => id !== dishId)
+        : [...prev, dishId];
+
+      try {
+        localStorage.setItem(`serveza_fav_dishes_${loggedInCustomer.email}`, JSON.stringify(next));
+        localStorage.setItem("serveza_favorite_dishes", JSON.stringify(next));
+      } catch (e) {
+        console.warn("Could not save favorites", e);
+      }
+      return next;
+    });
+  };
+
+  // Restaurant Menu Navigation
+  const handleOpenRestaurant = (restaurantId: string, targetDishId?: string) => {
+    setSelectedRestaurantId(restaurantId);
+    setHighlightedDishId(targetDishId || null);
+    if (activeTab === "orders" || activeTab === "favorites") {
+      setActiveTab("home");
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   // Smooth scroll helper with sticky header offset
   const scrollToSection = (sectionId: string) => {
+    setSelectedRestaurantId(null);
     isManualScrolling.current = true;
 
-    // If currently on orders or favorites view, switch back to home view first
     if (activeTab === "orders" || activeTab === "favorites") {
       const targetTab =
         sectionId === "categories-section"
@@ -186,7 +243,6 @@ export default function CustomerDashboardPage() {
       return;
     }
 
-    // Normal in-page smooth scroll
     const el = document.getElementById(sectionId);
     if (el) {
       const targetTab =
@@ -210,13 +266,13 @@ export default function CustomerDashboardPage() {
 
   // Scroll Spy for Home, Categories, and Restaurants
   useEffect(() => {
-    if (activeTab === "orders" || activeTab === "favorites") return;
+    if (activeTab === "orders" || activeTab === "favorites" || selectedRestaurantId) return;
 
     const handleScroll = () => {
       if (isManualScrolling.current) return;
-      if (activeTab === "orders" || activeTab === "favorites") return;
+      if (activeTab === "orders" || activeTab === "favorites" || selectedRestaurantId) return;
 
-      const scrollPosition = window.scrollY + 130; // offset below sticky header
+      const scrollPosition = window.scrollY + 130;
 
       const restEl = document.getElementById("popular-restaurants");
       const catEl = document.getElementById("categories-section");
@@ -233,14 +289,15 @@ export default function CustomerDashboardPage() {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [activeTab]);
+  }, [activeTab, selectedRestaurantId]);
 
   // Sidebar Tab Navigation Handler
   const handleTabChange = (tab: string) => {
+    setSelectedRestaurantId(null);
+    setHighlightedDishId(null);
+
     if (tab === "home") {
-      if (activeTab === "orders" || activeTab === "favorites") {
-        setActiveTab("home");
-      }
+      setActiveTab("home");
       setSelectedCategory("all");
       setRestaurantFilter("all");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -255,13 +312,6 @@ export default function CustomerDashboardPage() {
       setActiveTab("favorites");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  };
-
-  // Toggle favorite
-  const handleToggleFavorite = (id: string) => {
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
   };
 
   // Cart operations
@@ -317,9 +367,6 @@ export default function CustomerDashboardPage() {
       if (selectedCategory !== "all" && rest.category !== selectedCategory) {
         return false;
       }
-      if (activeTab === "favorites" && !favorites.includes(rest.id)) {
-        return false;
-      }
       if (restaurantFilter === "dine-in" && !rest.isDineIn) return false;
       if (restaurantFilter === "takeaway" && !rest.isTakeaway) return false;
       if (restaurantFilter === "fastest" && parseInt(rest.prepTime) > 15) return false;
@@ -332,10 +379,27 @@ export default function CustomerDashboardPage() {
       }
       return true;
     });
-  }, [selectedCategory, activeTab, favorites, restaurantFilter, searchQuery]);
+  }, [selectedCategory, restaurantFilter, searchQuery]);
 
-  // Filtered Menu Items for Featured Dishes
-  const filteredDishes = useMemo(() => {
+  // Active restaurant object if in restaurant menu view
+  const activeRestaurantObj = useMemo(() => {
+    if (!selectedRestaurantId) return null;
+    return RESTAURANTS.find((r) => r.id === selectedRestaurantId) || null;
+  }, [selectedRestaurantId]);
+
+  // Dishes belonging to the selected restaurant
+  const selectedRestaurantDishes = useMemo(() => {
+    if (!selectedRestaurantId) return [];
+    return MENU_ITEMS.filter((d) => d.restaurantId === selectedRestaurantId);
+  }, [selectedRestaurantId]);
+
+  // Customer's Favorited Dishes
+  const customerFavoriteDishes = useMemo(() => {
+    return MENU_ITEMS.filter((dish) => favoriteDishIds.includes(dish.id));
+  }, [favoriteDishIds]);
+
+  // Featured Dishes for the main homepage
+  const featuredDishes = useMemo(() => {
     return MENU_ITEMS.filter((dish) => {
       if (selectedCategory !== "all" && dish.category !== selectedCategory) {
         return false;
@@ -351,7 +415,7 @@ export default function CustomerDashboardPage() {
     });
   }, [selectedCategory, searchQuery]);
 
-  // Checkout trigger: places real order, saves to localStorage, updates My Orders
+  // Checkout trigger
   const handleCheckout = (details: {
     orderType: "dine-in" | "takeaway";
     tableOrShelf: string;
@@ -393,7 +457,6 @@ export default function CustomerDashboardPage() {
       notes: details.notes,
     };
 
-    // Update state and persistent storage
     const updatedOrders = [newOrder, ...customerOrders];
     setCustomerOrders(updatedOrders);
 
@@ -401,7 +464,6 @@ export default function CustomerDashboardPage() {
       localStorage.setItem(`serveza_orders_${loggedInCustomer.email}`, JSON.stringify(updatedOrders));
       localStorage.setItem("serveza_customer_orders", JSON.stringify(updatedOrders));
 
-      // Sync to admin backend orders (dineflow_orders) so the kitchen sees it
       const existingAdmin = localStorage.getItem("dineflow_orders");
       const adminOrders = existingAdmin ? JSON.parse(existingAdmin) : [];
       adminOrders.unshift({
@@ -470,7 +532,7 @@ export default function CustomerDashboardPage() {
       <Sidebar
         activeTab={activeTab}
         onTabChange={handleTabChange}
-        favoritesCount={favorites.length}
+        favoritesCount={favoriteDishIds.length}
         ordersCount={customerOrders.length}
         width={sidebarWidth}
         onWidthChange={setSidebarWidth}
@@ -510,81 +572,43 @@ export default function CustomerDashboardPage() {
               onReorder={handleReorderOrder}
             />
           ) : activeTab === "favorites" ? (
-            /* VIEW 2: Favorites View */
-            <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#ECE7DE]">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#252522]">
-                      Favorite Places
-                    </h1>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#D66B43]/10 text-[#D66B43]">
-                      {favorites.length} Saved
-                    </span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-[#6E6D66] mt-1">
-                    Your bookmarked campus kitchens and favorite coffee counters
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => {
-                    setActiveTab("home");
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  className="text-xs font-semibold text-[#D66B43] hover:underline cursor-pointer"
-                >
-                  Back to All Kitchens
-                </button>
-              </div>
-
-              {filteredRestaurants.length === 0 ? (
-                <div className="py-16 text-center max-w-md mx-auto space-y-4 bg-white rounded-3xl border border-[#ECE7DE] p-6 shadow-soft">
-                  <div className="w-16 h-16 rounded-full bg-[#FAF8F3] border border-[#ECE7DE] text-[#D66B43] flex items-center justify-center mx-auto shadow-xs">
-                    <Heart className="w-8 h-8" />
-                  </div>
-                  <h3 className="font-serif text-xl font-bold text-[#252522]">
-                    No Favorites Saved Yet
-                  </h3>
-                  <p className="text-xs text-[#6E6D66] leading-relaxed">
-                    Click the heart icon on any restaurant or cafe to bookmark them here for fast zero-wait ordering.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setActiveTab("restaurants");
-                      scrollToSection("popular-restaurants");
-                    }}
-                    className="px-6 py-2.5 rounded-full bg-[#D66B43] hover:bg-[#BF5832] text-white text-xs font-bold shadow-soft transition-colors cursor-pointer"
-                  >
-                    Discover Restaurants
-                  </button>
-                </div>
-              ) : (
-                <RestaurantSection
-                  restaurants={filteredRestaurants}
-                  selectedFilter={restaurantFilter}
-                  onFilterChange={setRestaurantFilter}
-                  favorites={favorites}
-                  onToggleFavorite={handleToggleFavorite}
-                  onSelectRestaurant={(restId) => {
-                    const rest = RESTAURANTS.find((r) => r.id === restId);
-                    if (rest) {
-                      setSelectedCategory(rest.category);
-                      setActiveTab("home");
-                      scrollToSection("menu-dishes");
-                    }
-                  }}
-                  onViewAllClick={() => {
-                    setSelectedCategory("all");
-                    setRestaurantFilter("all");
-                  }}
-                />
-              )}
-            </div>
+            /* VIEW 2: Favorites View (Displays individual liked dishes with restaurant details) */
+            <CustomerFavoritesView
+              favoriteDishes={customerFavoriteDishes}
+              cart={cart}
+              onRemoveFavorite={handleToggleFavoriteDish}
+              onAddToCart={handleAddToCart}
+              onUpdateQuantity={handleUpdateQuantity}
+              onNavigateToRestaurant={(restId, dishId) =>
+                handleOpenRestaurant(restId, dishId)
+              }
+              onOpenDishModal={(dish) => setInspectingDish(dish)}
+              onExploreClick={() => {
+                setActiveTab("restaurants");
+                scrollToSection("popular-restaurants");
+              }}
+            />
+          ) : selectedRestaurantId && activeRestaurantObj ? (
+            /* VIEW 3: Dedicated In-Depth Restaurant Menu View (12-20 dishes with categories & search) */
+            <RestaurantMenuView
+              restaurant={activeRestaurantObj}
+              dishes={selectedRestaurantDishes}
+              cart={cart}
+              favoriteDishIds={favoriteDishIds}
+              onToggleFavoriteDish={handleToggleFavoriteDish}
+              onAddToCart={handleAddToCart}
+              onUpdateQuantity={handleUpdateQuantity}
+              onOpenDishModal={(dish) => setInspectingDish(dish)}
+              onBack={() => {
+                setSelectedRestaurantId(null);
+                setHighlightedDishId(null);
+              }}
+              highlightedDishId={highlightedDishId}
+            />
           ) : (
-            /* VIEW 3: Main Dashboard (Home, Categories, Restaurants, Featured Dishes) */
+            /* VIEW 4: Main Homepage (Hero, Categories, Popular Near You, Featured Dishes) */
             <>
-              {/* Active Live Order Banner (shown only when customer has an active order) */}
+              {/* Active Live Order Banner */}
               {activeOrder && (
                 <ActiveOrderCard
                   tokenNumber={activeOrder.token}
@@ -622,15 +646,13 @@ export default function CustomerDashboardPage() {
                   restaurants={filteredRestaurants}
                   selectedFilter={restaurantFilter}
                   onFilterChange={setRestaurantFilter}
-                  favorites={favorites}
-                  onToggleFavorite={handleToggleFavorite}
-                  onSelectRestaurant={(restId) => {
-                    const rest = RESTAURANTS.find((r) => r.id === restId);
-                    if (rest) {
-                      setSelectedCategory(rest.category);
-                      scrollToSection("menu-dishes");
-                    }
+                  favorites={restaurantFavorites}
+                  onToggleFavorite={(id) => {
+                    setRestaurantFavorites((prev) =>
+                      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+                    );
                   }}
+                  onSelectRestaurant={(restId) => handleOpenRestaurant(restId)}
                   onViewAllClick={() => {
                     setSelectedCategory("all");
                     setRestaurantFilter("all");
@@ -646,7 +668,7 @@ export default function CustomerDashboardPage() {
                       Featured Dishes
                     </h2>
                     <p className="text-xs text-[#6E6D66]">
-                      Steaming hot plates prepared directly by partner kitchens
+                      Handcrafted specialties prepared hot across campus partner kitchens
                     </p>
                   </div>
 
@@ -661,8 +683,10 @@ export default function CustomerDashboardPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {filteredDishes.map((dish) => {
+                  {featuredDishes.slice(0, 15).map((dish) => {
                     const inCart = cart.find((i) => i.dish.id === dish.id);
+                    const isFav = favoriteDishIds.includes(dish.id);
+
                     return (
                       <motion.div
                         key={dish.id}
@@ -682,12 +706,34 @@ export default function CustomerDashboardPage() {
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           />
 
-                          <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+                          <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
                             <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/95 backdrop-blur-sm text-[#252522] shadow-xs flex items-center gap-1.5 border border-[#ECE7DE]">
                               <Clock className="w-3 h-3 text-[#D66B43]" />
                               {dish.prepTimeMinutes}m prep
                             </span>
 
+                            {/* Dish Favorite Heart Button */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleFavoriteDish(dish.id);
+                              }}
+                              className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-xs ${
+                                isFav
+                                  ? "bg-rose-50 text-rose-500"
+                                  : "bg-white/90 text-[#6E6D66] hover:text-rose-500 hover:bg-white"
+                              }`}
+                              title={isFav ? "Remove from Favorites" : "Save to Favorites"}
+                            >
+                              <Heart
+                                className={`w-3.5 h-3.5 ${
+                                  isFav ? "fill-rose-500 text-rose-500" : ""
+                                }`}
+                              />
+                            </button>
+                          </div>
+
+                          <div className="absolute bottom-2.5 left-3">
                             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#252522]/90 backdrop-blur-sm text-white shadow-xs">
                               ⭐ {dish.rating}
                             </span>
@@ -701,16 +747,22 @@ export default function CustomerDashboardPage() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setSelectedCategory(dish.category);
-                                  scrollToSection("popular-restaurants");
+                                  handleOpenRestaurant(dish.restaurantId, dish.id);
                                 }}
-                                className="text-[10px] font-bold text-[#D66B43] uppercase tracking-wider hover:underline text-left cursor-pointer"
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-[#D66B43] uppercase tracking-wider hover:underline text-left cursor-pointer"
+                                title={`Open ${dish.restaurantName} full menu`}
                               >
-                                {dish.restaurantName}
+                                <Store className="w-3 h-3" />
+                                <span>{dish.restaurantName}</span>
                               </button>
-                              {dish.isVeg && (
+
+                              {dish.isVeg ? (
                                 <span className="w-3.5 h-3.5 rounded-sm border border-emerald-600 flex items-center justify-center p-0.5">
                                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                                </span>
+                              ) : (
+                                <span className="w-3.5 h-3.5 rounded-sm border border-rose-600 flex items-center justify-center p-0.5">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
                                 </span>
                               )}
                             </div>
@@ -787,7 +839,7 @@ export default function CustomerDashboardPage() {
       <MobileBottomNav
         activeTab={activeTab}
         onTabChange={handleTabChange}
-        favoritesCount={favorites.length}
+        favoritesCount={favoriteDishIds.length}
         ordersCount={customerOrders.length}
       />
 
@@ -819,7 +871,7 @@ export default function CustomerDashboardPage() {
         </div>
       )}
 
-      {/* Dish Customization Modal */}
+      {/* Dish Customization Modal (with Favorite Heart support) */}
       <DishDetailModal
         dish={inspectingDish}
         onClose={() => setInspectingDish(null)}
@@ -827,6 +879,8 @@ export default function CustomerDashboardPage() {
         currentCartQty={
           inspectingDish ? cart.find((i) => i.dish.id === inspectingDish.id)?.quantity || 0 : 0
         }
+        isFavorite={inspectingDish ? favoriteDishIds.includes(inspectingDish.id) : false}
+        onToggleFavorite={(dishId) => handleToggleFavoriteDish(dishId)}
       />
 
       {/* Cart Drawer */}

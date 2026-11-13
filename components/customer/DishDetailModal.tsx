@@ -13,6 +13,7 @@ import {
   Minus,
   Check,
   UtensilsCrossed,
+  Heart,
 } from "lucide-react";
 import { MenuItem } from "@/data/mockCustomerData";
 
@@ -21,6 +22,8 @@ interface DishDetailModalProps {
   onClose: () => void;
   onAddToCart: (dish: MenuItem, quantity: number, instructions?: string) => void;
   currentCartQty?: number;
+  isFavorite?: boolean;
+  onToggleFavorite?: (dishId: string) => void;
 }
 
 export const DishDetailModal: React.FC<DishDetailModalProps> = ({
@@ -28,6 +31,8 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({
   onClose,
   onAddToCart,
   currentCartQty = 0,
+  isFavorite = false,
+  onToggleFavorite,
 }) => {
   const [qty, setQty] = useState(currentCartQty > 0 ? currentCartQty : 1);
   const [selectedSpice, setSelectedSpice] = useState<string>("Balanced");
@@ -58,34 +63,54 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({
         <motion.div
           initial={{ opacity: 0, scale: 0.94, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          transition={{ type: "spring", damping: 26, stiffness: 300 }}
-          className="relative w-full max-w-xl bg-[#FAF8F3] rounded-3xl border border-[#ECE7DE] shadow-2xl overflow-hidden z-10 flex flex-col max-h-[90vh]"
+          exit={{ opacity: 0, scale: 0.94, y: 16 }}
+          className="relative w-full max-w-lg bg-[#FAF8F3] rounded-3xl border border-[#ECE7DE] shadow-2xl overflow-hidden z-10 max-h-[92vh] flex flex-col"
         >
-          {/* Header Image with Gradient Overlays */}
-          <div className="relative h-64 sm:h-72 w-full bg-[#ECE7DE] overflow-hidden flex-shrink-0">
+          {/* Header Image with Floating Action Buttons */}
+          <div className="relative h-60 w-full bg-[#ECE7DE] flex-shrink-0">
             <Image
               src={dish.image}
               alt={dish.name}
               fill
               className="object-cover"
-              sizes="(max-width: 640px) 100vw, 600px"
+              sizes="(max-width: 640px) 100vw, 500px"
+              priority
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#252522]/80 via-transparent to-black/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#252522]/90 via-[#252522]/30 to-transparent" />
 
-            {/* Close Button */}
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#FAF8F3]/90 backdrop-blur-md text-[#252522] flex items-center justify-center hover:bg-white shadow-md transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            {/* Top Bar with Favorite Heart & Close */}
+            <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+              {onToggleFavorite && (
+                <button
+                  onClick={() => onToggleFavorite(dish.id)}
+                  className="w-9 h-9 rounded-full bg-white/95 backdrop-blur-sm text-[#6E6D66] hover:text-rose-500 flex items-center justify-center transition-colors shadow-xs cursor-pointer"
+                  title={isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+                >
+                  <Heart
+                    className={`w-4 h-4 ${
+                      isFavorite ? "fill-rose-500 text-rose-500" : ""
+                    }`}
+                  />
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                className="w-9 h-9 rounded-full bg-white/95 backdrop-blur-sm text-[#252522] hover:bg-white flex items-center justify-center transition-colors shadow-xs cursor-pointer"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
             {/* Badges on Image */}
             <div className="absolute bottom-4 left-5 right-5 flex items-end justify-between">
               <div className="space-y-1">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#FAF8F3]/95 backdrop-blur-sm text-[#252522]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      dish.isVeg ? "bg-emerald-600" : "bg-rose-600"
+                    }`}
+                  />
                   {dish.restaurantName}
                 </span>
                 <h3 className="font-serif text-2xl font-bold text-[#FAF8F3] tracking-tight leading-snug drop-shadow-sm">
@@ -124,8 +149,8 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({
                 <div className="text-[10px] font-bold text-[#6E6D66] uppercase tracking-wider">
                   Rating
                 </div>
-                <div className="text-sm font-bold text-[#252522] mt-0.5 flex items-center justify-center gap-1">
-                  ⭐ {dish.rating}
+                <div className="text-sm font-bold text-[#252522] mt-0.5">
+                  ⭐ {dish.rating} / 5.0
                 </div>
               </div>
 
@@ -133,8 +158,8 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({
                 <div className="text-[10px] font-bold text-[#6E6D66] uppercase tracking-wider">
                   Dietary
                 </div>
-                <div className="text-sm font-bold text-emerald-700 mt-0.5 flex items-center justify-center gap-1">
-                  100% Veg 🌱
+                <div className="text-sm font-bold text-[#252522] mt-0.5">
+                  {dish.isVeg ? "🌱 100% Veg" : "🍗 Non-Veg"}
                 </div>
               </div>
             </div>
@@ -142,84 +167,84 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({
             {/* Description */}
             <div className="space-y-1.5">
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#6E6D66]">
-                Chef&apos;s Description
+                About This Dish
               </h4>
-              <p className="text-sm text-[#252522] leading-relaxed font-normal">
+              <p className="text-xs text-[#252522] leading-relaxed">
                 {dish.description}
               </p>
             </div>
 
-            {/* Custom Spice Level */}
+            {/* Spice Preference */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#252522] flex items-center gap-1.5">
-                  <Flame className="w-3.5 h-3.5 text-[#D66B43]" />
-                  Spice & Seasoning Preference
-                </span>
-                <span className="text-[11px] text-[#6E6D66]">Customized for you</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2.5">
-                {spiceOptions.map((s) => (
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#6E6D66] flex items-center gap-1.5">
+                <Flame className="w-3.5 h-3.5 text-[#D66B43]" />
+                <span>Spice Preference</span>
+              </h4>
+
+              <div className="grid grid-cols-3 gap-2">
+                {spiceOptions.map((opt) => (
                   <button
-                    key={s}
-                    onClick={() => setSelectedSpice(s)}
-                    className={`py-2.5 rounded-xl border text-xs font-semibold transition-all ${
-                      selectedSpice === s
-                        ? "bg-[#D66B43]/10 border-[#D66B43] text-[#D66B43] shadow-xs"
-                        : "bg-[#FFFFFF] border-[#ECE7DE] text-[#6E6D66] hover:text-[#252522]"
+                    key={opt}
+                    onClick={() => setSelectedSpice(opt)}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      selectedSpice === opt
+                        ? "bg-[#D66B43] border-[#D66B43] text-white shadow-soft"
+                        : "bg-white border-[#ECE7DE] text-[#252522] hover:border-[#D66B43]/50"
                     }`}
                   >
-                    {s}
+                    {opt}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Special Requests */}
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-[#252522]">
-                Special Preparation Note (Optional)
-              </label>
-              <input
-                type="text"
+            {/* Special Instructions */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#6E6D66]">
+                Kitchen Instructions (Optional)
+              </h4>
+              <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="e.g. Keep dressing on the side, extra napkins..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFFFFF] border border-[#ECE7DE] text-xs text-[#252522] placeholder:text-[#6E6D66] focus:outline-none focus:border-[#D66B43]"
+                placeholder="E.g., Extra napkins, no onions, dressing on side..."
+                rows={2}
+                className="w-full p-3 rounded-xl bg-white border border-[#ECE7DE] text-xs text-[#252522] placeholder:text-[#6E6D66]/60 focus:outline-none focus:border-[#D66B43] resize-none"
               />
             </div>
           </div>
 
-          {/* Sticky Bottom Footer */}
-          <div className="p-5 border-t border-[#ECE7DE] bg-[#FFFFFF] flex items-center justify-between gap-4">
+          {/* Footer Quantity & Add to Cart Action */}
+          <div className="p-4 sm:p-5 bg-white border-t border-[#ECE7DE] flex items-center justify-between gap-4">
             {/* Quantity Stepper */}
-            <div className="flex items-center gap-3 rounded-xl bg-[#FAF8F3] border border-[#ECE7DE] px-3 py-2">
+            <div className="flex items-center gap-3 bg-[#FAF8F3] border border-[#ECE7DE] rounded-xl px-3 py-1.5 shadow-xs">
               <button
-                onClick={() => setQty((q) => Math.max(1, q - 1))}
-                className="text-[#6E6D66] hover:text-[#D66B43] transition-colors p-0.5"
+                onClick={() => setQty(Math.max(1, qty - 1))}
+                className="text-[#6E6D66] hover:text-[#252522] transition-colors cursor-pointer"
+                title="Decrease"
               >
-                <Minus className="w-4 h-4" />
+                <Minus className="w-3.5 h-3.5" />
               </button>
-              <span className="text-sm font-bold text-[#252522] w-6 text-center">
+              <span className="text-xs font-bold text-[#252522] w-4 text-center">
                 {qty}
               </span>
               <button
-                onClick={() => setQty((q) => q + 1)}
-                className="text-[#6E6D66] hover:text-[#D66B43] transition-colors p-0.5"
+                onClick={() => setQty(qty + 1)}
+                className="text-[#6E6D66] hover:text-[#252522] transition-colors cursor-pointer"
+                title="Increase"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            {/* Add to Plate CTA */}
+            {/* Total & Add Button */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleAdd}
-              className="flex-1 py-3.5 px-6 rounded-xl bg-[#D66B43] text-[#FAF8F3] font-bold text-sm flex items-center justify-between hover:bg-[#BF5832] transition-colors shadow-soft"
+              className="flex-1 py-3 px-5 rounded-xl bg-[#252522] hover:bg-[#D66B43] text-white text-xs font-bold flex items-center justify-between transition-colors shadow-soft cursor-pointer"
             >
               <span>Add to Plate</span>
-              <span>₹{dish.price * qty}</span>
+              <span className="font-serif text-sm">₹{dish.price * qty}</span>
             </motion.button>
           </div>
         </motion.div>
