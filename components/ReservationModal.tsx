@@ -113,7 +113,7 @@ export default function ReservationModal({ isOpen, onClose }: ReservationModalPr
             <div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#f4ede4] text-[10px] font-semibold text-[#c96342] uppercase tracking-wider mb-2">
                 <Sparkles className="w-3 h-3" />
-                <span>The Corner Table Hearth</span>
+                <span>ServeZa Hearth</span>
               </div>
               <h3 className="font-serif text-2xl font-medium text-[#1c1917]">
                 Reserve Your Table

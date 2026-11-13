@@ -38,11 +38,11 @@ export default function Footer({ onOpenReservation }: FooterProps) {
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-[#c96342] text-white flex items-center justify-center font-serif font-bold text-base shadow-xs">
-                CT
+                SZ
               </div>
               <div>
                 <span className="font-serif text-lg font-medium text-[#1c1917] tracking-tight">
-                  The Corner Table
+                  ServeZa
                 </span>
                 <span className="block text-[10px] tracking-widest uppercase font-medium text-[#78716c]">
                   Kitchen & Hearth
@@ -185,7 +185,7 @@ export default function Footer({ onOpenReservation }: FooterProps) {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#78716c]">
-          <p>© 2026 The Corner Table. All rights reserved.</p>
+          <p>© 2026 ServeZa. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <span className="hover:text-[#1c1917] cursor-pointer transition-colors">Privacy Policy</span>
             <span className="hover:text-[#1c1917] cursor-pointer transition-colors">Terms of Service</span>

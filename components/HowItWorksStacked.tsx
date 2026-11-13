@@ -22,7 +22,7 @@ const steps: StepCard[] = [
     title: "Find Local Kitchens",
     tagline: "Live Preparation Times",
     description:
-      "Open DineFlow to explore nearby campus cafes and compare live kitchen preparation queues before stepping out.",
+      "Open ServeZa to explore nearby campus cafes and compare live kitchen preparation queues before stepping out.",
     image:
       "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80",
   },
@@ -115,7 +115,7 @@ export default function HowItWorksStacked() {
             className="text-3xl sm:text-5xl font-bold tracking-tight text-[#1c1917] mt-3"
             style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
           >
-            How DINEFLOW Works
+            How ServeZa Works
           </h2>
           <p className="mt-3 text-base sm:text-lg text-[#57534e] leading-relaxed max-w-xl mx-auto">
             From discovering nearby eateries to collecting your hot meal without waiting in line.

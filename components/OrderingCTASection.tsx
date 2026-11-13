@@ -41,7 +41,7 @@ export default function OrderingCTASection({ onOpenReservation }: OrderingCTASec
 
             {/* Prescribed Supporting Text */}
             <p className="mt-4 text-sm sm:text-base text-[#a8a29e] leading-relaxed max-w-lg mx-auto">
-              Join us at The Corner Table for an exceptional dining experience, or get in touch for reservations and private gatherings.
+              Join us at ServeZa for an exceptional dining experience, or get in touch for reservations and private gatherings.
             </p>
 
             {/* Action Button */}

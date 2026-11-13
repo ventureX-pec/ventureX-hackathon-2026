@@ -64,7 +64,7 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
           className="flex items-center gap-3 group"
         >
           <div className="w-10 h-10 rounded-xl bg-[#c96342] text-white flex items-center justify-center font-serif font-bold text-lg shadow-xs transition-transform group-hover:scale-105">
-            CT
+            SZ
           </div>
           <div className="flex flex-col">
             <span
@@ -74,7 +74,7 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
                   : "text-white group-hover:text-[#e07a5f]"
               }`}
             >
-              The Corner Table
+              ServeZa
             </span>
             <span
               className={`text-[10px] tracking-widest uppercase font-medium ${

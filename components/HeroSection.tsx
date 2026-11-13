@@ -13,7 +13,7 @@ const FEATURED_HERO_DISHES: Dish[] = [
     label: "Prime Ribeye",
     rating: 4.9,
     chef: "Chef Marcus Vance",
-    kitchen: "The Corner Table Hearth",
+    kitchen: "ServeZa Hearth",
     description: "Dry-aged prime ribeye seared over hickory embers with black truffle butter, confit garlic and rosemary sea salt.",
     likes: 428,
     ingredients: ["Prime Ribeye", "Truffle Butter", "Garlic Confit", "Fresh Rosemary", "Pink Sea Salt"],

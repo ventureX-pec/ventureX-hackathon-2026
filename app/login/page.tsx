@@ -78,10 +78,10 @@ export default function LoginPage() {
   const fillDemoCredentials = (targetRole: RoleType) => {
     setRole(targetRole)
     if (targetRole === "customer") {
-      setUsername("alex.morgan@dineflow.com")
+      setUsername("alex.morgan@serveza.com")
       setPassword("customer123")
     } else {
-      setUsername("admin@thecornertable.com")
+      setUsername("admin@serveza.com")
       setPassword("admin2026")
     }
   }
@@ -207,11 +207,11 @@ export default function LoginPage() {
             <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-[#e7dfd5]">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-[#c96342] text-white flex items-center justify-center font-serif font-bold text-sm shadow-xs">
-                  DF
+                  SZ
                 </div>
                 <div>
                   <span className="font-serif text-base font-medium text-[#1c1917] tracking-tight block leading-tight">
-                    DineFlow
+                    ServeZa
                   </span>
                   <span className="text-[9px] tracking-widest uppercase font-medium text-[#78716c] block">
                     Digital Ordering Platform
@@ -301,8 +301,8 @@ export default function LoginPage() {
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder={
                       role === "customer"
-                        ? "alex.morgan@dineflow.com"
-                        : "admin@thecornertable.com"
+                        ? "alex.morgan@serveza.com"
+                        : "admin@serveza.com"
                     }
                     className="w-full pl-9 pr-3.5 py-2 bg-[#fbf9f6] border border-[#e7dfd5] rounded-xl text-xs text-[#1c1917] placeholder-[#a8a29e] focus:outline-none focus:border-[#c96342] focus:ring-1 focus:ring-[#c96342] transition-colors"
                   />

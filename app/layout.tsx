@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Corner Table | Artisanal Neighborhood Kitchen & Café",
+  title: "ServeZa | Artisanal Neighborhood Kitchen & Digital Ordering",
   description: "Scratch cooking, seasonal plates, and express skip-the-line ordering in the heart of the neighborhood.",
 };
 
