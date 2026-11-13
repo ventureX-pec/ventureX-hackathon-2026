@@ -244,7 +244,7 @@ export function DishOrbitCarousel({
       const w = el.clientWidth
       const h = el.clientHeight
       const availableH = Math.max(300, h - 210)
-      el.style.setProperty("--dsh-s", String(Math.min(w / 960, availableH / 460, 1.15)))
+      el.style.setProperty("--dsh-s", String(Math.min((w - 48) / 980, availableH / 460, 1.1)))
     }
     fit()
     const ro = new ResizeObserver(fit)
