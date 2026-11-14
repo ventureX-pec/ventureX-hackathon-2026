@@ -18,7 +18,12 @@ export function getAppBaseUrl(): string {
     return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`.replace(/\/$/, "");
   }
 
-  if (typeof window !== "undefined" && window.location.origin) {
+  if (
+    typeof window !== "undefined" &&
+    window.location.origin &&
+    !window.location.hostname.includes("localhost") &&
+    !window.location.hostname.includes("127.0.0.1")
+  ) {
     return window.location.origin.replace(/\/$/, "");
   }
 
@@ -31,7 +36,8 @@ export function getAppBaseUrl(): string {
  */
 export function generateTableMenuUrl(restaurantSlug?: string, tableNumber?: string): string {
   const baseUrl = getAppBaseUrl();
-  const cleanSlug = encodeURIComponent((restaurantSlug || "the-corner-table").toLowerCase().trim());
+  const rawSlug = (restaurantSlug || "corner-cafe").toLowerCase().trim();
+  const cleanSlug = encodeURIComponent(rawSlug);
   const cleanTable = encodeURIComponent((tableNumber ? String(tableNumber) : "T01").toUpperCase().trim());
   return `${baseUrl}/r/${cleanSlug}/menu?table=${cleanTable}`;
 }
@@ -58,13 +64,13 @@ export async function generateQrDataUrl(
 }
 
 /**
- * Triggers a browser download of the high-resolution QR PNG
+ * Helper to trigger browser download of the generated PNG file.
  */
-export function downloadQrPng(dataUrl: string, fileName: string) {
+export function downloadQrPng(dataUrl: string, filename: string): void {
   if (typeof window === "undefined") return;
   const link = document.createElement("a");
   link.href = dataUrl;
-  link.download = fileName.endsWith(".png") ? fileName : `${fileName}.png`;
+  link.download = filename;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

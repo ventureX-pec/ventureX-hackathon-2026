@@ -30,24 +30,52 @@ import { EditTableModal } from "@/components/admin/modals/EditTableModal";
 
 const DEFAULT_RESTAURANTS: RestaurantInfo[] = [
   {
-    id: "rest-001",
-    name: "The Corner Table",
-    slug: "the-corner-table",
-    address: "Connaught Place, New Delhi",
+    id: "corner-cafe",
+    name: "The Corner Café",
+    slug: "corner-cafe",
+    address: "Courtyard Wing • Block A",
     phone: "+91 98765 43210",
   },
   {
-    id: "rest-002",
-    name: "Burger House & Grill",
+    id: "burger-house",
+    name: "Burger House",
     slug: "burger-house",
-    address: "Indiranagar, Bangalore",
+    address: "Block A • Food Court",
     phone: "+91 98111 22334",
+  },
+  {
+    id: "pizza-palace",
+    name: "Pizza Palace",
+    slug: "pizza-palace",
+    address: "Main Commons • Stall 03",
+    phone: "+91 98222 33445",
+  },
+  {
+    id: "sushi-world",
+    name: "Sushi World",
+    slug: "sushi-world",
+    address: "East Wing Courtyard",
+    phone: "+91 98333 44556",
+  },
+  {
+    id: "healthy-bites",
+    name: "Healthy Bites",
+    slug: "healthy-bites",
+    address: "Sports Complex Kiosk",
+    phone: "+91 98444 55667",
+  },
+  {
+    id: "tandoor-hub",
+    name: "Tandoor & Curry Hub",
+    slug: "tandoor-hub",
+    address: "Hostel Zone Dine Hall",
+    phone: "+91 98555 66778",
   },
 ];
 
 export const TableManagementView: React.FC = () => {
   const [restaurants, setRestaurants] = useState<RestaurantInfo[]>(DEFAULT_RESTAURANTS);
-  const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>("rest-001");
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>("corner-cafe");
   const [tables, setTables] = useState<RestaurantTable[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");

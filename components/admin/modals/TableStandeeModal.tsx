@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { X, Printer, Download, ExternalLink, QrCode, MapPin } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { RestaurantTable } from "@/app/api/tables/route";
-import { generateQrDataUrl, downloadQrPng } from "@/lib/qrGenerator";
+import { generateQrDataUrl, downloadQrPng, generateTableMenuUrl } from "@/lib/qrGenerator";
 
 interface TableStandeeModalProps {
   isOpen: boolean;
@@ -20,17 +20,14 @@ export const TableStandeeModal: React.FC<TableStandeeModalProps> = ({
   onClose,
   table,
   restaurantName,
-  restaurantSlug = "the-corner-table",
+  restaurantSlug = "corner-cafe",
 }) => {
   const standeeRef = useRef<HTMLDivElement>(null);
 
   if (!isOpen || !table) return null;
 
   const tableNum = table.table_number || (table as any).tableNumber || "T01";
-  const prodDomain =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    "https://venture-x-hackathon-2026.vercel.app";
-  const targetUrl = `${prodDomain}/r/${restaurantSlug}/menu?table=${tableNum}`;
+  const targetUrl = generateTableMenuUrl(restaurantSlug, tableNum);
 
   const handleDownload = async () => {
     try {

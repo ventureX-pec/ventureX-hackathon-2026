@@ -10,32 +10,53 @@ export interface RestaurantInfo {
   phone?: string;
 }
 
-// Baseline restaurants
-const BASELINE_RESTAURANTS: RestaurantInfo[] = [
+// 6 Real Campus Partner Restaurants matching the storefront catalog
+export const BASELINE_RESTAURANTS: RestaurantInfo[] = [
   {
-    id: "rest-001",
-    name: "The Corner Table",
-    slug: "the-corner-table",
-    address: "Connaught Place, New Delhi",
+    id: "corner-cafe",
+    name: "The Corner Café",
+    slug: "corner-cafe",
+    address: "Courtyard Wing • Block A",
     phone: "+91 98765 43210",
   },
   {
-    id: "rest-002",
-    name: "Burger House & Grill",
+    id: "burger-house",
+    name: "Burger House",
     slug: "burger-house",
-    address: "Indiranagar, Bangalore",
+    address: "Block A • Food Court",
     phone: "+91 98111 22334",
   },
   {
-    id: "rest-003",
-    name: "Sushi Bay & Asian Bowls",
-    slug: "sushi-bay",
-    address: "Bandra West, Mumbai",
+    id: "pizza-palace",
+    name: "Pizza Palace",
+    slug: "pizza-palace",
+    address: "Main Commons • Stall 03",
     phone: "+91 98222 33445",
+  },
+  {
+    id: "sushi-world",
+    name: "Sushi World",
+    slug: "sushi-world",
+    address: "East Wing Courtyard",
+    phone: "+91 98333 44556",
+  },
+  {
+    id: "healthy-bites",
+    name: "Healthy Bites",
+    slug: "healthy-bites",
+    address: "Sports Complex Kiosk",
+    phone: "+91 98444 55667",
+  },
+  {
+    id: "tandoor-hub",
+    name: "Tandoor & Curry Hub",
+    slug: "tandoor-hub",
+    address: "Hostel Zone Dine Hall",
+    phone: "+91 98555 66778",
   },
 ];
 
-// GET /api/restaurants or /api/restaurants?slug=the-corner-table
+// GET /api/restaurants or /api/restaurants?slug=corner-cafe
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -59,9 +80,16 @@ export async function GET(req: Request) {
 
     // Fallback to baseline restaurants
     if (slug) {
+      const normalized = slug.toLowerCase().trim();
       const match =
-        BASELINE_RESTAURANTS.find((r) => r.slug === slug || r.id === slug) ||
-        BASELINE_RESTAURANTS[0];
+        BASELINE_RESTAURANTS.find(
+          (r) =>
+            r.slug === normalized ||
+            r.id === normalized ||
+            (normalized === "the-corner-table" && r.id === "corner-cafe") ||
+            (normalized === "the-corner-cafe" && r.id === "corner-cafe") ||
+            (normalized === "sushi-bay" && r.id === "sushi-world")
+        ) || BASELINE_RESTAURANTS[0];
       return NextResponse.json({ success: true, restaurant: match, source: "baseline" });
     }
 

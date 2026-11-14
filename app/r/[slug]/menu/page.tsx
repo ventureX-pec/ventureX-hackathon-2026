@@ -57,56 +57,47 @@ function TableMenuContent() {
 
   // Fetch and resolve restaurant & available dishes
   useEffect(() => {
-    // 1. Find matching restaurant by slug
+    // 1. Find matching restaurant by slug or alias
+    const normalizedSlug = slug.toLowerCase().trim();
+
+    const aliasMap: Record<string, string> = {
+      "the-corner-table": "corner-cafe",
+      "the-corner-cafe": "corner-cafe",
+      "corner-cafe": "corner-cafe",
+      "burger-house": "burger-house",
+      "pizza-palace": "pizza-palace",
+      "sushi-bay": "sushi-world",
+      "sushi-world": "sushi-world",
+      "healthy-bites": "healthy-bites",
+      "tandoor-hub": "tandoor-hub",
+      "tandoor-curry-hub": "tandoor-hub",
+    };
+
+    const targetId = aliasMap[normalizedSlug] || normalizedSlug;
+
     let matchedRest = RESTAURANTS.find(
       (r) =>
-        r.id === slug ||
-        r.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") === slug ||
-        (slug === "the-corner-table" && (r.id === "corner-cafe" || r.id === "the-corner-table"))
+        r.id === targetId ||
+        r.id === normalizedSlug ||
+        r.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") === normalizedSlug
     );
 
     // Fallback if slug not found
     if (!matchedRest) {
-      matchedRest = {
-        id: slug,
-        name: slug
-          .split("-")
-          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(" "),
-        tagline: "Artisanal Table-Side Dining Experience",
-        cuisine: "Cafe & Hearth Specialties",
-        prepTime: "10-15 min",
-        rating: 4.9,
-        location: "Main Dining Wing",
-        image:
-          "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80",
-        deliveryFee: "₹0",
-        currentQueue: 3,
-        isOpen: true,
-        isDineIn: true,
-        isTakeaway: true,
-        priceLevel: "$$",
-        category: "coffee",
-      };
+      matchedRest = RESTAURANTS[0];
     }
 
     setRestaurant(matchedRest);
 
-    // 2. Fetch dishes belonging to this restaurant (or full signature set)
+    // 2. Fetch dishes belonging specifically to this restaurant
     let restDishes = MENU_ITEMS.filter(
       (d) =>
         d.restaurantId === matchedRest.id ||
-        d.restaurantName.toLowerCase().includes(matchedRest.name.toLowerCase()) ||
-        matchedRest.name.toLowerCase().includes(d.restaurantName.toLowerCase())
+        d.restaurantName.toLowerCase().trim() === matchedRest.name.toLowerCase().trim()
     );
 
     if (restDishes.length === 0) {
-      // Provide signature dishes under this restaurant name
-      restDishes = MENU_ITEMS.slice(0, 16).map((d) => ({
-        ...d,
-        restaurantId: matchedRest.id,
-        restaurantName: matchedRest.name,
-      }));
+      restDishes = MENU_ITEMS.filter((d) => d.restaurantId === matchedRest.id);
     }
 
     setDishes(restDishes);
