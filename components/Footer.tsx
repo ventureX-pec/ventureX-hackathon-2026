@@ -1,15 +1,24 @@
 "use client"
 
 import React, { useState } from "react"
+import Link from "next/link"
 import { ArrowRight, CheckCircle2 } from "lucide-react"
 
-interface FooterProps {
-  onOpenReservation?: () => void
+export interface FooterProps {
+  onOpenReservation?: () => void;
+  onOpenPolicy?: (policy: "privacy" | "terms" | "allergens") => void;
 }
 
-export default function Footer({ onOpenReservation }: FooterProps) {
+export default function Footer({ onOpenReservation, onOpenPolicy }: FooterProps) {
   const [newsletterEmail, setNewsletterEmail] = useState("")
   const [subscribed, setSubscribed] = useState(false)
+  const handlePolicyClick = (policy: "privacy" | "terms" | "allergens") => {
+    if (onOpenPolicy) {
+      onOpenPolicy(policy);
+    } else if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("app:open-policy", { detail: policy }));
+    }
+  };
 
   const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
@@ -31,18 +40,20 @@ export default function Footer({ onOpenReservation }: FooterProps) {
   }
 
   return (
-    <footer className="bg-[#f4ede4] text-[#57534e] border-t border-[#e7dfd5] pt-16 pb-12">
+    <footer id="about" className="bg-[#f4ede4] text-[#57534e] border-t border-[#e7dfd5] pt-16 pb-12 scroll-mt-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-[#e7dfd5]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-[#e7dfd5]">
           {/* Column 1: Brand & Bio */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-[#c96342] text-white flex items-center justify-center font-serif font-bold text-base shadow-xs">
-                SZ
-              </div>
+              <img
+                src="/logo.png"
+                alt="ServeZa Logo"
+                className="w-10 h-10 object-contain"
+              />
               <div>
                 <span className="font-serif text-lg font-medium text-[#1c1917] tracking-tight">
-                  ServeZa
+                  Serve<span className="text-[#c96342]">Za</span>
                 </span>
                 <span className="block text-[10px] tracking-widest uppercase font-medium text-[#78716c]">
                   Kitchen & Hearth
@@ -99,7 +110,7 @@ export default function Footer({ onOpenReservation }: FooterProps) {
             <ul className="space-y-2.5 text-xs sm:text-sm text-[#57534e]">
               <li>
                 <a href="#hero" onClick={(e) => scrollTo(e, "#hero")} className="hover:text-[#c96342] transition-colors">
-                  Featured Dishes
+                  Home
                 </a>
               </li>
               <li>
@@ -108,8 +119,8 @@ export default function Footer({ onOpenReservation }: FooterProps) {
                 </a>
               </li>
               <li>
-                <a href="/customer" className="hover:text-[#c96342] transition-colors">
-                  Order Online (Customer Hub)
+                <a href="#about" onClick={(e) => scrollTo(e, "#about")} className="hover:text-[#c96342] transition-colors">
+                  About Us
                 </a>
               </li>
               <li>
@@ -132,25 +143,7 @@ export default function Footer({ onOpenReservation }: FooterProps) {
             </ul>
           </div>
 
-          {/* Column 3: Hours & Dining */}
-          <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#1c1917] mb-4">
-              Service Hours
-            </h4>
-            <ul className="space-y-3 text-xs sm:text-sm text-[#57534e]">
-              <li>
-                <span className="block font-medium text-[#1c1917]">Monday – Thursday</span>
-                <span className="text-xs">11:30 AM – 10:00 PM</span>
-              </li>
-              <li>
-                <span className="block font-medium text-[#1c1917]">Friday – Sunday</span>
-                <span className="text-xs">11:00 AM – 11:00 PM</span>
-              </li>
-              <li className="pt-2 text-xs text-[#78716c]">
-                Kitchen fires last order 30 mins prior to close.
-              </li>
-            </ul>
-          </div>
+          
 
           {/* Column 4: Newsletter */}
           <div>
@@ -197,9 +190,27 @@ export default function Footer({ onOpenReservation }: FooterProps) {
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#78716c]">
           <p>© 2026 ServeZa. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <span className="hover:text-[#1c1917] cursor-pointer transition-colors">Privacy Policy</span>
-            <span className="hover:text-[#1c1917] cursor-pointer transition-colors">Terms of Service</span>
-            <span className="hover:text-[#1c1917] cursor-pointer transition-colors">Allergen Guide</span>
+            <button
+              type="button"
+              onClick={() => handlePolicyClick("privacy")}
+              className="hover:text-[#1c1917] hover:underline cursor-pointer transition-colors"
+            >
+              Privacy Policy
+            </button>
+            <button
+              type="button"
+              onClick={() => handlePolicyClick("terms")}
+              className="hover:text-[#1c1917] hover:underline cursor-pointer transition-colors"
+            >
+              Terms of Service
+            </button>
+            <button
+              type="button"
+              onClick={() => handlePolicyClick("allergens")}
+              className="hover:text-[#1c1917] hover:underline cursor-pointer transition-colors"
+            >
+              Allergen Guide
+            </button>
           </div>
         </div>
       </div>

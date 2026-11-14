@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import { motion } from "motion/react";
 import {
   Plus,
+  Minus,
   Search,
   Check,
   X,
@@ -15,6 +15,7 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { MenuItem } from "@/data/mockCustomerData";
+import SafeImage from "@/components/customer/SafeImage";
 
 interface MenuManagementViewProps {
   dishes: MenuItem[];
@@ -22,6 +23,7 @@ interface MenuManagementViewProps {
   onOpenAddModal: () => void;
   onEditDish?: (dish: MenuItem) => void;
   onDeleteDish?: (dishId: string) => void;
+  onUpdatePrice?: (dishId: string, newPrice: number) => void;
 }
 
 export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
@@ -30,9 +32,12 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
   onOpenAddModal,
   onEditDish,
   onDeleteDish,
+  onUpdatePrice,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
+  const [tempPrice, setTempPrice] = useState<string>("");
 
   const categories = [
     { id: "all", label: "All Items" },
@@ -43,6 +48,25 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
     { id: "salads", label: "Healthy & Salads" },
     { id: "drinks", label: "Beverages" },
   ];
+
+  const handleAdjustPrice = (dishId: string, delta: number) => {
+    const dish = dishes.find((d) => d.id === dishId);
+    if (!dish) return;
+    const newPrice = Math.max(10, dish.price + delta);
+    if (onUpdatePrice) {
+      onUpdatePrice(dishId, newPrice);
+    }
+  };
+
+  const handleSaveInlinePrice = (dishId: string) => {
+    const parsed = parseInt(tempPrice, 10);
+    if (!isNaN(parsed) && parsed > 0) {
+      if (onUpdatePrice) {
+        onUpdatePrice(dishId, parsed);
+      }
+    }
+    setEditingPriceId(null);
+  };
 
   const filteredDishes = dishes.filter((dish) => {
     if (selectedCategory !== "all" && dish.category !== selectedCategory) {
@@ -77,7 +101,7 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
 
         <button
           onClick={onOpenAddModal}
-          className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#D66B43] to-[#E87A48] text-white text-xs sm:text-sm font-bold shadow-md hover:brightness-105 transition-all flex items-center justify-center gap-2 shrink-0"
+          className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#D66B43] to-[#E87A48] text-white text-xs sm:text-sm font-bold shadow-md hover:brightness-105 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Add New Dish</span>
@@ -92,7 +116,7 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold shrink-0 transition-all ${
+              className={`px-4 py-2 rounded-full text-xs font-semibold shrink-0 transition-all cursor-pointer ${
                 selectedCategory === cat.id
                   ? "bg-[#D66B43] text-white shadow-xs"
                   : "bg-white border border-[#EDE5DA] text-[#5C574F] hover:bg-[#FAF8F5] hover:text-[#252522]"
@@ -133,7 +157,7 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
               <div>
                 {/* Dish Photo */}
                 <div className="relative w-full h-44 bg-[#FAF8F5]">
-                  <Image
+                  <SafeImage
                     src={dish.image}
                     alt={dish.name}
                     fill
@@ -174,14 +198,65 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
                 </div>
 
                 {/* Details */}
-                <div className="p-5 space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-serif text-lg font-bold text-[#252522] leading-tight">
+                <div className="p-5 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="font-serif text-lg font-bold text-[#252522] leading-tight flex-1">
                       {dish.name}
                     </h3>
-                    <span className="font-serif text-lg font-bold text-[#D66B43] shrink-0">
-                      ₹{dish.price}
-                    </span>
+
+                    {/* Interactive Price Controls: Decrease / Input / Increase */}
+                    <div className="inline-flex items-center bg-[#FAF8F5] border border-[#EDE5DA] rounded-xl p-1 shadow-2xs shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleAdjustPrice(dish.id, -10)}
+                        className="w-7 h-7 rounded-lg bg-white border border-[#EDE5DA] text-[#5C574F] hover:bg-[#D66B43] hover:text-white hover:border-[#D66B43] flex items-center justify-center transition-all cursor-pointer shadow-2xs active:scale-90"
+                        title="Decrease price (-₹10)"
+                        aria-label="Decrease price by ₹10"
+                      >
+                        <Minus className="w-3.5 h-3.5" />
+                      </button>
+
+                      {editingPriceId === dish.id ? (
+                        <div className="flex items-center px-1">
+                          <span className="text-xs font-bold text-[#D66B43]">₹</span>
+                          <input
+                            type="number"
+                            value={tempPrice}
+                            onChange={(e) => setTempPrice(e.target.value)}
+                            onBlur={() => handleSaveInlinePrice(dish.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") handleSaveInlinePrice(dish.id);
+                              if (e.key === "Escape") setEditingPriceId(null);
+                            }}
+                            autoFocus
+                            className="w-14 px-1 py-0.5 text-xs font-bold text-[#D66B43] bg-white rounded border border-[#D66B43] focus:outline-none text-center"
+                            min="1"
+                          />
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingPriceId(dish.id);
+                            setTempPrice(String(dish.price));
+                          }}
+                          className="px-2 py-0.5 font-serif text-base font-bold text-[#D66B43] min-w-[52px] text-center hover:bg-white hover:rounded-md transition-colors cursor-pointer"
+                          title="Click to edit price directly"
+                        >
+                          ₹{dish.price}
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => handleAdjustPrice(dish.id, 10)}
+                        className="w-7 h-7 rounded-lg bg-white border border-[#EDE5DA] text-[#5C574F] hover:bg-[#D66B43] hover:text-white hover:border-[#D66B43] flex items-center justify-center transition-all cursor-pointer shadow-2xs active:scale-90"
+                        title="Increase price (+₹10)"
+                        aria-label="Increase price by ₹10"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
 
                   <p className="text-xs text-[#736E65] line-clamp-2 leading-relaxed">
@@ -205,7 +280,7 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => onToggleAvailability(dish.id)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none cursor-pointer ${
                       isAvailable ? "bg-[#D66B43]" : "bg-gray-300"
                     }`}
                     aria-label="Toggle availability"
@@ -225,7 +300,7 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
                   {onEditDish && (
                     <button
                       onClick={() => onEditDish(dish)}
-                      className="p-2 rounded-xl bg-[#FAF8F5] border border-[#EDE5DA] text-[#5C574F] hover:text-[#D66B43] hover:bg-white transition-colors"
+                      className="p-2 rounded-xl bg-[#FAF8F5] border border-[#EDE5DA] text-[#5C574F] hover:text-[#D66B43] hover:bg-white transition-colors cursor-pointer"
                       title="Edit dish"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -234,7 +309,7 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
                   {onDeleteDish && (
                     <button
                       onClick={() => onDeleteDish(dish.id)}
-                      className="p-2 rounded-xl bg-[#FAF8F5] border border-[#EDE5DA] text-rose-500 hover:bg-rose-50 transition-colors"
+                      className="p-2 rounded-xl bg-[#FAF8F5] border border-[#EDE5DA] text-rose-500 hover:bg-rose-50 transition-colors cursor-pointer"
                       title="Delete dish"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

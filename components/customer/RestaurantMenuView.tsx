@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Image from "next/image";
+import SafeImage from "./SafeImage";
 import { motion, AnimatePresence } from "motion/react";
 import {
   ArrowLeft,
@@ -100,7 +101,7 @@ export const RestaurantMenuView: React.FC<RestaurantMenuViewProps> = ({
       <div className="relative rounded-3xl overflow-hidden bg-[#252522] text-white border border-[#ECE7DE] shadow-card">
         {/* Background Atmosphere Image with Gradient Scrim */}
         <div className="absolute inset-0">
-          <Image
+          <SafeImage
             src={restaurant.image}
             alt={restaurant.name}
             fill
@@ -258,7 +259,7 @@ export const RestaurantMenuView: React.FC<RestaurantMenuViewProps> = ({
                   onClick={() => onOpenDishModal(dish)}
                   className="relative h-48 w-full bg-[#ECE7DE] overflow-hidden cursor-pointer"
                 >
-                  <Image
+                  <SafeImage
                     src={dish.image}
                     alt={dish.name}
                     fill

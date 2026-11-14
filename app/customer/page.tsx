@@ -523,7 +523,7 @@ export default function CustomerDashboardPage() {
   return (
     <div className="min-h-screen bg-[#FAF8F3] text-[#252522] selection:bg-[#D66B43]/20 selection:text-[#D66B43] relative overflow-x-hidden isolate">
       {/* Editorial Food Photography Background Layer */}
-      <FoodPhotographyBackdrop isSidebarOpen={isSidebarOpen} sidebarWidth={sidebarWidth} />
+      <FoodPhotographyBackdrop isSidebarOpen={isSidebarOpen} sidebarWidth={sidebarWidth} activeTab={activeTab} />
 
       {/* Light subtle cursor trail */}
       <CursorTrail />

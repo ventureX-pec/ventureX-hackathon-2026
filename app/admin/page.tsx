@@ -121,6 +121,12 @@ export default function AdminDashboardPage() {
   };
 
   // Add new dish
+  const handleUpdatePrice = (dishId: string, newPrice: number) => {
+    setDishes((prev) =>
+      prev.map((d) => (d.id === dishId ? { ...d, price: Math.max(10, newPrice) } : d))
+    );
+  };
+
   const handleAddDish = (newDish: MenuItem) => {
     setDishes((prev) => [newDish, ...prev]);
   };
@@ -258,6 +264,7 @@ export default function AdminDashboardPage() {
                   dishes={dishes}
                   onToggleAvailability={handleToggleDishAvailability}
                   onOpenAddModal={() => setIsAddDishOpen(true)}
+                  onUpdatePrice={handleUpdatePrice}
                   onDeleteDish={(id) =>
                     setDishes((prev) => prev.filter((d) => d.id !== id))
                   }

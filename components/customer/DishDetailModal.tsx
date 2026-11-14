@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import SafeImage from "./SafeImage";
 import { motion, AnimatePresence } from "motion/react";
 import {
   X,
@@ -68,7 +69,7 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({
         >
           {/* Header Image with Floating Action Buttons */}
           <div className="relative h-60 w-full bg-[#ECE7DE] flex-shrink-0">
-            <Image
+            <SafeImage
               src={dish.image}
               alt={dish.name}
               fill

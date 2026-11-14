@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import SafeImage from "./SafeImage";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowRight, Flame, Menu as MenuIcon, Sparkles } from "lucide-react";
 
@@ -216,7 +217,7 @@ export const HeroFeaturedSection: React.FC<HeroFeaturedSectionProps> = ({
                 transition={{ type: "spring", damping: 22, stiffness: 220 }}
                 className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full overflow-hidden shadow-2xl border-4 border-white/95 group"
               >
-                <Image
+                <SafeImage
                   src={current.plateImage}
                   alt={current.titlePrefix}
                   fill

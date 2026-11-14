@@ -115,7 +115,7 @@ export default function HowItWorksStacked() {
             className="text-3xl sm:text-5xl font-bold tracking-tight text-[#1c1917] mt-3"
             style={{ fontFamily: 'Georgia, "Times New Roman", Times, serif' }}
           >
-            How ServeZa Works
+            How Serve<span className="text-[#c96342]">Za</span> Works
           </h2>
           <p className="mt-3 text-base sm:text-lg text-[#57534e] leading-relaxed max-w-xl mx-auto">
             From discovering nearby eateries to collecting your hot meal without waiting in line.

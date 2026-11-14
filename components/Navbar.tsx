@@ -23,9 +23,9 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
   }, [])
 
   const navLinks = [
-    { label: "Featured Dishes", href: "#hero" },
+    { label: "Home", href: "#hero" },
     { label: "How It Works", href: "#how-it-works" },
-    { label: "Order Online", href: "/customer" },
+    { label: "About Us", href: "#about" },
   ]
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -68,9 +68,11 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
           onClick={(e) => handleNavClick(e, "#hero")}
           className="flex items-center gap-3 group"
         >
-          <div className="w-10 h-10 rounded-xl bg-[#c96342] text-white flex items-center justify-center font-serif font-bold text-lg shadow-xs transition-transform group-hover:scale-105">
-            SZ
-          </div>
+          <img
+            src="/logo.png"
+            alt="ServeZa Logo"
+            className="w-10 h-10 object-contain transition-transform group-hover:scale-105"
+          />
           <div className="flex flex-col">
             <span
               className={`font-serif font-medium text-lg tracking-tight transition-colors ${
@@ -79,7 +81,7 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
                   : "text-white group-hover:text-[#e07a5f]"
               }`}
             >
-              ServeZa
+              Serve<span className={isScrolledToLight ? "text-[#c96342]" : "text-[#e07a5f]"}>Za</span>
             </span>
             <span
               className={`text-[10px] tracking-widest uppercase font-medium ${
