@@ -67,11 +67,13 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
 
             {/* Mobile Logo */}
             <Link href="/" className="lg:hidden flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-[#252522] flex items-center justify-center text-white shadow-xs">
-                <UtensilsCrossed className="w-4 h-4 text-[#D66B43]" />
-              </div>
+              <img
+                src="/logo.png"
+                alt="ServeZa Logo"
+                className="w-9 h-9 object-contain"
+              />
               <span className="font-serif text-lg font-bold text-[#252522]">
-                ServeZa
+                Serve<span className="text-[#D66B43]">Za</span>
               </span>
             </Link>
 

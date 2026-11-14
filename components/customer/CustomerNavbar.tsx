@@ -57,13 +57,15 @@ export const CustomerNavbar: React.FC<CustomerNavbarProps> = ({
             </Link>
 
             <Link href="/customer" className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-[#252522] flex items-center justify-center text-[#FAF8F3] shadow-xs">
-                <UtensilsCrossed className="w-5 h-5 text-[#D66B43]" />
-              </div>
+              <img
+                src="/logo.png"
+                alt="ServeZa Logo"
+                className="w-10 h-10 object-contain"
+              />
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                   <span className="font-serif text-xl font-bold tracking-tight text-[#252522]">
-                    ServeZa
+                    Serve<span className="text-[#D66B43]">Za</span>
                   </span>
                   <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest bg-[#D66B43]/10 text-[#D66B43] border border-[#D66B43]/20">
                     Customer Hub

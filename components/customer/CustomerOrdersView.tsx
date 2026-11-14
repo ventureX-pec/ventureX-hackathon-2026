@@ -117,17 +117,17 @@ export const CustomerOrdersView: React.FC<CustomerOrdersViewProps> = ({
   return (
     <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
       {/* Header & Filter Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#ECE7DE]">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#252522]">
+      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#ECE7DE]">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2.5">
+            <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-[#252522] tracking-tight">
               My Orders
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#D66B43]/10 text-[#D66B43]">
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#D66B43]/10 text-[#D66B43] border border-[#D66B43]/20 shadow-xs">
               {orders.length} Total
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-[#6E6D66] mt-1">
+          <p className="text-xs sm:text-sm text-[#6E6D66] font-medium leading-relaxed">
             Real-time campus order status, token receipts, and kitchen history
           </p>
         </div>

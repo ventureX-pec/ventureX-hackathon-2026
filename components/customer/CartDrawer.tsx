@@ -114,7 +114,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 </div>
                 <div>
                   <h3 className="font-serif font-bold text-base text-[#252522]">
-                    Your ServeZa Plate
+                    Your Serve<span className="text-[#D66B43]">Za</span> Plate
                   </h3>
                   <p className="text-[11px] text-[#6E6D66]">
                     {items.length} {items.length === 1 ? "item" : "items"} selected

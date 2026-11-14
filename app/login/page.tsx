@@ -264,12 +264,14 @@ export default function LoginPage() {
             {/* Brand Header */}
             <div className="flex items-center justify-between pb-3.5 mb-3.5 border-b border-[#e7dfd5]">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#c96342] text-white flex items-center justify-center font-serif font-bold text-sm shadow-xs">
-                  SZ
-                </div>
+                <img
+                  src="/logo.png"
+                  alt="ServeZa Logo"
+                  className="w-8 h-8 object-contain"
+                />
                 <div>
                   <span className="font-serif text-base font-medium text-[#1c1917] tracking-tight block leading-tight">
-                    ServeZa
+                    Serve<span className="text-[#c96342]">Za</span>
                   </span>
                   <span className="text-[9px] tracking-widest uppercase font-medium text-[#78716c] block">
                     Digital Ordering Platform

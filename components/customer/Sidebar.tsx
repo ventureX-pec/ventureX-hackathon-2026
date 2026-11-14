@@ -100,13 +100,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div>
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-[#252522] flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform flex-shrink-0">
-              <UtensilsCrossed className="w-5 h-5 text-[#D66B43]" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="ServeZa Logo"
+              className="w-10 h-10 object-contain group-hover:scale-105 transition-transform flex-shrink-0"
+            />
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="font-serif text-xl font-bold tracking-tight text-[#252522] truncate">
-                  ServeZa
+                  Serve<span className="text-[#D66B43]">Za</span>
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#D66B43] flex-shrink-0" />
               </div>

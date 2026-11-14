@@ -117,12 +117,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {/* Brand Header */}
         <div className="flex items-center justify-between gap-2 px-2 pb-5 border-b border-[#EFE8DE] mb-5">
           <Link href="/admin" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#D66B43] to-[#E87A48] flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
-              <Flame className="w-5 h-5 fill-white" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="ServeZa Logo"
+              className="w-9 h-9 object-contain group-hover:scale-105 transition-transform"
+            />
             <div>
               <span className="font-serif text-lg font-bold tracking-tight text-[#252522] block leading-none">
-                ServeZa
+                Serve<span className="text-[#D66B43]">Za</span>
               </span>
               <span className="text-[10px] font-semibold tracking-wider text-[#8C877D] uppercase">
                 Admin Workspace

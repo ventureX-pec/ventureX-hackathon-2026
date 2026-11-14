@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import SafeImage from "./SafeImage";
 import { motion } from "motion/react";
 import { CATEGORIES } from "@/data/mockCustomerData";
 
@@ -22,12 +23,12 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
   return (
     <section id="categories-section" className="scroll-mt-24 space-y-4 overflow-hidden">
       {/* Section Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#252522]">
+      <div className="relative z-10 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <h2 className="font-serif text-xl sm:text-2xl lg:text-3xl font-bold text-[#252522] tracking-tight">
             Explore Categories
           </h2>
-          <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#D66B43]/10 text-[#D66B43]">
+          <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#D66B43]/10 text-[#D66B43] border border-[#D66B43]/20">
             Curated Kitchens
           </span>
         </div>
@@ -73,7 +74,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
               >
                 {/* Category Image in circular container */}
                 <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden mb-2 bg-[#FAF8F3] border border-[#ECE7DE] shadow-xs">
-                  <Image
+                  <SafeImage
                     src={cat.image}
                     alt={cat.name}
                     fill

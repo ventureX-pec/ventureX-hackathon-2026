@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import SafeImage from "./SafeImage";
 import { motion } from "motion/react";
 import {
   Heart,
@@ -45,12 +46,12 @@ export const RestaurantSection: React.FC<RestaurantSectionProps> = ({
   return (
     <section className="space-y-4">
       {/* Header and Filter Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#252522]">
+      <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="space-y-1">
+          <h2 className="font-serif text-xl sm:text-2xl lg:text-3xl font-bold text-[#252522] tracking-tight">
             Popular Near You
           </h2>
-          <p className="text-xs text-[#6E6D66]">
+          <p className="text-xs sm:text-sm text-[#6E6D66] font-medium">
             Campus partner kitchens & live counter prep speeds
           </p>
         </div>
@@ -99,7 +100,7 @@ export const RestaurantSection: React.FC<RestaurantSectionProps> = ({
             >
               {/* Cover Photo */}
               <div className="relative h-44 w-full bg-[#ECE7DE] overflow-hidden">
-                <Image
+                <SafeImage
                   src={restaurant.image}
                   alt={restaurant.name}
                   fill

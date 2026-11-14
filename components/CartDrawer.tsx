@@ -52,9 +52,11 @@ export default function CartDrawer() {
           {/* Header */}
           <div className="px-6 py-5 border-b border-[#e7dfd5] flex items-center justify-between bg-white">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#c25e3e] text-white flex items-center justify-center font-bold text-sm">
-                SZ
-              </div>
+              <img
+                src="/logo.png"
+                alt="ServeZa Logo"
+                className="w-8 h-8 object-contain"
+              />
               <div>
                 <h3 className="font-serif text-lg font-medium text-[#1c1917]">
                   {placedOrder ? "Order Receipt" : "Your Kitchen Order"}
