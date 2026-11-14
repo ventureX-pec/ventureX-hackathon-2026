@@ -29,6 +29,8 @@ function toDbRow(order: AdminOrder) {
     items: {
       orderNumber: order.orderNumber,
       tokenNumber: order.tokenNumber,
+      customerEmail: order.customerEmail,
+      customerName: order.customerName,
       realStatus: order.status,
       prepTimeEstimate: order.prepTimeEstimate,
       timeAgo: order.timeAgo || "Just now",
@@ -38,6 +40,7 @@ function toDbRow(order: AdminOrder) {
       restaurantName: order.restaurantName || "The Corner Table",
       tableNumber: extractedTableNum,
       tableId: order.tableId,
+      createdAt: order.createdAt,
     },
   };
 }
@@ -71,8 +74,9 @@ function fromDbRow(row: any): AdminOrder {
     tokenNumber: isWrapped
       ? meta.tokenNumber
       : meta.tokenNumber || row.id.slice(-2),
-    customerName: row.customer_name || "Customer",
+    customerName: row.customer_name || meta.customerName || "Customer",
     customerPhone: row.customer_phone || "+91 98765 43210",
+    customerEmail: meta.customerEmail || row.customer_email || undefined,
     orderType: (row.pickup_type as "dine-in" | "takeaway") || "takeaway",
     tableOrShelf: row.pickup_slot || (tableNumber ? `Table #${tableNumber}` : "Counter 1"),
     items: isWrapped
@@ -105,17 +109,26 @@ function fromDbRow(row: any): AdminOrder {
   };
 }
 
-// GET /api/orders?restaurantId=the-corner-table
+// GET /api/orders?restaurantId=the-corner-table&customerEmail=user@gmail.com
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const restaurantId = searchParams.get("restaurantId");
+    const customerEmail = searchParams.get("customerEmail")?.trim().toLowerCase();
+    const customerName = searchParams.get("customerName")?.trim().toLowerCase();
 
     const supabase = getSupabaseAdmin();
     if (!supabase) {
       let filtered = INITIAL_ADMIN_ORDERS;
       if (restaurantId && restaurantId !== "all") {
         filtered = filtered.filter((o) => !o.restaurantId || o.restaurantId === restaurantId);
+      }
+      if (customerEmail) {
+        filtered = filtered.filter((o) => {
+          const matchEmail = (o.customerEmail || "").toLowerCase() === customerEmail;
+          const matchName = customerName && (o.customerName || "").toLowerCase() === customerName;
+          return matchEmail || matchName;
+        });
       }
       return NextResponse.json({
         success: true,
@@ -156,6 +169,13 @@ export async function GET(req: Request) {
       if (restaurantId && restaurantId !== "all") {
         orders = orders.filter((o) => !o.restaurantId || o.restaurantId === restaurantId);
       }
+      if (customerEmail) {
+        orders = orders.filter((o) => {
+          const matchEmail = (o.customerEmail || "").toLowerCase() === customerEmail;
+          const matchName = customerName && (o.customerName || "").toLowerCase() === customerName;
+          return matchEmail || matchName;
+        });
+      }
       return NextResponse.json({
         success: true,
         orders,
@@ -166,6 +186,13 @@ export async function GET(req: Request) {
     let orders = rows.map(fromDbRow);
     if (restaurantId && restaurantId !== "all") {
       orders = orders.filter((o) => !o.restaurantId || o.restaurantId === restaurantId);
+    }
+    if (customerEmail) {
+      orders = orders.filter((o) => {
+        const matchEmail = (o.customerEmail || "").toLowerCase() === customerEmail;
+        const matchName = customerName && (o.customerName || "").toLowerCase() === customerName;
+        return matchEmail || matchName;
+      });
     }
     return NextResponse.json({
       success: true,

@@ -212,20 +212,28 @@ export const CustomerOrdersView: React.FC<CustomerOrdersViewProps> = ({
               >
                 {/* Order Header */}
                 <div className="flex items-start justify-between gap-3 pb-3.5 border-b border-[#ECE7DE]">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-serif text-base font-bold text-[#252522]">
-                        {order.restaurantName}
-                      </span>
-                      <span className="px-2 py-0.5 rounded-md bg-[#FAF8F3] border border-[#ECE7DE] text-[10px] font-bold text-[#6E6D66]">
-                        Token #{order.tokenNumber}
-                      </span>
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-[#D66B43]/10 text-[#D66B43] flex items-center justify-center shrink-0 mt-0.5">
+                      <Store className="w-4 h-4" />
                     </div>
-                    <div className="flex items-center gap-2 text-[11px] text-[#6E6D66] mt-1">
-                      <Clock className="w-3 h-3 text-[#D66B43]" />
-                      <span>{order.formattedDate}</span>
-                      <span>•</span>
-                      <span>Order #{order.id}</span>
+                    <div className="min-w-0">
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-[#8C877D] block leading-none">
+                        Café / Restaurant
+                      </span>
+                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                        <span className="font-serif text-base font-bold text-[#252522] truncate">
+                          {order.restaurantName}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-md bg-[#FAF8F3] border border-[#ECE7DE] text-[10px] font-bold text-[#6E6D66]">
+                          Pass #{order.tokenNumber}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] text-[#6E6D66] mt-1">
+                        <Clock className="w-3 h-3 text-[#D66B43]" />
+                        <span>{order.formattedDate}</span>
+                        <span>•</span>
+                        <span>Order #{order.id}</span>
+                      </div>
                     </div>
                   </div>
 

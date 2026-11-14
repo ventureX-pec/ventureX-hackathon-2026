@@ -39,6 +39,7 @@ import {
   CustomerOrderRecord,
 } from "@/components/customer/CustomerOrderDetailsModal";
 import { CustomerOrdersView } from "@/components/customer/CustomerOrdersView";
+import { PreviousOrdersSection } from "@/components/customer/PreviousOrdersSection";
 import {
   CATEGORIES,
   RESTAURANTS,
@@ -54,6 +55,7 @@ import {
   getStoredCart,
   saveStoredCart,
   subscribeToDataChanges,
+  fetchCustomerOrdersFromDb,
 } from "@/lib/dataService";
 import { formatDisplayName, getStoredUserProfile, setStoredUserProfile } from "@/lib/auth";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -201,10 +203,9 @@ export default function CustomerDashboardPage() {
         setCart(storedCart);
       }
 
-      // Load persistent customer orders
+      // Load persistent customer orders for this profile
       const storageKey = `serveza_orders_${currentUser.email}`;
-      const savedOrders =
-        localStorage.getItem(storageKey) || localStorage.getItem("serveza_customer_orders");
+      const savedOrders = localStorage.getItem(storageKey);
       if (savedOrders) {
         try {
           const parsed = JSON.parse(savedOrders);
@@ -246,7 +247,62 @@ export default function CustomerDashboardPage() {
             }
           }
         } catch (e) {}
+      } else if (currentUser.email === "alex.morgan@serveza.com") {
+        // Fallback demo order only for default demo user
+        const demoOrders = localStorage.getItem("serveza_customer_orders");
+        if (demoOrders) {
+          try {
+            setCustomerOrders(JSON.parse(demoOrders));
+          } catch (e) {}
+        }
       }
+
+      // Fetch profile-specific orders from Supabase Database
+      fetchCustomerOrdersFromDb(currentUser.email, currentUser.name)
+        .then((dbOrders) => {
+          if (Array.isArray(dbOrders) && dbOrders.length > 0) {
+            const mappedRecords: CustomerOrderRecord[] = dbOrders.map((ord) => ({
+              id: ord.id,
+              tokenNumber: ord.tokenNumber || "01",
+              customerName: ord.customerName || currentUser.name,
+              customerEmail: ord.customerEmail || currentUser.email,
+              restaurantName:
+                ord.restaurantName ||
+                (ord.restaurantId === "burger-house"
+                  ? "Burger House"
+                  : ord.restaurantId === "pizza-palace"
+                  ? "Pizza Palace"
+                  : "The Corner Table"),
+              items: ord.items.map((i) => ({
+                dishName: i.dishName,
+                quantity: i.quantity,
+                price: i.price,
+                image: ord.image,
+                instructions: i.notes,
+              })),
+              totalAmount: ord.totalAmount,
+              status:
+                ord.status === "completed"
+                  ? "delivered"
+                  : ord.status === "ready"
+                  ? "out_for_delivery"
+                  : ord.status === "preparing" || ord.status === "accepted"
+                  ? "preparing"
+                  : ord.status === "cancelled"
+                  ? "cancelled"
+                  : "pending",
+              orderType: ord.orderType || "takeaway",
+              tableOrShelf: ord.tableOrShelf || "Counter 1",
+              pickupSlot: ord.tableOrShelf || "Express Pickup",
+              createdAt: ord.createdAt || new Date().toISOString(),
+              formattedDate: ord.timeAgo || ord.createdAt || "Recent order",
+            }));
+
+            setCustomerOrders(mappedRecords);
+            localStorage.setItem(storageKey, JSON.stringify(mappedRecords));
+          }
+        })
+        .catch(() => {});
 
       // Check persistent active order
       const storedActive = getStoredActiveOrder();
@@ -280,6 +336,67 @@ export default function CustomerDashboardPage() {
 
     return () => unsubscribe();
   }, []);
+
+  // Synchronize orders whenever authenticated customer profile switches
+  useEffect(() => {
+    if (!loggedInCustomer?.email) return;
+    const storageKey = `serveza_orders_${loggedInCustomer.email}`;
+    const cached = localStorage.getItem(storageKey);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) setCustomerOrders(parsed);
+      } catch (e) {}
+    } else if (loggedInCustomer.email !== "alex.morgan@serveza.com") {
+      setCustomerOrders([]);
+    }
+
+    fetchCustomerOrdersFromDb(loggedInCustomer.email, loggedInCustomer.name)
+      .then((dbOrders) => {
+        if (Array.isArray(dbOrders) && dbOrders.length > 0) {
+          const mappedRecords: CustomerOrderRecord[] = dbOrders.map((ord) => ({
+            id: ord.id,
+            tokenNumber: ord.tokenNumber || "01",
+            customerName: ord.customerName || loggedInCustomer.name,
+            customerEmail: ord.customerEmail || loggedInCustomer.email,
+            restaurantName:
+              ord.restaurantName ||
+              (ord.restaurantId === "burger-house"
+                ? "Burger House"
+                : ord.restaurantId === "pizza-palace"
+                ? "Pizza Palace"
+                : "The Corner Table"),
+            items: ord.items.map((i) => ({
+              dishName: i.dishName,
+              quantity: i.quantity,
+              price: i.price,
+              image: ord.image,
+              instructions: i.notes,
+            })),
+            totalAmount: ord.totalAmount,
+            status:
+              ord.status === "completed"
+                ? "delivered"
+                : ord.status === "ready"
+                ? "out_for_delivery"
+                : ord.status === "preparing" || ord.status === "accepted"
+                ? "preparing"
+                : ord.status === "cancelled"
+                ? "cancelled"
+                : "pending",
+            orderType: ord.orderType || "takeaway",
+            tableOrShelf: ord.tableOrShelf || "Counter 1",
+            pickupSlot: ord.tableOrShelf || "Express Pickup",
+            createdAt: ord.createdAt || new Date().toISOString(),
+            formattedDate: ord.timeAgo || ord.createdAt || "Recent order",
+          }));
+
+          setCustomerOrders(mappedRecords);
+          localStorage.setItem(storageKey, JSON.stringify(mappedRecords));
+        }
+      })
+      .catch(() => {});
+  }, [loggedInCustomer.email, loggedInCustomer.name]);
 
   // Dish-Level Favorite Toggle Handler
   const handleToggleFavoriteDish = (dishId: string) => {
@@ -538,7 +655,16 @@ export default function CustomerDashboardPage() {
       minute: "2-digit",
     });
 
-    const primaryRestaurant = cart[0]?.dish.restaurantName || "ServeZa Campus Kitchen";
+    const primaryRestaurant =
+      cart[0]?.dish.restaurantName ||
+      (selectedRestaurantId
+        ? RESTAURANTS.find((r) => r.id === selectedRestaurantId)?.name
+        : "The Corner Table") ||
+      "The Corner Table";
+    const primaryRestaurantId =
+      cart[0]?.dish.restaurantId ||
+      selectedRestaurantId ||
+      "the-corner-table";
 
     // 1. Create Customer History Record (for "My Orders" tab)
     const newCustomerOrder: CustomerOrderRecord = {
@@ -603,7 +729,10 @@ export default function CustomerDashboardPage() {
       orderNumber,
       tokenNumber: randomToken,
       customerName: loggedInCustomer.name,
+      customerEmail: loggedInCustomer.email,
       customerPhone: "+91 98765 43210",
+      restaurantId: primaryRestaurantId,
+      restaurantName: primaryRestaurant,
       orderType: details.orderType,
       tableOrShelf: details.tableOrShelf,
       items: cart.map((c) => ({
@@ -751,6 +880,18 @@ export default function CustomerDashboardPage() {
                   }}
                 />
               </div>
+
+              {/* Previous Orders Section (Real-time orders with café/restaurant name, synced to database) */}
+              <PreviousOrdersSection
+                orders={customerOrders}
+                onOpenDetails={(ord) => setSelectedOrderForModal(ord)}
+                onReorder={handleReorderOrder}
+                onViewAllClick={() => {
+                  setActiveTab("orders");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                customerName={loggedInCustomer.name}
+              />
 
               {/* 2. Categories Marquee Section */}
               <CategorySection

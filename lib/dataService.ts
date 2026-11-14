@@ -94,6 +94,30 @@ export async function fetchLiveOrders(): Promise<AdminOrder[]> {
 }
 
 /**
+ * Fetches profile-specific previous orders from Supabase Database
+ */
+export async function fetchCustomerOrdersFromDb(
+  email: string,
+  name?: string
+): Promise<AdminOrder[]> {
+  if (!email) return [];
+  try {
+    const params = new URLSearchParams({ customerEmail: email });
+    if (name) params.set("customerName", name);
+    const res = await fetch(`/api/orders?${params.toString()}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && Array.isArray(data.orders)) {
+        return data.orders;
+      }
+    }
+  } catch (err) {
+    console.warn("[DataService] Error fetching customer profile orders:", err);
+  }
+  return [];
+}
+
+/**
  * Creates an order in Supabase and updates local store
  */
 export async function createLiveOrder(order: AdminOrder): Promise<AdminOrder> {

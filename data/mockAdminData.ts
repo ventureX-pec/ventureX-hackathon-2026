@@ -4,6 +4,7 @@ export interface AdminOrder {
   tokenNumber: string; // e.g. "42"
   customerName: string;
   customerPhone: string;
+  customerEmail?: string;
   orderType: "dine-in" | "takeaway";
   tableOrShelf: string; // e.g. "Table #4" or "Shelf B • Express"
   items: {
