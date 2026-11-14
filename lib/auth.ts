@@ -19,9 +19,99 @@ export interface AuthResponse {
     id: string
     email: string
     role: UserRole
+    full_name?: string
+    avatar_url?: string
   }
   redirect?: string
   isDemo?: boolean
+}
+
+/**
+ * Derives a human-friendly display name from an email address or full name
+ * Examples:
+ *  - "prakhar@gmail.com" -> "Prakhar"
+ *  - "prakhar.singh@gmail.com" -> "Prakhar Singh"
+ *  - "alex.morgan@serveza.com" -> "Alex Morgan"
+ */
+export function formatDisplayName(email?: string, fullName?: string): string {
+  if (fullName && fullName.trim().length > 0) {
+    return fullName.trim()
+  }
+  if (!email || !email.includes("@")) {
+    return "Guest Diner"
+  }
+  const prefix = email.split("@")[0]
+  const words = prefix.split(/[._-]+/).filter(Boolean)
+  if (words.length === 0) return "Guest Diner"
+  return words
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ")
+}
+
+/**
+ * Computes 1-2 character initials for display avatars
+ */
+export function getInitials(name?: string): string {
+  if (!name || name.trim().length === 0) return "SZ"
+  const parts = name.trim().split(/\s+/)
+  if (parts.length === 1) {
+    return parts[0].substring(0, 2).toUpperCase()
+  }
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}
+
+/**
+ * Persist user identity to localStorage for zero-latency hydration
+ */
+export function setStoredUserProfile(user: {
+  id?: string
+  email: string
+  name?: string
+  role: UserRole
+  avatar?: string
+}) {
+  if (typeof window === "undefined") return
+  try {
+    const serialized = JSON.stringify(user)
+    localStorage.setItem("serveza_user", serialized)
+    if (user.role === "admin") {
+      localStorage.setItem("serveza_admin_user", serialized)
+    } else {
+      localStorage.setItem("serveza_customer_user", serialized)
+    }
+  } catch (e) {
+    // Ignore storage quota errors
+  }
+}
+
+/**
+ * Retrieve persisted user from localStorage
+ */
+export function getStoredUserProfile(expectedRole?: UserRole): {
+  id?: string
+  email: string
+  name: string
+  role: UserRole
+  avatar?: string
+} | null {
+  if (typeof window === "undefined") return null
+  try {
+    const key = expectedRole === "admin" ? "serveza_admin_user" : "serveza_customer_user"
+    const raw = localStorage.getItem(key) || localStorage.getItem("serveza_user")
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (parsed.email) {
+        return {
+          id: parsed.id,
+          email: parsed.email,
+          name: parsed.name || formatDisplayName(parsed.email, parsed.full_name),
+          role: (parsed.role as UserRole) || expectedRole || "customer",
+          avatar: parsed.avatar || parsed.avatar_url,
+        }
+      }
+    }
+  } catch (e) {}
+  return null
 }
 
 /**
@@ -48,12 +138,19 @@ export async function signInUser(
         return { success: false, error: "No user returned from authentication." }
       }
 
-      // Query user role from public.profiles table
+      // Query user role and profile from public.profiles table
       let userRole: UserRole = expectedRole
+      let fullName: string =
+        data.user.user_metadata?.full_name ||
+        data.user.user_metadata?.name ||
+        formatDisplayName(data.user.email || email)
+      let avatarUrl: string | undefined =
+        data.user.user_metadata?.avatar_url || data.user.user_metadata?.picture
+
       try {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("role")
+          .select("role, full_name, avatar_url")
           .eq("id", data.user.id)
           .single()
 
@@ -61,6 +158,13 @@ export async function signInUser(
           userRole = profile.role as UserRole
         } else if (data.user.user_metadata?.role) {
           userRole = data.user.user_metadata.role as UserRole
+        }
+
+        if (profile?.full_name) {
+          fullName = profile.full_name
+        }
+        if (profile?.avatar_url) {
+          avatarUrl = profile.avatar_url
         }
       } catch {
         // Fallback to expected role if table query encounters error
@@ -73,6 +177,8 @@ export async function signInUser(
           id: data.user.id,
           email: data.user.email || email,
           role: userRole,
+          full_name: fullName,
+          avatar_url: avatarUrl,
         },
         redirect: userRole === "admin" ? "/admin" : "/customer",
         isDemo: false,
@@ -89,6 +195,7 @@ export async function signInUser(
   const cleanEmail = email.trim().toLowerCase()
   const isMatchAdmin = cleanEmail.includes("admin") || expectedRole === "admin"
   const determinedRole: UserRole = isMatchAdmin ? "admin" : "customer"
+  const dynamicName = formatDisplayName(cleanEmail)
 
   return {
     success: true,
@@ -96,6 +203,7 @@ export async function signInUser(
       id: "demo-user-" + (isMatchAdmin ? "admin" : "customer"),
       email: cleanEmail,
       role: determinedRole,
+      full_name: dynamicName,
     },
     redirect: determinedRole === "admin" ? "/admin" : "/customer",
     isDemo: true,
@@ -135,6 +243,7 @@ export async function signUpUser(
               id: data.user.id,
               email: data.user.email || email,
               role,
+              full_name: fullName.trim() || formatDisplayName(email),
             }
           : undefined,
         redirect: role === "admin" ? "/admin" : "/customer",
@@ -148,12 +257,14 @@ export async function signUpUser(
 
   // Fallback demo response
   await new Promise((resolve) => setTimeout(resolve, 600))
+  const cleanEmail = email.trim()
   return {
     success: true,
     user: {
       id: "demo-new-user",
-      email: email.trim(),
+      email: cleanEmail,
       role,
+      full_name: fullName.trim() || formatDisplayName(cleanEmail),
     },
     redirect: role === "admin" ? "/admin" : "/customer",
     isDemo: true,

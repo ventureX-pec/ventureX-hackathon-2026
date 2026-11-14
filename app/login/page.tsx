@@ -21,8 +21,8 @@ import {
   UserPlus,
   LogIn,
 } from "lucide-react"
-import { signInUser, signUpUser } from "@/lib/auth"
-import { isSupabaseConfigured } from "@/lib/supabase"
+import { signInUser, signUpUser, formatDisplayName, setStoredUserProfile } from "@/lib/auth"
+import { isSupabaseConfigured, supabase } from "@/lib/supabase"
 
 // Curated signature dishes for the left-side food showcase
 const SHOWCASE_SLIDES = [
@@ -115,10 +115,20 @@ export default function LoginPage() {
         setAuthError(res.error || "Failed to create account.")
         return
       }
+
+      const cleanEmail = username.trim()
+      const displayName = fullName.trim() || res.user?.full_name || formatDisplayName(cleanEmail)
+      setStoredUserProfile({
+        id: res.user?.id || `user-${Date.now()}`,
+        email: cleanEmail,
+        name: displayName,
+        role,
+      })
+
       setLoginSuccess(
         supabaseReady
-          ? "Account created in Supabase! Signing you into portal..."
-          : "Account registered! Redirecting to your workspace..."
+          ? `Welcome, ${displayName}! Account created in Supabase.`
+          : `Welcome, ${displayName}! Account created.`
       )
       setTimeout(() => {
         router.push(res.redirect || (role === "admin" ? "/admin" : "/customer"))
@@ -130,14 +140,65 @@ export default function LoginPage() {
         setAuthError(res.error || "Invalid username or password.")
         return
       }
-      setLoginSuccess(
-        role === "customer"
-          ? "Welcome back! Redirecting to customer ordering portal..."
-          : "Admin authenticated! Redirecting to Kitchen & Restaurant Manager..."
-      )
+
+      const cleanEmail = username.trim()
+      const displayName = res.user?.full_name || fullName.trim() || formatDisplayName(cleanEmail)
+      const avatarUrl = res.user?.avatar_url
+
+      setStoredUserProfile({
+        id: res.user?.id || `user-${Date.now()}`,
+        email: cleanEmail,
+        name: displayName,
+        role,
+        avatar: avatarUrl,
+      })
+
+      setLoginSuccess(`Welcome back, ${displayName}! Redirecting...`)
       setTimeout(() => {
         router.push(res.redirect || (role === "admin" ? "/admin" : "/customer"))
       }, 600)
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true)
+    setAuthError(null)
+
+    if (isSupabaseConfigured()) {
+      try {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: `${window.location.origin}${role === "admin" ? "/admin" : "/customer"}`,
+          },
+        })
+        if (!error) return
+      } catch (e) {
+        // Fallback to local profile derivation
+      }
+    }
+
+    // Interactive fallback if user typed an email or prompt them for dynamic experience
+    const activeEmail = username.includes("@")
+      ? username.trim()
+      : (typeof window !== "undefined" ? window.prompt("Sign in with Google - Enter your Gmail address:", "user@gmail.com") : null)
+
+    if (activeEmail && activeEmail.includes("@")) {
+      const derivedName = fullName.trim() || formatDisplayName(activeEmail)
+      const userObj = {
+        id: `google-user-${Date.now()}`,
+        email: activeEmail,
+        name: derivedName,
+        role,
+      }
+      setStoredUserProfile(userObj)
+      setLoginSuccess(`Signed in with Google as ${derivedName}! Redirecting...`)
+      setTimeout(() => {
+        setIsLoading(false)
+        router.push(role === "admin" ? "/admin" : "/customer")
+      }, 500)
+    } else {
+      setIsLoading(false)
     }
   }
 
@@ -146,6 +207,13 @@ export default function LoginPage() {
     setIsLoading(true)
     setAuthError(null)
     const targetRoute = role === "customer" ? "/customer" : "/admin"
+    const demoUser = {
+      id: role === "customer" ? "demo-customer" : "demo-admin",
+      email: role === "customer" ? "alex.morgan@serveza.com" : "admin@serveza.com",
+      name: role === "customer" ? "Alex Morgan" : "Kitchen Admin",
+      role,
+    }
+    setStoredUserProfile(demoUser)
     setLoginSuccess(
       role === "customer"
         ? "1-Tap Demo authenticated! Redirecting to customer portal..."
@@ -423,7 +491,7 @@ export default function LoginPage() {
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Aarav Sharma"
+                      placeholder="e.g. John Doe or your name"
                       className="w-full pl-9 pr-3.5 py-2 bg-[#fbf9f6] border border-[#e7dfd5] rounded-xl text-xs text-[#1c1917] placeholder-[#a8a29e] focus:outline-none focus:border-[#c96342] focus:ring-1 focus:ring-[#c96342] transition-colors"
                     />
                   </div>
@@ -558,7 +626,7 @@ export default function LoginPage() {
             <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"
-                onClick={() => fillDemoCredentials(role)}
+                onClick={handleGoogleSignIn}
                 className="w-full py-2 px-2.5 rounded-xl border border-[#e7dfd5] hover:border-[#c96342]/50 bg-white hover:bg-[#faf7f2] text-xs font-medium text-[#44403c] flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
               >
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
@@ -600,7 +668,11 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => {
-                  fillDemoCredentials("customer")
+                  setStoredUserProfile({
+                    email: "alex.morgan@serveza.com",
+                    name: "Alex Morgan",
+                    role: "customer",
+                  })
                   router.push("/customer")
                 }}
                 className="px-2 py-0.5 rounded-md bg-[#f4ede4] hover:bg-[#eae2d7] text-[#1c1917] font-medium transition-colors cursor-pointer text-[10px]"
@@ -611,7 +683,11 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => {
-                  fillDemoCredentials("admin")
+                  setStoredUserProfile({
+                    email: "admin@serveza.com",
+                    name: "Kitchen Admin",
+                    role: "admin",
+                  })
                   router.push("/admin")
                 }}
                 className="px-2 py-0.5 rounded-md bg-[#f4ede4] hover:bg-[#eae2d7] text-[#1c1917] font-medium transition-colors cursor-pointer text-[10px]"

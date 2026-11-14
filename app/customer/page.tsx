@@ -55,6 +55,8 @@ import {
   saveStoredCart,
   subscribeToDataChanges,
 } from "@/lib/dataService";
+import { formatDisplayName, getStoredUserProfile, setStoredUserProfile } from "@/lib/auth";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 export default function CustomerDashboardPage() {
   // Navigation & Active Tab ("home", "categories", "restaurants", "orders", "favorites")
@@ -93,9 +95,11 @@ export default function CustomerDashboardPage() {
   const [loggedInCustomer, setLoggedInCustomer] = useState<{
     name: string;
     email: string;
+    avatar?: string;
   }>({
     name: "Alex Morgan",
     email: "alex.morgan@serveza.com",
+    avatar: "",
   });
 
   const [customerOrders, setCustomerOrders] = useState<CustomerOrderRecord[]>([]);
@@ -133,16 +137,49 @@ export default function CustomerDashboardPage() {
   // Load user profile, orders, cart, and favorite dishes on mount & subscribe to Supabase live changes
   useEffect(() => {
     try {
-      const savedUser = localStorage.getItem("serveza_customer_user");
+      // 1. Check Supabase live session first
+      if (isSupabaseConfigured()) {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          if (user?.email) {
+            const dynamicName =
+              user.user_metadata?.full_name ||
+              user.user_metadata?.name ||
+              formatDisplayName(user.email);
+            const dynamicAvatar =
+              user.user_metadata?.avatar_url ||
+              user.user_metadata?.picture ||
+              "";
+            const currentProfile = {
+              name: dynamicName,
+              email: user.email,
+              avatar: dynamicAvatar,
+            };
+            setLoggedInCustomer(currentProfile);
+            setStoredUserProfile({
+              id: user.id,
+              email: user.email,
+              name: dynamicName,
+              role: "customer",
+              avatar: dynamicAvatar,
+            });
+          }
+        }).catch(() => {});
+      }
+
+      // 2. Load stored profile from localStorage
+      const storedUser = getStoredUserProfile("customer");
       let currentUser = {
         name: "Alex Morgan",
         email: "alex.morgan@serveza.com",
+        avatar: "",
       };
-      if (savedUser) {
-        try {
-          currentUser = JSON.parse(savedUser);
-          setLoggedInCustomer(currentUser);
-        } catch (e) {}
+      if (storedUser && storedUser.email) {
+        currentUser = {
+          name: storedUser.name || formatDisplayName(storedUser.email),
+          email: storedUser.email,
+          avatar: storedUser.avatar || "",
+        };
+        setLoggedInCustomer(currentUser);
       }
 
       // Load persistent dish favorites for this customer
@@ -638,6 +675,9 @@ export default function CustomerDashboardPage() {
           onOpenCart={() => setIsCartOpen(true)}
           isSidebarOpen={isSidebarOpen}
           onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+          userName={loggedInCustomer.name}
+          userEmail={loggedInCustomer.email}
+          userAvatar={loggedInCustomer.avatar}
         />
 
         {/* Dashboard Body */}

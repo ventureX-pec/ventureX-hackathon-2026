@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
+import { formatDisplayName, getInitials, getStoredUserProfile } from "@/lib/auth";
 import {
   LayoutDashboard,
   Bell,
@@ -53,6 +54,18 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 }) => {
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+
+  // Dynamic admin profile
+  const [adminName, setAdminName] = useState("Kitchen Admin");
+  useEffect(() => {
+    const stored = getStoredUserProfile("admin");
+    if (stored?.name) {
+      setAdminName(stored.name);
+    } else if (stored?.email) {
+      setAdminName(formatDisplayName(stored.email));
+    }
+  }, []);
+  const adminInitials = getInitials(adminName);
 
   // Drag resizing handlers
   useEffect(() => {
@@ -197,10 +210,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         <div className="flex items-center justify-between p-2 rounded-2xl hover:bg-[#F2ECE2] transition-colors">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-full bg-[#D66B43]/15 text-[#D66B43] font-bold text-xs flex items-center justify-center shrink-0">
-              AS
+              {adminInitials}
             </div>
             <div className="min-w-0">
-              <div className="text-xs font-bold text-[#252522] truncate">Aarav Sharma</div>
+              <div className="text-xs font-bold text-[#252522] truncate">{adminName}</div>
               <div className="text-[10px] text-[#8C877D] truncate">Kitchen Admin</div>
             </div>
           </div>

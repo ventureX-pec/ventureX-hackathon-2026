@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { formatDisplayName, getInitials, getStoredUserProfile } from "@/lib/auth";
 import {
   MapPin,
   ChevronDown,
@@ -24,6 +25,8 @@ interface AdminTopHeaderProps {
   onToggleSidebar?: () => void;
   activeOrdersCount?: number;
   onOpenKitchen?: () => void;
+  adminName?: string;
+  adminEmail?: string;
 }
 
 export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
@@ -33,10 +36,39 @@ export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
   onToggleSidebar,
   activeOrdersCount = 24,
   onOpenKitchen,
+  adminName,
+  adminEmail,
 }) => {
   const [selectedLocation, setSelectedLocation] = useState("Main Food Court, Block A");
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // Dynamic admin profile state
+  const [profile, setProfile] = useState<{ name: string; email: string }>({
+    name: adminName || "",
+    email: adminEmail || "",
+  });
+
+  useEffect(() => {
+    if (adminName || adminEmail) {
+      setProfile({
+        name: adminName || "",
+        email: adminEmail || "",
+      });
+      return;
+    }
+    const stored = getStoredUserProfile("admin");
+    if (stored) {
+      setProfile({
+        name: stored.name || formatDisplayName(stored.email),
+        email: stored.email,
+      });
+    }
+  }, [adminName, adminEmail]);
+
+  const displayName = profile.name || (profile.email ? formatDisplayName(profile.email) : "Kitchen Admin");
+  const displayEmail = profile.email || "admin@serveza.kitchen";
+  const initials = getInitials(displayName);
 
   const locations = [
     "Main Food Court, Block A",
@@ -159,10 +191,12 @@ export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
                 className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full bg-white border border-[#EDE5DA] hover:border-[#D66B43]/40 shadow-xs transition-colors"
               >
                 <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#D66B43] to-[#F4A261] text-white text-[11px] font-bold flex items-center justify-center">
-                  AS
+                  {initials}
                 </div>
                 <div className="text-left hidden sm:block">
-                  <div className="text-xs font-bold text-[#252522] leading-none">Aarav Sharma</div>
+                  <div className="text-xs font-bold text-[#252522] leading-none truncate max-w-[120px]">
+                    {displayName}
+                  </div>
                   <div className="text-[10px] text-[#8C877D] leading-none mt-0.5">Admin</div>
                 </div>
                 <ChevronDown className="w-3 h-3 text-[#8C877D]" />
@@ -171,8 +205,8 @@ export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
               {isProfileOpen && (
                 <div className="absolute top-full right-0 mt-2 w-56 rounded-2xl bg-white border border-[#ECE5DA] shadow-[0_15px_30px_rgba(37,37,34,0.08)] p-1.5 z-50">
                   <div className="px-3 py-2 border-b border-[#F2ECE2]">
-                    <div className="text-xs font-bold text-[#252522]">Aarav Sharma</div>
-                    <div className="text-[11px] text-[#8C877D]">admin@serveza.kitchen</div>
+                    <div className="text-xs font-bold text-[#252522] truncate">{displayName}</div>
+                    <div className="text-[11px] text-[#8C877D] truncate">{displayEmail}</div>
                   </div>
                   <div className="py-1">
                     <Link

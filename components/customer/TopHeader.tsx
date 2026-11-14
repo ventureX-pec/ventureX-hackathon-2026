@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { formatDisplayName, getInitials } from "@/lib/auth";
 import {
   MapPin,
   ChevronDown,
@@ -22,6 +23,9 @@ interface TopHeaderProps {
   onOpenCart: () => void;
   isSidebarOpen?: boolean;
   onToggleSidebar?: () => void;
+  userName?: string;
+  userEmail?: string;
+  userAvatar?: string;
 }
 
 export const TopHeader: React.FC<TopHeaderProps> = ({
@@ -32,9 +36,55 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   onOpenCart,
   isSidebarOpen = true,
   onToggleSidebar,
+  userName,
+  userEmail,
+  userAvatar,
 }) => {
   const [selectedLocation, setSelectedLocation] = useState("Main Food Court, Block A");
   const [isLocationOpen, setIsLocationOpen] = useState(false);
+
+  // Dynamic user profile state (accepts props or hydrates from local session)
+  const [profile, setProfile] = useState<{
+    name: string;
+    email: string;
+    avatar?: string;
+  }>({
+    name: userName || "",
+    email: userEmail || "",
+    avatar: userAvatar || "",
+  });
+
+  useEffect(() => {
+    if (userName || userEmail) {
+      setProfile({
+        name: userName || "",
+        email: userEmail || "",
+        avatar: userAvatar || "",
+      });
+      return;
+    }
+
+    if (typeof window !== "undefined") {
+      try {
+        const stored =
+          localStorage.getItem("serveza_customer_user") ||
+          localStorage.getItem("serveza_user");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setProfile({
+            name: parsed.name || (parsed.email ? formatDisplayName(parsed.email) : ""),
+            email: parsed.email || "",
+            avatar: parsed.avatar || parsed.avatar_url || "",
+          });
+        }
+      } catch (e) {}
+    }
+  }, [userName, userEmail, userAvatar]);
+
+  const displayName =
+    profile.name ||
+    (profile.email ? formatDisplayName(profile.email) : "Guest Diner");
+  const initials = getInitials(displayName);
 
   const locations = [
     "Main Food Court, Block A",
@@ -167,20 +217,24 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             {/* User Profile Pill */}
             <Link
               href="/login"
-              title="Signed in as Aarav • Click to switch or sign out"
-              className="hidden sm:flex items-center gap-2 pl-2 border-l border-[#ECE7DE] hover:opacity-80 transition-opacity cursor-pointer"
+              title={`Signed in as ${displayName} • Click to switch or sign out`}
+              className="hidden sm:flex items-center gap-2 pl-2 border-l border-[#ECE7DE] hover:opacity-80 transition-opacity cursor-pointer group"
             >
-              <div className="relative w-8 h-8 rounded-full overflow-hidden bg-[#ECE7DE]">
-                <Image
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-                  alt="Aarav Sharma"
-                  fill
-                  className="object-cover"
-                  sizes="32px"
-                />
+              <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gradient-to-tr from-[#D66B43] to-[#F4A261] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+                {profile.avatar ? (
+                  <Image
+                    src={profile.avatar}
+                    alt={displayName}
+                    fill
+                    className="object-cover"
+                    sizes="32px"
+                  />
+                ) : (
+                  <span>{initials}</span>
+                )}
               </div>
-              <span className="text-xs font-bold text-[#252522]">
-                Aarav Sharma
+              <span className="text-xs font-bold text-[#252522] group-hover:text-[#D66B43] transition-colors truncate max-w-[130px]">
+                {displayName}
               </span>
             </Link>
           </div>
