@@ -370,7 +370,7 @@ export const MENU_ITEMS: MenuItem[] = [
     "menuSection": "Starters",
     "description": "Thick-cut sweet yellow onion rings double-battered in craft beer batter, served with smoked paprika aioli.",
     "price": 120,
-    "image": "https://images.unsplash.com/photo-1639024471287-035216701f84?auto=format&fit=crop&w=800&q=80",
+    "image": "https://images.unsplash.com/photo-1625938145744-e380515399b7?auto=format&fit=crop&w=800&q=80",
     "isVeg": true,
     "prepTimeMinutes": 6,
     "rating": 4.65,

@@ -117,6 +117,14 @@ export default function CustomerDashboardPage() {
   } | null>(null);
 
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Scroll spy control refs
   const isManualScrolling = useRef(false);
@@ -597,7 +605,7 @@ export default function CustomerDashboardPage() {
   return (
     <div className="min-h-screen bg-[#FAF8F3] text-[#252522] selection:bg-[#D66B43]/20 selection:text-[#D66B43] relative overflow-x-hidden isolate">
       {/* Editorial Food Photography Background Layer */}
-      <FoodPhotographyBackdrop isSidebarOpen={isSidebarOpen} sidebarWidth={sidebarWidth} />
+      <FoodPhotographyBackdrop isSidebarOpen={isDesktop && isSidebarOpen} sidebarWidth={sidebarWidth} />
 
       {/* Light subtle cursor trail */}
       <CursorTrail />
@@ -618,7 +626,7 @@ export default function CustomerDashboardPage() {
       <div
         className="relative z-10 flex flex-col min-h-screen transition-all"
         style={{
-          paddingLeft: isSidebarOpen ? `${sidebarWidth}px` : "0px",
+          paddingLeft: isDesktop && isSidebarOpen ? `${sidebarWidth}px` : "0px",
         }}
       >
         {/* Top Header Bar */}
