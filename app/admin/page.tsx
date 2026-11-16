@@ -267,6 +267,7 @@ export default function AdminDashboardPage() {
           onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           activeOrdersCount={orders.filter((o) => o.status !== "completed").length}
           onOpenKitchen={() => setActiveTab("kitchen")}
+          onNavigateTab={(tab) => setActiveTab(tab as AdminTab)}
         />
 
         {/* Dashboard Body */}

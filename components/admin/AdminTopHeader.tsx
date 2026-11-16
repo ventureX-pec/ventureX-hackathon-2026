@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDisplayName, getInitials, getStoredUserProfile } from "@/lib/auth";
@@ -19,7 +19,61 @@ import {
   Sparkles,
   Store,
   PowerOff,
+  X,
+  CheckCheck,
+  Layers,
+  Package,
+  CheckCircle2,
 } from "lucide-react";
+
+export interface AdminNotification {
+  id: string;
+  title: string;
+  message: string;
+  time: string;
+  type: "order" | "stock" | "pickup" | "system";
+  read: boolean;
+  linkTab?: string;
+}
+
+const DEFAULT_ADMIN_NOTIFICATIONS: AdminNotification[] = [
+  {
+    id: "notif-1",
+    title: "New Table Order Placed",
+    message: "Order #D4821 received for Table #T01 (Classic Double Smashed Cheeseburger + Loaded Truffle Fries)",
+    time: "2m ago",
+    type: "order",
+    read: false,
+    linkTab: "orders",
+  },
+  {
+    id: "notif-2",
+    title: "Low Ingredient Stock Warning",
+    message: "Aged Wisconsin Sharp Cheddar has reached reorder threshold (3.2 kg remaining)",
+    time: "14m ago",
+    type: "stock",
+    read: false,
+    linkTab: "ingredients",
+  },
+  {
+    id: "notif-3",
+    title: "Express Shelf Handover",
+    message: "Token #38 was picked up and verified at Shelf A",
+    time: "32m ago",
+    type: "pickup",
+    read: true,
+    linkTab: "pickup",
+  },
+  {
+    id: "notif-4",
+    title: "Burger House Live Storefront",
+    message: "Storefront is live & actively receiving campus orders at Block A • Food Court",
+    time: "1h ago",
+    type: "system",
+    read: true,
+    linkTab: "overview",
+  },
+];
 
 interface AdminTopHeaderProps {
   searchQuery: string;
@@ -28,6 +82,7 @@ interface AdminTopHeaderProps {
   onToggleSidebar?: () => void;
   activeOrdersCount?: number;
   onOpenKitchen?: () => void;
+  onNavigateTab?: (tab: string) => void;
   adminName?: string;
   adminEmail?: string;
 }
@@ -39,6 +94,7 @@ export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
   onToggleSidebar,
   activeOrdersCount = 24,
   onOpenKitchen,
+  onNavigateTab,
   adminName,
   adminEmail,
 }) => {
@@ -47,6 +103,78 @@ export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isStoreLive, setIsStoreLive] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Notification states
+  const [notifications, setNotifications] = useState<AdminNotification[]>(DEFAULT_ADMIN_NOTIFICATIONS);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const notificationsRef = useRef<HTMLDivElement | null>(null);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const handleMarkAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  const handleClearAll = () => {
+    setNotifications([]);
+  };
+
+  const handleNotificationClick = (notif: AdminNotification) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === notif.id ? { ...n, read: true } : n))
+    );
+    setIsNotificationsOpen(false);
+    if (notif.linkTab && onNavigateTab) {
+      onNavigateTab(notif.linkTab);
+    }
+  };
+
+  // Close notifications on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        notificationsRef.current &&
+        !notificationsRef.current.contains(e.target as Node)
+      ) {
+        setIsNotificationsOpen(false);
+      }
+    };
+    if (isNotificationsOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isNotificationsOpen]);
+
+  // Subscribe to live incoming orders to push notifications
+  useEffect(() => {
+    const unsubscribeOrders = subscribeToDataChanges((event) => {
+      if (event.type === "ORDERS_UPDATED" && Array.isArray(event.payload) && event.payload.length > 0) {
+        const latest = event.payload[0];
+        if (latest) {
+          setNotifications((prev) => {
+            const exists = prev.some((n) => n.id === `order-${latest.id}`);
+            if (exists) return prev;
+            return [
+              {
+                id: `order-${latest.id}`,
+                title: `New Order ${latest.orderNumber}`,
+                message: `${latest.customerName} • ${latest.tableNumber ? `Table ${latest.tableNumber}` : latest.tableOrShelf} • ₹${latest.totalAmount}`,
+                time: "Just now",
+                type: "order",
+                read: false,
+                linkTab: "orders",
+              },
+              ...prev,
+            ];
+          });
+        }
+      }
+    });
+
+    return () => unsubscribeOrders();
+  }, []);
 
   // Sync store status across tabs
   useEffect(() => {
@@ -228,16 +356,144 @@ export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
               </button>
             )}
 
-            {/* Notification Bell */}
-            <button
-              className="relative p-2 rounded-full bg-white border border-[#EDE5DA] text-[#252522] hover:text-[#D66B43] hover:border-[#D66B43]/40 shadow-xs transition-colors"
-              aria-label="Notifications"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#D66B43] text-white text-[10px] font-bold flex items-center justify-center">
-                2
-              </span>
-            </button>
+            {/* Notification Bell with Floating Popover */}
+            <div className="relative" ref={notificationsRef}>
+              <button
+                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                className={`relative p-2 rounded-full border transition-all cursor-pointer ${
+                  isNotificationsOpen
+                    ? "bg-[#D66B43]/10 border-[#D66B43] text-[#D66B43]"
+                    : "bg-white border-[#EDE5DA] text-[#252522] hover:text-[#D66B43] hover:border-[#D66B43]/40 shadow-xs"
+                }`}
+                aria-label="Notifications"
+                title="Kitchen Notifications"
+              >
+                <Bell className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#D66B43] text-white text-[10px] font-bold flex items-center justify-center animate-pulse shadow-xs">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Notifications Dropdown Modal / Popover */}
+              {isNotificationsOpen && (
+                <div className="absolute top-full right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white border border-[#ECE5DA] shadow-[0_20px_40px_rgba(37,37,34,0.12)] z-50 overflow-hidden animate-in fade-in duration-200">
+                  {/* Popover Header */}
+                  <div className="p-3.5 px-4 bg-[#FAF8F5] border-b border-[#F2ECE2] flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-[#D66B43]/15 text-[#D66B43] flex items-center justify-center">
+                        <Bell className="w-3.5 h-3.5" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#252522]">Kitchen Notifications</h4>
+                        <p className="text-[10px] text-[#8C877D]">
+                          {unreadCount > 0 ? `${unreadCount} unread alert${unreadCount > 1 ? "s" : ""}` : "All notifications read"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={handleMarkAllRead}
+                          className="px-2 py-1 rounded-lg text-[10px] font-semibold text-[#D66B43] hover:bg-[#D66B43]/10 transition-colors cursor-pointer"
+                          title="Mark all as read"
+                        >
+                          Mark read
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setIsNotificationsOpen(false)}
+                        className="p-1 rounded-lg text-[#8C877D] hover:text-[#252522] hover:bg-[#F2ECE2] transition-colors cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Notification List */}
+                  <div className="max-h-80 overflow-y-auto divide-y divide-[#F5EFE6] scrollbar-thin">
+                    {notifications.length === 0 ? (
+                      <div className="p-8 text-center space-y-2">
+                        <div className="w-10 h-10 rounded-full bg-[#FAF8F5] text-[#8C877D] flex items-center justify-center mx-auto">
+                          <CheckCheck className="w-5 h-5 text-emerald-600" />
+                        </div>
+                        <p className="text-xs font-semibold text-[#252522]">No notifications</p>
+                        <p className="text-[11px] text-[#8C877D]">You&apos;re all caught up with kitchen alerts</p>
+                      </div>
+                    ) : (
+                      notifications.map((notif) => (
+                        <div
+                          key={notif.id}
+                          onClick={() => handleNotificationClick(notif)}
+                          className={`p-3.5 hover:bg-[#FAF8F5] transition-colors cursor-pointer flex items-start gap-3 relative group ${
+                            !notif.read ? "bg-[#FAF6F0]/60" : ""
+                          }`}
+                        >
+                          {/* Type Icon */}
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                            notif.type === "order"
+                              ? "bg-amber-100 text-amber-700"
+                              : notif.type === "stock"
+                              ? "bg-rose-100 text-rose-700"
+                              : notif.type === "pickup"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-blue-100 text-blue-700"
+                          }`}>
+                            {notif.type === "order" && <ShoppingBag className="w-4 h-4" />}
+                            {notif.type === "stock" && <Layers className="w-4 h-4" />}
+                            {notif.type === "pickup" && <Package className="w-4 h-4" />}
+                            {notif.type === "system" && <Sparkles className="w-4 h-4" />}
+                          </div>
+
+                          {/* Content */}
+                          <div className="flex-1 min-w-0 pr-2">
+                            <div className="flex items-center justify-between gap-1 mb-0.5">
+                              <span className={`text-xs font-bold truncate ${!notif.read ? "text-[#252522]" : "text-[#5C5954]"}`}>
+                                {notif.title}
+                              </span>
+                              <span className="text-[10px] text-[#8C877D] shrink-0 font-medium">
+                                {notif.time}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-[#736E65] leading-relaxed line-clamp-2">
+                              {notif.message}
+                            </p>
+                          </div>
+
+                          {/* Unread indicator dot */}
+                          {!notif.read && (
+                            <span className="w-2 h-2 rounded-full bg-[#D66B43] shrink-0 mt-2" />
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Popover Footer */}
+                  {notifications.length > 0 && (
+                    <div className="p-2.5 px-4 bg-[#FAF8F5] border-t border-[#F2ECE2] flex items-center justify-between text-[11px]">
+                      <button
+                        onClick={handleClearAll}
+                        className="text-[#8C877D] hover:text-rose-600 transition-colors cursor-pointer font-medium"
+                      >
+                        Clear all alerts
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsNotificationsOpen(false);
+                          if (onNavigateTab) onNavigateTab("orders");
+                        }}
+                        className="text-[#D66B43] hover:underline font-semibold cursor-pointer"
+                      >
+                        Go to Orders Board →
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Customer Portal Link Pill */}
             <Link
