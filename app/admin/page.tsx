@@ -11,6 +11,7 @@ import { CursorTrail } from "@/components/motion/CursorTrail";
 import {
   fetchLiveOrders,
   getStoredOrders,
+  saveStoredOrders,
   updateLiveOrderStatus,
   getStoredDishes,
   saveStoredDishes,
@@ -137,6 +138,12 @@ export default function AdminDashboardPage() {
     updateLiveOrderStatus(orderId, newStatus).then((updated) => {
       setOrders(updated);
     });
+  };
+
+  // Reset demo orders to active baseline (for presentation demos)
+  const handleResetDemoOrders = () => {
+    saveStoredOrders(INITIAL_ADMIN_ORDERS);
+    setOrders(INITIAL_ADMIN_ORDERS);
   };
 
   // Toggle dish availability (Persisted across refreshes)
@@ -288,6 +295,7 @@ export default function AdminDashboardPage() {
                   onUpdateStatus={handleUpdateOrderStatus}
                   onOpenOrder={(order) => setInspectingOrder(order)}
                   searchQuery={searchQuery}
+                  onResetDemoOrders={handleResetDemoOrders}
                 />
               )}
 

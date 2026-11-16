@@ -22,6 +22,7 @@ interface OrdersViewProps {
   onUpdateStatus: (orderId: string, newStatus: AdminOrder["status"]) => void;
   onOpenOrder: (order: AdminOrder) => void;
   searchQuery?: string;
+  onResetDemoOrders?: () => void;
 }
 
 export const OrdersView: React.FC<OrdersViewProps> = ({
@@ -29,14 +30,22 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
   onUpdateStatus,
   onOpenOrder,
   searchQuery = "",
+  onResetDemoOrders,
 }) => {
   const [activeFilter, setActiveFilter] = useState<
-    "all" | "new" | "accepted" | "preparing" | "ready" | "completed"
-  >("all");
+    "active" | "all" | "new" | "accepted" | "preparing" | "ready" | "completed"
+  >("active");
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
+  const activeOrdersCount = orders.filter((o) => o.status !== "completed").length;
+  const completedOrdersCount = orders.filter((o) => o.status === "completed").length;
+
   const filterTabs = [
-    { id: "all", label: "All Orders", count: orders.length },
+    {
+      id: "active",
+      label: "Active Orders",
+      count: activeOrdersCount,
+    },
     {
       id: "new",
       label: "New",
@@ -60,20 +69,28 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
     {
       id: "completed",
       label: "Completed",
-      count: orders.filter((o) => o.status === "completed").length,
+      count: completedOrdersCount,
+    },
+    {
+      id: "all",
+      label: "All Orders",
+      count: orders.length,
     },
   ];
 
   const filteredOrders = orders.filter((order) => {
-    if (activeFilter !== "all" && order.status !== activeFilter) {
+    if (activeFilter === "active") {
+      if (order.status === "completed") return false;
+    } else if (activeFilter !== "all" && order.status !== activeFilter) {
       return false;
     }
     if (localSearch.trim()) {
       const q = localSearch.toLowerCase();
       const matchesId = order.orderNumber.toLowerCase().includes(q);
+      const matchesToken = order.tokenNumber.toLowerCase().includes(q);
       const matchesCustomer = order.customerName.toLowerCase().includes(q);
       const matchesDish = order.items.some((i) => i.dishName.toLowerCase().includes(q));
-      if (!matchesId && !matchesCustomer && !matchesDish) return false;
+      if (!matchesId && !matchesToken && !matchesCustomer && !matchesDish) return false;
     }
     return true;
   });
@@ -110,7 +127,7 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
           <button
             key={tab.id}
             onClick={() => setActiveFilter(tab.id as typeof activeFilter)}
-            className={`px-4 py-2 rounded-full text-xs font-semibold shrink-0 transition-all ${
+            className={`px-4 py-2 rounded-full text-xs font-semibold shrink-0 transition-all cursor-pointer ${
               activeFilter === tab.id
                 ? "bg-[#D66B43] text-white shadow-sm"
                 : "bg-white/90 border border-[#EDE5DA] text-[#5C574F] hover:bg-white hover:text-[#252522]"
@@ -128,16 +145,64 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
         ))}
       </div>
 
+      {/* Completed Orders Header Banner */}
+      {activeFilter === "completed" && (
+        <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-emerald-900">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+            <span className="font-semibold">
+              Completed Orders Archive ({completedOrdersCount} tickets fulfilled)
+            </span>
+          </div>
+          <span className="text-emerald-700 text-[11px]">
+            All completed & handed over orders are automatically shifted here out of the live queue.
+          </span>
+        </div>
+      )}
+
       {/* Orders Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredOrders.length === 0 ? (
-          <div className="col-span-full bg-white/90 p-12 text-center rounded-3xl border border-[#EDE5DA] space-y-2">
-            <div className="w-12 h-12 rounded-full bg-[#FAF8F5] flex items-center justify-center mx-auto text-[#8C877D]">
-              <ChefHat className="w-6 h-6" />
+          activeFilter === "active" && completedOrdersCount > 0 ? (
+            <div className="col-span-full bg-white/95 backdrop-blur-md p-10 sm:p-12 text-center rounded-3xl border border-[#EDE5DA] space-y-4 shadow-xs">
+              <div className="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto shadow-xs">
+                <CheckCircle2 className="w-7 h-7" />
+              </div>
+              <div className="space-y-1">
+                <div className="font-serif text-xl font-bold text-[#252522]">
+                  All Active Orders Completed!
+                </div>
+                <div className="text-xs sm:text-sm text-[#736E65] max-w-md mx-auto leading-relaxed">
+                  All {completedOrdersCount} finished tickets have been shifted to the <span className="font-bold text-[#D66B43]">Completed</span> section.
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <button
+                  onClick={() => setActiveFilter("completed")}
+                  className="px-5 py-2.5 rounded-full bg-[#FAF8F5] border border-[#EDE5DA] text-xs font-bold text-[#252522] hover:border-[#D66B43] hover:text-[#D66B43] transition-all cursor-pointer shadow-xs flex items-center gap-2"
+                >
+                  <span>View Completed Section ({completedOrdersCount})</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#D66B43]" />
+                </button>
+                {onResetDemoOrders && (
+                  <button
+                    onClick={onResetDemoOrders}
+                    className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#D66B43] to-[#E87A48] text-white text-xs font-bold hover:brightness-105 transition-all shadow-xs cursor-pointer"
+                  >
+                    ✦ Populate Fresh Active Orders
+                  </button>
+                )}
+              </div>
             </div>
-            <div className="font-serif text-lg font-bold text-[#252522]">No orders found</div>
-            <div className="text-xs text-[#736E65]">Try switching the filter tab or clearing search</div>
-          </div>
+          ) : (
+            <div className="col-span-full bg-white/90 p-12 text-center rounded-3xl border border-[#EDE5DA] space-y-2">
+              <div className="w-12 h-12 rounded-full bg-[#FAF8F5] flex items-center justify-center mx-auto text-[#8C877D]">
+                <ChefHat className="w-6 h-6" />
+              </div>
+              <div className="font-serif text-lg font-bold text-[#252522]">No orders found</div>
+              <div className="text-xs text-[#736E65]">Try switching the filter tab or clearing search</div>
+            </div>
+          )
         ) : (
           filteredOrders.map((order) => (
             <motion.div
@@ -258,9 +323,19 @@ export const OrdersView: React.FC<OrdersViewProps> = ({
                   )}
 
                   {order.status === "completed" && (
-                    <span className="flex-1 py-1.5 text-center text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200">
-                      ✓ Completed
-                    </span>
+                    <div className="flex-1 flex items-center justify-between gap-2">
+                      <span className="flex-1 py-1.5 text-center text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center justify-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Fulfilled</span>
+                      </span>
+                      <button
+                        onClick={() => onUpdateStatus(order.id, "ready")}
+                        className="px-2.5 py-1.5 text-[11px] font-semibold text-[#8C877D] hover:text-[#D66B43] hover:bg-[#FAF8F5] rounded-xl border border-transparent hover:border-[#EDE5DA] transition-all cursor-pointer"
+                        title="Reopen ticket to Ready status"
+                      >
+                        Reopen
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
