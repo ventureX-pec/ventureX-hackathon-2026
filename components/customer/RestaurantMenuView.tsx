@@ -328,6 +328,15 @@ export const RestaurantMenuView: React.FC<RestaurantMenuViewProps> = ({
                       ⭐ {dish.rating}
                     </span>
                   </div>
+
+                  {/* Out of Stock Overlay */}
+                  {dish.isAvailable === false && (
+                    <div className="absolute inset-0 bg-black/45 backdrop-blur-[0.5px] flex items-center justify-center pointer-events-none z-10">
+                      <span className="px-3 py-1 rounded-full bg-rose-600/90 text-white text-[11px] font-bold border border-white/20 shadow-md">
+                        Sold Out
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Dish Info & Actions */}
@@ -373,7 +382,14 @@ export const RestaurantMenuView: React.FC<RestaurantMenuViewProps> = ({
                       )}
                     </div>
 
-                    {isOffline ? (
+                    {dish.isAvailable === false ? (
+                      <button
+                        disabled
+                        className="px-3.5 py-1.5 rounded-xl bg-stone-100 text-stone-400 text-xs font-semibold cursor-not-allowed border border-stone-200"
+                      >
+                        Sold Out
+                      </button>
+                    ) : isOffline ? (
                       <button
                         disabled
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-100 text-stone-400 text-xs font-semibold cursor-not-allowed border border-stone-200"

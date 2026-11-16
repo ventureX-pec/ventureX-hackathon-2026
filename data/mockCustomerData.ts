@@ -21,6 +21,7 @@ export interface MenuItem {
   rating: number;
   tags: string[];
   spiceLevel?: "Mild" | "Medium" | "Spicy";
+  isAvailable?: boolean;
 }
 
 export interface Restaurant {

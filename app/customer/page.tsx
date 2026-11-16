@@ -56,6 +56,7 @@ import {
   getStoredCart,
   saveStoredCart,
   getStoredStoreStatus,
+  getStoredDishes,
   subscribeToDataChanges,
   fetchCustomerOrdersFromDb,
 } from "@/lib/dataService";
@@ -94,6 +95,9 @@ export default function CustomerDashboardPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [inspectingDish, setInspectingDish] = useState<MenuItem | null>(null);
+
+  // Dynamic dishes catalog (synced with admin menu management)
+  const [allDishes, setAllDishes] = useState<MenuItem[]>(MENU_ITEMS);
 
   // Logged-in Customer & Orders State
   const [loggedInCustomer, setLoggedInCustomer] = useState<{
@@ -345,11 +349,16 @@ export default function CustomerDashboardPage() {
       if (storedActive) {
         setActiveOrder(storedActive);
       }
+
+      // Hydrate live dishes from store
+      setAllDishes(getStoredDishes());
     } catch (e) {}
 
     // Subscribe to cross-tab & Supabase live sync
     const unsubscribe = subscribeToDataChanges((event) => {
-      if (event.type === "ORDERS_UPDATED" && Array.isArray(event.payload)) {
+      if (event.type === "DISHES_UPDATED" && Array.isArray(event.payload)) {
+        setAllDishes(event.payload);
+      } else if (event.type === "ORDERS_UPDATED" && Array.isArray(event.payload)) {
         // When kitchen updates order status (e.g. from Preparing to Ready), update active order
         const current = getStoredActiveOrder();
         if (current) {
@@ -594,6 +603,7 @@ export default function CustomerDashboardPage() {
 
   // Cart operations
   const handleAddToCart = (dish: MenuItem, quantity = 1, instructions?: string) => {
+    if (dish.isAvailable === false) return;
     setCart((prev) => {
       const existing = prev.find((item) => item.dish.id === dish.id);
       let updated: CartItem[];
@@ -675,20 +685,20 @@ export default function CustomerDashboardPage() {
     return RESTAURANTS.find((r) => r.id === selectedRestaurantId) || null;
   }, [selectedRestaurantId]);
 
-  // Dishes belonging to the selected restaurant
+  // Dishes belonging to the selected restaurant (dynamically synced with admin catalog)
   const selectedRestaurantDishes = useMemo(() => {
     if (!selectedRestaurantId) return [];
-    return MENU_ITEMS.filter((d) => d.restaurantId === selectedRestaurantId);
-  }, [selectedRestaurantId]);
+    return allDishes.filter((d) => d.restaurantId === selectedRestaurantId);
+  }, [selectedRestaurantId, allDishes]);
 
   // Customer's Favorited Dishes
   const customerFavoriteDishes = useMemo(() => {
-    return MENU_ITEMS.filter((dish) => favoriteDishIds.includes(dish.id));
-  }, [favoriteDishIds]);
+    return allDishes.filter((dish) => favoriteDishIds.includes(dish.id));
+  }, [favoriteDishIds, allDishes]);
 
   // Featured Dishes for the main homepage
   const featuredDishes = useMemo(() => {
-    return MENU_ITEMS.filter((dish) => {
+    return allDishes.filter((dish) => {
       if (selectedCategory !== "all" && dish.category !== selectedCategory) {
         return false;
       }
@@ -701,7 +711,7 @@ export default function CustomerDashboardPage() {
       }
       return true;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, searchQuery, allDishes]);
 
   // Checkout trigger (Saves to Supabase Database, syncs with Admin KDS, & updates Customer Orders)
   const handleCheckout = (details: {
@@ -1089,6 +1099,15 @@ export default function CustomerDashboardPage() {
                               ⭐ {dish.rating}
                             </span>
                           </div>
+
+                          {/* Sold Out / Out of Stock Overlay */}
+                          {dish.isAvailable === false && (
+                            <div className="absolute inset-0 bg-black/45 backdrop-blur-[0.5px] flex items-center justify-center pointer-events-none z-10">
+                              <span className="px-3 py-1 rounded-full bg-rose-600/90 text-white text-[11px] font-bold border border-white/20 shadow-md">
+                                Sold Out
+                              </span>
+                            </div>
+                          )}
                         </div>
 
                         {/* Dish Info & Actions */}
@@ -1143,7 +1162,14 @@ export default function CustomerDashboardPage() {
                               )}
                             </div>
 
-                            {inCart ? (
+                            {dish.isAvailable === false ? (
+                              <button
+                                disabled
+                                className="px-3 py-1.5 rounded-xl bg-stone-100 text-stone-400 text-xs font-semibold cursor-not-allowed border border-stone-200"
+                              >
+                                Sold Out
+                              </button>
+                            ) : inCart ? (
                               <div className="flex items-center gap-2 rounded-xl bg-[#FAF8F3] border border-[#D66B43] px-2 py-1 shadow-xs">
                                 <button
                                   onClick={() => handleUpdateQuantity(dish.id, -1)}

@@ -79,7 +79,7 @@ export const AddDishModal: React.FC<AddDishModalProps> = ({
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Saffron Dum Biryani Bowl"
+              placeholder="e.g. Smoky Chipotle Bacon Double Smashed Burger"
               className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDE5DA] text-xs text-[#252522] focus:outline-none focus:border-[#D66B43]"
             />
           </div>
@@ -93,11 +93,8 @@ export const AddDishModal: React.FC<AddDishModalProps> = ({
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#EDE5DA] text-xs text-[#252522] focus:outline-none focus:border-[#D66B43] bg-white"
               >
                 <option value="burgers">Burgers</option>
-                <option value="pizza">Pizza</option>
-                <option value="indian">Lunch Bowls</option>
-                <option value="sushi">Sushi & Asian</option>
-                <option value="salads">Salads</option>
-                <option value="drinks">Beverages</option>
+                <option value="starters">Sides & Loaded Fries</option>
+                <option value="drinks">Shakes & Beverages</option>
                 <option value="desserts">Desserts</option>
               </select>
             </div>

@@ -238,15 +238,24 @@ export const DishDetailModal: React.FC<DishDetailModalProps> = ({
             </div>
 
             {/* Total & Add Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleAdd}
-              className="flex-1 py-3 px-5 rounded-xl bg-[#252522] hover:bg-[#D66B43] text-white text-xs font-bold flex items-center justify-between transition-colors shadow-soft cursor-pointer"
-            >
-              <span>Add to Plate</span>
-              <span className="font-serif text-sm">₹{dish.price * qty}</span>
-            </motion.button>
+            {dish.isAvailable === false ? (
+              <button
+                disabled
+                className="flex-1 py-3 px-5 rounded-xl bg-stone-100 text-stone-400 text-xs font-bold flex items-center justify-center cursor-not-allowed border border-stone-200"
+              >
+                <span>Sold Out • Currently Unavailable</span>
+              </button>
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleAdd}
+                className="flex-1 py-3 px-5 rounded-xl bg-[#252522] hover:bg-[#D66B43] text-white text-xs font-bold flex items-center justify-between transition-colors shadow-soft cursor-pointer"
+              >
+                <span>Add to Plate</span>
+                <span className="font-serif text-sm">₹{dish.price * qty}</span>
+              </motion.button>
+            )}
           </div>
         </motion.div>
       </div>

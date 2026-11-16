@@ -41,12 +41,10 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
 
   const categories = [
     { id: "all", label: "All Items" },
-    { id: "burgers", label: "Burgers" },
-    { id: "pizza", label: "Pizza" },
-    { id: "indian", label: "Lunch Bowls" },
-    { id: "sushi", label: "Sushi & Asian" },
-    { id: "salads", label: "Healthy & Salads" },
-    { id: "drinks", label: "Beverages" },
+    { id: "burgers", label: "Signature Burgers" },
+    { id: "starters", label: "Sides & Loaded Fries" },
+    { id: "drinks", label: "Shakes & Beverages" },
+    { id: "desserts", label: "Desserts" },
   ];
 
   const handleAdjustPrice = (dishId: string, delta: number) => {

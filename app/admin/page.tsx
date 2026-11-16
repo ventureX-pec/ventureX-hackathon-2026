@@ -142,6 +142,13 @@ export default function AdminDashboardPage() {
     };
   }, [orders]);
 
+  // Only Burger House dishes for Burger House admin portal
+  const burgerHouseDishes = useMemo(() => {
+    return dishes.filter(
+      (d) => !d.restaurantId || d.restaurantId === "burger-house"
+    );
+  }, [dishes]);
+
   // Order status transitions (Persisted to Supabase Database + LocalStorage)
   const handleUpdateOrderStatus = (
     orderId: string,
@@ -184,8 +191,13 @@ export default function AdminDashboardPage() {
 
   // Add new dish (Persisted across refreshes)
   const handleAddDish = (newDish: MenuItem) => {
+    const formatted: MenuItem = {
+      ...newDish,
+      restaurantId: "burger-house",
+      restaurantName: "Burger House",
+    };
     setDishes((prev) => {
-      const updated = [newDish, ...prev];
+      const updated = [formatted, ...prev];
       saveStoredDishes(updated);
       return updated;
     });
@@ -331,13 +343,17 @@ export default function AdminDashboardPage() {
 
               {activeTab === "menu" && (
                 <MenuManagementView
-                  dishes={dishes}
+                  dishes={burgerHouseDishes}
                   onToggleAvailability={handleToggleDishAvailability}
                   onOpenAddModal={() => setIsAddDishOpen(true)}
                   onUpdatePrice={handleUpdatePrice}
-                  onDeleteDish={(id) =>
-                    setDishes((prev) => prev.filter((d) => d.id !== id))
-                  }
+                  onDeleteDish={(id) => {
+                    setDishes((prev) => {
+                      const updated = prev.filter((d) => d.id !== id);
+                      saveStoredDishes(updated);
+                      return updated;
+                    });
+                  }}
                 />
               )}
 
