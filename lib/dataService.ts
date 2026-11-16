@@ -9,6 +9,7 @@ const STORAGE_KEYS = {
   ACTIVE_ORDER: "serveza_active_order",
   CART: "serveza_cart",
   FAVORITES: "serveza_favorites",
+  STORE_STATUS: "serveza_store_is_live",
 };
 
 // Cross-tab broadcast channel for instantaneous reactive updates
@@ -331,5 +332,29 @@ export function saveStoredFavorites(favs: string[]) {
     localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(favs));
   } catch (e) {
     console.error("[DataService] Error saving favorites:", e);
+  }
+}
+
+export function getStoredStoreStatus(): boolean {
+  if (typeof window === "undefined") return true;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.STORE_STATUS);
+    if (raw !== null) {
+      return raw === "true";
+    }
+  } catch (e) {
+    console.error("[DataService] Error reading store status:", e);
+  }
+  return true;
+}
+
+export function setStoredStoreStatus(isLive: boolean): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEYS.STORE_STATUS, String(isLive));
+    broadcastEvent("serveza_store_is_live", { isLive });
+    window.dispatchEvent(new CustomEvent("serveza:store-status-change", { detail: { isLive } }));
+  } catch (e) {
+    console.error("[DataService] Error saving store status:", e);
   }
 }

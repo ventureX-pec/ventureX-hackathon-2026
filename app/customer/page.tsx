@@ -54,6 +54,7 @@ import {
   saveStoredActiveOrder,
   getStoredCart,
   saveStoredCart,
+  getStoredStoreStatus,
   subscribeToDataChanges,
   fetchCustomerOrdersFromDb,
 } from "@/lib/dataService";
@@ -130,6 +131,31 @@ export default function CustomerDashboardPage() {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Store Live Status (Synchronized with Admin Toggle)
+  const [isStoreLive, setIsStoreLive] = useState<boolean>(true);
+
+  useEffect(() => {
+    setIsStoreLive(getStoredStoreStatus());
+
+    const unsubscribe = subscribeToDataChanges((event) => {
+      if (event.type === "serveza_store_is_live") {
+        setIsStoreLive(getStoredStoreStatus());
+      }
+    });
+
+    const handleCustomChange = (e: any) => {
+      if (typeof e.detail?.isLive === "boolean") {
+        setIsStoreLive(e.detail.isLive);
+      }
+    };
+    window.addEventListener("serveza:store-status-change" as any, handleCustomChange);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener("serveza:store-status-change" as any, handleCustomChange);
+    };
   }, []);
 
   // Scroll spy control refs
@@ -809,6 +835,14 @@ export default function CustomerDashboardPage() {
           userAvatar={loggedInCustomer.avatar}
         />
 
+        {/* Real-time Kitchen Offline / Paused Banner */}
+        {!isStoreLive && (
+          <div className="bg-gradient-to-r from-amber-600 via-rose-600 to-amber-600 text-white text-xs font-semibold px-4 py-2.5 flex items-center justify-center gap-2 shadow-xs transition-all text-center">
+            <span className="w-2 h-2 rounded-full bg-amber-200 animate-ping" />
+            <span>Notice: Kitchen is currently paused by staff. Menu browsing is open, but incoming checkouts are temporarily held.</span>
+          </div>
+        )}
+
         {/* Dashboard Body */}
         <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 sm:space-y-10 pb-28 lg:pb-16">
           {/* VIEW 1: My Orders View */}
@@ -1154,6 +1188,7 @@ export default function CustomerDashboardPage() {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveFromCart}
         onCheckout={handleCheckout}
+        isStoreLive={isStoreLive}
       />
 
       {/* Live Token Modal (from active order card) */}

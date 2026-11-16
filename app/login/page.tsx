@@ -445,7 +445,7 @@ export default function LoginPage() {
                 {isSignUp
                   ? "Sign up with Supabase authentication to save preferences and order history."
                   : role === "customer"
-                  ? "Enter your credentials to pre-order and reserve your table."
+                  ? "Enter your credentials to browse menus, order ahead, and track food."
                   : "Enter your staff credentials to manage orders, live KDS, and menus."}
               </p>
             </div>

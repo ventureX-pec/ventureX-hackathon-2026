@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import Link from "next/link"
-import { CalendarClock, LogIn, Menu as MenuIcon, X } from "lucide-react"
+import { UtensilsCrossed, LogIn, Menu as MenuIcon, X } from "lucide-react"
 
 interface NavbarProps {
   onOpenReservation?: () => void
@@ -41,15 +41,6 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
     const target = document.querySelector(href)
     if (target) {
       target.scrollIntoView({ behavior: "smooth" })
-    }
-  }
-
-  const handleReserve = () => {
-    setMobileMenuOpen(false)
-    if (onOpenReservation) {
-      onOpenReservation()
-    } else if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("app:open-reservation"))
     }
   }
 
@@ -111,7 +102,7 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
           ))}
         </nav>
 
-        {/* Right CTA Button: Reserve / Contact */}
+        {/* Right CTA Button: Order Online / Sign In */}
         <div className="flex items-center gap-3">
           <Link
             href="/login"
@@ -125,13 +116,13 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
             <span>Sign In</span>
           </Link>
 
-          <button
-            onClick={handleReserve}
+          <Link
+            href="/customer"
             className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#c96342] hover:bg-[#a84d31] text-white text-xs sm:text-sm font-medium transition-all shadow-xs hover:shadow active:scale-95 cursor-pointer"
           >
-            <CalendarClock className="w-4 h-4" />
-            <span>Reserve Table</span>
-          </button>
+            <UtensilsCrossed className="w-4 h-4" />
+            <span>Order Now</span>
+          </Link>
 
           {/* Mobile Menu Toggle */}
           {navLinks.length > 0 && (
@@ -178,15 +169,14 @@ export default function Navbar({ onOpenReservation }: NavbarProps) {
               <LogIn className="w-4 h-4 text-[#c96342]" />
               <span>Sign In (Customer / Admin)</span>
             </Link>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false)
-                handleReserve()
-              }}
-              className="w-full py-3 rounded-full bg-[#c96342] text-white font-medium text-sm text-center"
+            <Link
+              href="/customer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full py-3 rounded-full bg-[#c96342] hover:bg-[#a84d31] text-white font-medium text-sm text-center flex items-center justify-center gap-2"
             >
-              Reserve a Table
-            </button>
+              <UtensilsCrossed className="w-4 h-4" />
+              <span>Order Now</span>
+            </Link>
           </div>
         </div>
       )}

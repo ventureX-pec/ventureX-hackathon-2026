@@ -129,16 +129,9 @@ export default function Footer({ onOpenReservation, onOpenPolicy }: FooterProps)
                 </a>
               </li>
               <li>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (onOpenReservation) onOpenReservation()
-                    else if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("app:open-reservation"))
-                  }}
-                  className="hover:text-[#c96342] transition-colors cursor-pointer text-left"
-                >
-                  Table Reservations
-                </button>
+                <Link href="/customer" className="hover:text-[#c96342] transition-colors">
+                  Order Online
+                </Link>
               </li>
             </ul>
           </div>

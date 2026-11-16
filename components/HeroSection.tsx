@@ -54,19 +54,10 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ onOpenReservation }: HeroSectionProps) {
-  const handleReserve = () => {
-    if (onOpenReservation) {
-      onOpenReservation()
-    } else if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("app:open-reservation"))
-    }
-  }
-
   return (
     <section id="hero" className="relative w-full bg-[#0f0e0d]">
       <DishOrbitCarousel
         dishes={FEATURED_HERO_DISHES}
-        onReserveClick={handleReserve}
       />
     </section>
   )

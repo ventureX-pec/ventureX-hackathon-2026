@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDisplayName, getInitials, getStoredUserProfile } from "@/lib/auth";
+import { getStoredStoreStatus, setStoredStoreStatus, subscribeToDataChanges } from "@/lib/dataService";
 import {
   MapPin,
   ChevronDown,
@@ -16,6 +17,8 @@ import {
   ChefHat,
   SlidersHorizontal,
   Sparkles,
+  Store,
+  PowerOff,
 } from "lucide-react";
 
 interface AdminTopHeaderProps {
@@ -42,6 +45,43 @@ export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
   const [selectedLocation, setSelectedLocation] = useState("Main Food Court, Block A");
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isStoreLive, setIsStoreLive] = useState(true);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Sync store status across tabs
+  useEffect(() => {
+    setIsStoreLive(getStoredStoreStatus());
+
+    const unsubscribe = subscribeToDataChanges((event) => {
+      if (event.type === "serveza_store_is_live") {
+        setIsStoreLive(getStoredStoreStatus());
+      }
+    });
+
+    const handleCustomChange = (e: any) => {
+      if (typeof e.detail?.isLive === "boolean") {
+        setIsStoreLive(e.detail.isLive);
+      }
+    };
+    window.addEventListener("serveza:store-status-change" as any, handleCustomChange);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener("serveza:store-status-change" as any, handleCustomChange);
+    };
+  }, []);
+
+  const handleToggleStoreLive = () => {
+    const nextStatus = !isStoreLive;
+    setIsStoreLive(nextStatus);
+    setStoredStoreStatus(nextStatus);
+    setToastMessage(
+      nextStatus
+        ? "Kitchen is now LIVE • Accepting student orders"
+        : "Kitchen PAUSED • New customer checkouts paused"
+    );
+    setTimeout(() => setToastMessage(null), 3500);
+  };
 
   // Dynamic admin profile state
   const [profile, setProfile] = useState<{ name: string; email: string }>({
@@ -149,17 +189,42 @@ export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
           </div>
 
           {/* Right: Actions, Notifications & Admin Profile */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
+            {/* Live Store Status / Accepting Orders Toggle */}
+            <button
+              onClick={handleToggleStoreLive}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all shadow-xs border cursor-pointer active:scale-95 ${
+                isStoreLive
+                  ? "bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100"
+                  : "bg-rose-50 border-rose-300 text-rose-800 hover:bg-rose-100"
+              }`}
+              title={
+                isStoreLive
+                  ? "Store is currently LIVE & accepting orders • Click to pause"
+                  : "Store is currently PAUSED • Click to go live & accept orders"
+              }
+            >
+              <span
+                className={`w-2 h-2 rounded-full transition-all ${
+                  isStoreLive
+                    ? "bg-emerald-500 animate-pulse ring-2 ring-emerald-200"
+                    : "bg-rose-500 ring-2 ring-rose-200"
+                }`}
+              />
+              <Store className={`w-3.5 h-3.5 ${isStoreLive ? "text-emerald-700" : "text-rose-600"}`} />
+              <span className="hidden sm:inline">{isStoreLive ? "Accepting Orders" : "Orders Paused"}</span>
+              <span className="sm:hidden">{isStoreLive ? "Live" : "Paused"}</span>
+            </button>
+
             {/* Quick Kitchen Display Shortcut */}
             {onOpenKitchen && (
               <button
                 onClick={onOpenKitchen}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#EDE5DA] text-xs font-medium text-[#252522] hover:border-[#D66B43]/40 shadow-xs transition-colors"
+                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white border border-[#EDE5DA] text-xs font-medium text-[#252522] hover:border-[#D66B43]/40 shadow-xs transition-colors cursor-pointer"
                 title="Open KDS Screen"
               >
                 <ChefHat className="w-3.5 h-3.5 text-[#D66B43]" />
-                <span>KDS Live</span>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>KDS</span>
               </button>
             )}
 
@@ -235,6 +300,28 @@ export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Animated Feedback Banner when toggled */}
+        {toastMessage && (
+          <div
+            className={`mt-2.5 px-3.5 py-1.5 rounded-xl text-xs font-medium flex items-center justify-between border shadow-xs transition-all ${
+              isStoreLive
+                ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                : "bg-rose-50 border-rose-200 text-rose-800"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <span className={`w-2 h-2 rounded-full ${isStoreLive ? "bg-emerald-500 animate-pulse" : "bg-rose-500"}`} />
+              <span>{toastMessage}</span>
+            </div>
+            <button
+              onClick={() => setToastMessage(null)}
+              className="text-xs hover:opacity-70 cursor-pointer ml-3 font-bold text-gray-500"
+            >
+              ×
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );

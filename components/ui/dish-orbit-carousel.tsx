@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import Link from "next/link"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
@@ -101,7 +102,7 @@ const CSS =
   ".dsh-hero-accent{font-style:italic;font-weight:400;color:#e07a5f}" +
   ".dsh-hero-desc{font-size:clamp(0.84rem,1.1vw,0.92rem);color:#a8a29e;margin:0.4rem auto 0.75rem;max-width:520px;line-height:1.45}" +
   ".dsh-hero-ctas{display:flex;gap:0.75rem;justify-content:center;align-items:center}" +
-  ".dsh-hero-btn-primary{display:inline-flex;align-items:center;gap:0.5rem;padding:0.55rem 1.6rem;border-radius:9999px;background:#c96342;color:#ffffff;font-weight:500;font-size:0.84rem;border:none;cursor:pointer;transition:all 0.2s ease;box-shadow:0 4px 14px -3px rgba(201,99,66,0.5)}" +
+  ".dsh-hero-btn-primary{display:inline-flex;align-items:center;gap:0.5rem;padding:0.55rem 1.6rem;border-radius:9999px;background:#c96342;color:#ffffff;font-weight:500;font-size:0.84rem;border:none;cursor:pointer;text-decoration:none;transition:all 0.2s ease;box-shadow:0 4px 14px -3px rgba(201,99,66,0.5)}" +
   ".dsh-hero-btn-primary:hover{background:#a84d31;box-shadow:0 6px 18px -3px rgba(201,99,66,0.6);transform:translateY(-1px)}" +
   ".dsh-btn-icon{width:14px;height:14px}" +
   /* 960 x 460 Stage */
@@ -459,19 +460,17 @@ export function DishOrbitCarousel({
             Artisanal hearth-fired dishes crafted with honest, seasonal ingredients.
           </p>
           <div className="dsh-hero-ctas">
-            <button
-              type="button"
-              onClick={onReserveClick}
+            <Link
+              href="/customer"
               className="dsh-hero-btn-primary"
             >
               <svg className="dsh-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                <line x1="16" x2="16" y1="2" y2="6" />
-                <line x1="8" x2="8" y1="2" y2="6" />
-                <line x1="3" x2="21" y1="10" y2="10" />
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                <path d="M3 6h18" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
-              <span>Reserve a Table</span>
-            </button>
+              <span>Order Online</span>
+            </Link>
           </div>
         </div>
 

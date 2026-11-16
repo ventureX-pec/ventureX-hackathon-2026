@@ -38,6 +38,7 @@ interface CartDrawerProps {
   defaultTable?: string;
   defaultOrderType?: "dine-in" | "takeaway";
   restaurantName?: string;
+  isStoreLive?: boolean;
 }
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({
@@ -50,6 +51,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   defaultTable,
   defaultOrderType,
   restaurantName,
+  isStoreLive = true,
 }) => {
   const [orderType, setOrderType] = useState<"dine-in" | "takeaway">(
     defaultOrderType || (defaultTable ? "dine-in" : "takeaway")
@@ -356,9 +358,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 </div>
 
                 <motion.button
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={isStoreLive ? { scale: 1.01 } : {}}
+                  whileTap={isStoreLive ? { scale: 0.98 } : {}}
+                  disabled={!isStoreLive}
                   onClick={() =>
+                    isStoreLive &&
                     onCheckout({
                       orderType,
                       tableOrShelf,
@@ -366,10 +370,20 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       notes: specialNotes,
                     })
                   }
-                  className="w-full py-3.5 rounded-xl bg-[#D66B43] text-[#FAF8F3] font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#BF5832] transition-colors shadow-soft"
+                  className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                    isStoreLive
+                      ? "bg-[#D66B43] text-[#FAF8F3] hover:bg-[#BF5832] shadow-soft cursor-pointer"
+                      : "bg-[#ECE7DE] text-[#8C877D] cursor-not-allowed opacity-80"
+                  }`}
                 >
-                  <span>Pay ₹{grandTotal} with 1-Tap UPI</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {isStoreLive ? (
+                    <>
+                      <span>Pay ₹{grandTotal} with 1-Tap UPI</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  ) : (
+                    <span>Kitchen Paused • Not Accepting Orders</span>
+                  )}
                 </motion.button>
               </div>
             )}
