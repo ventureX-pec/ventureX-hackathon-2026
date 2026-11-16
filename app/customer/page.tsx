@@ -940,6 +940,7 @@ export default function CustomerDashboardPage() {
                 setHighlightedDishId(null);
               }}
               highlightedDishId={highlightedDishId}
+              isStoreLive={isStoreLive}
             />
           ) : (
             /* VIEW 4: Main Homepage (Hero, Categories, Popular Near You, Featured Dishes) */
@@ -1006,6 +1007,7 @@ export default function CustomerDashboardPage() {
                     setSelectedCategory("all");
                     setRestaurantFilter("all");
                   }}
+                  isStoreLive={isStoreLive}
                 />
               </div>
 

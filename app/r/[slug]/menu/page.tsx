@@ -22,7 +22,14 @@ import { CartDrawer, CartItem } from "@/components/customer/CartDrawer";
 import { DishDetailModal } from "@/components/customer/DishDetailModal";
 import { CheckoutSuccessModal } from "@/components/customer/CheckoutSuccessModal";
 import { AdminOrder } from "@/data/mockAdminData";
-import { createLiveOrder, saveStoredActiveOrder, saveStoredCart, getStoredCart } from "@/lib/dataService";
+import {
+  createLiveOrder,
+  saveStoredActiveOrder,
+  saveStoredCart,
+  getStoredCart,
+  getStoredStoreStatus,
+  subscribeToDataChanges,
+} from "@/lib/dataService";
 
 function TableMenuContent() {
   const params = useParams();
@@ -43,6 +50,30 @@ function TableMenuContent() {
   const [inspectingDish, setInspectingDish] = useState<MenuItem | null>(null);
   const [favoriteDishIds, setFavoriteDishIds] = useState<string[]>([]);
   const [isValidTable, setIsValidTable] = useState<boolean>(true);
+  const [isStoreLive, setIsStoreLive] = useState<boolean>(true);
+
+  // Sync kitchen live status
+  useEffect(() => {
+    setIsStoreLive(getStoredStoreStatus());
+
+    const unsubscribe = subscribeToDataChanges((event) => {
+      if (event.type === "serveza_store_is_live") {
+        setIsStoreLive(getStoredStoreStatus());
+      }
+    });
+
+    const handleCustomChange = (e: any) => {
+      if (typeof e.detail?.isLive === "boolean") {
+        setIsStoreLive(e.detail.isLive);
+      }
+    };
+    window.addEventListener("serveza:store-status-change" as any, handleCustomChange);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener("serveza:store-status-change" as any, handleCustomChange);
+    };
+  }, []);
 
   // Active placed order state
   const [activeOrder, setActiveOrder] = useState<{
@@ -304,6 +335,14 @@ function TableMenuContent() {
         </div>
       </header>
 
+      {/* Top Offline Kitchen Alert */}
+      {!isStoreLive && (
+        <div className="bg-gradient-to-r from-rose-600 via-rose-500 to-rose-600 text-white text-xs font-semibold px-4 py-2.5 flex items-center justify-center gap-2 shadow-xs text-center sticky top-14 z-30">
+          <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+          <span>Notice: Kitchen is currently offline. Menu browsing is open, but checkout is temporarily held.</span>
+        </div>
+      )}
+
       {/* ============================================================ */}
       {/* 2. REUSED ARTISANAL RESTAURANT MENU VIEW                      */}
       {/* ============================================================ */}
@@ -320,6 +359,7 @@ function TableMenuContent() {
           onBack={() => {
             window.location.href = "/customer";
           }}
+          isStoreLive={isStoreLive}
         />
       </main>
 
@@ -384,6 +424,7 @@ function TableMenuContent() {
         defaultTable={tableNumber}
         defaultOrderType="dine-in"
         restaurantName={restaurant.name}
+        isStoreLive={isStoreLive}
       />
 
       {/* Checkout Success Modal */}

@@ -34,6 +34,7 @@ interface RestaurantMenuViewProps {
   onOpenDishModal: (dish: MenuItem) => void;
   onBack: () => void;
   highlightedDishId?: string | null;
+  isStoreLive?: boolean;
 }
 
 export const RestaurantMenuView: React.FC<RestaurantMenuViewProps> = ({
@@ -47,10 +48,15 @@ export const RestaurantMenuView: React.FC<RestaurantMenuViewProps> = ({
   onOpenDishModal,
   onBack,
   highlightedDishId,
+  isStoreLive = true,
 }) => {
   const [selectedSection, setSelectedSection] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [vegOnly, setVegOnly] = useState(false);
+
+  const isOffline =
+    restaurant.isOpen === false ||
+    (restaurant.id === "burger-house" && isStoreLive === false);
 
   // Extract unique menu sections for this restaurant
   const sections = useMemo(() => {
@@ -82,6 +88,19 @@ export const RestaurantMenuView: React.FC<RestaurantMenuViewProps> = ({
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+      {/* Top Kitchen Offline Alert Banner */}
+      {isOffline && (
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs sm:text-sm font-semibold flex items-center gap-3 shadow-xs">
+          <div className="w-8 h-8 rounded-xl bg-rose-600 text-white flex items-center justify-center flex-shrink-0 font-bold text-sm shadow-xs animate-pulse">
+            !
+          </div>
+          <div className="flex-1">
+            <span className="font-bold text-rose-950">This Kitchen is Currently Offline:</span>{" "}
+            {restaurant.name} has temporarily paused taking incoming orders. You can browse the full menu, but checkout is disabled until staff resumes service.
+          </div>
+        </div>
+      )}
+
       {/* Back Button */}
       <div className="flex items-center justify-between">
         <button
@@ -148,6 +167,13 @@ export const RestaurantMenuView: React.FC<RestaurantMenuViewProps> = ({
             <span className="px-3 py-1 rounded-xl bg-emerald-500/20 backdrop-blur-md text-emerald-300 font-bold border border-emerald-500/30">
               ⚡ {restaurant.currentQueue} orders in queue
             </span>
+
+            {isOffline && (
+              <span className="px-3 py-1 rounded-xl bg-rose-500/30 backdrop-blur-md text-rose-200 font-bold border border-rose-400/40 flex items-center gap-1.5 animate-pulse">
+                <span className="w-2 h-2 rounded-full bg-rose-400" />
+                <span>Kitchen Offline</span>
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -347,7 +373,14 @@ export const RestaurantMenuView: React.FC<RestaurantMenuViewProps> = ({
                       )}
                     </div>
 
-                    {inCart ? (
+                    {isOffline ? (
+                      <button
+                        disabled
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-100 text-stone-400 text-xs font-semibold cursor-not-allowed border border-stone-200"
+                      >
+                        <span>Offline</span>
+                      </button>
+                    ) : inCart ? (
                       <div className="flex items-center gap-2 rounded-xl bg-[#FAF8F3] border border-[#D66B43] px-2 py-1 shadow-xs">
                         <button
                           onClick={() => onUpdateQuantity(dish.id, -1)}
