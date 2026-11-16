@@ -38,25 +38,30 @@ export const PreviousOrdersSection: React.FC<PreviousOrdersSectionProps> = ({
   const recentOrders = orders.slice(0, 4);
 
   const getStatusBadge = (status: CustomerOrderRecord["status"]) => {
-    switch (status) {
+    const s = (status || "").toLowerCase();
+    switch (s) {
       case "pending":
+      case "new":
         return {
           label: "Received",
           className: "bg-amber-50 text-amber-700 border-amber-200",
           icon: Clock,
         };
       case "confirmed":
+      case "accepted":
         return {
           label: "Confirmed",
           className: "bg-blue-50 text-blue-700 border-blue-200",
           icon: CheckCircle2,
         };
       case "preparing":
+      case "in_kitchen":
         return {
           label: "In Kitchen",
           className: "bg-orange-50 text-[#D66B43] border-orange-200",
           icon: Sparkles,
         };
+      case "ready":
       case "out_for_delivery":
         return {
           label: "Ready for Pickup",
@@ -64,12 +69,16 @@ export const PreviousOrdersSection: React.FC<PreviousOrdersSectionProps> = ({
           icon: Package,
         };
       case "delivered":
+      case "completed":
+      case "picked_up":
+      case "handed_over":
         return {
-          label: "Completed",
+          label: "Delivered",
           className: "bg-emerald-50 text-emerald-700 border-emerald-200",
           icon: CheckCircle2,
         };
       case "cancelled":
+      case "rejected":
         return {
           label: "Cancelled",
           className: "bg-rose-50 text-rose-700 border-rose-200",

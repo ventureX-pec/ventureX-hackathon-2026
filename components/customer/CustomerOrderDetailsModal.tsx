@@ -30,8 +30,18 @@ export interface CustomerOrderRecord {
     instructions?: string;
   }[];
   totalAmount: number;
-  status: "pending" | "confirmed" | "preparing" | "out_for_delivery" | "delivered" | "cancelled";
-  orderType: "dine-in" | "takeaway";
+  status:
+    | "pending"
+    | "confirmed"
+    | "accepted"
+    | "preparing"
+    | "ready"
+    | "out_for_delivery"
+    | "delivered"
+    | "completed"
+    | "cancelled"
+    | string;
+  orderType: "dine-in" | "takeaway" | string;
   tableOrShelf: string;
   pickupSlot: string;
   createdAt: string;
@@ -55,24 +65,34 @@ export const CustomerOrderDetailsModal: React.FC<CustomerOrderDetailsModalProps>
   if (!isOpen || !order) return null;
 
   const getStatusBadge = (status: CustomerOrderRecord["status"]) => {
-    switch (status) {
+    const s = (status || "").toLowerCase();
+    switch (s) {
       case "pending":
+      case "new":
         return {
-          label: "Pending",
+          label: "Order Placed",
           className: "bg-amber-50 text-amber-700 border-amber-200",
           icon: Clock,
         };
       case "confirmed":
+      case "accepted":
         return {
-          label: "Confirmed",
+          label: "Order Accepted",
           className: "bg-blue-50 text-blue-700 border-blue-200",
           icon: CheckCircle2,
         };
       case "preparing":
+      case "in_kitchen":
         return {
           label: "Preparing in Kitchen",
           className: "bg-orange-50 text-[#D66B43] border-orange-200",
           icon: Sparkles,
+        };
+      case "ready":
+        return {
+          label: "Ready for Pickup",
+          className: "bg-emerald-50 text-emerald-700 border-emerald-200",
+          icon: Package,
         };
       case "out_for_delivery":
         return {
@@ -81,12 +101,16 @@ export const CustomerOrderDetailsModal: React.FC<CustomerOrderDetailsModalProps>
           icon: Package,
         };
       case "delivered":
+      case "completed":
+      case "picked_up":
+      case "handed_over":
         return {
           label: "Delivered",
           className: "bg-emerald-50 text-emerald-700 border-emerald-200",
           icon: CheckCircle2,
         };
       case "cancelled":
+      case "rejected":
         return {
           label: "Cancelled",
           className: "bg-rose-50 text-rose-700 border-rose-200",

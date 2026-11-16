@@ -324,6 +324,10 @@ export function saveStoredActiveOrder(order: any | null) {
   }
 }
 
+export function clearStoredActiveOrder() {
+  saveStoredActiveOrder(null);
+}
+
 export function getStoredCart(): any[] {
   if (typeof window === "undefined") return [];
   try {

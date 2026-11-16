@@ -33,38 +33,61 @@ export const CustomerOrdersView: React.FC<CustomerOrdersViewProps> = ({
 }) => {
   const [filter, setFilter] = useState<"all" | "active" | "delivered" | "cancelled">("all");
 
+  const isActive = (s: string) =>
+    ["new", "pending", "confirmed", "accepted", "preparing", "ready", "out_for_delivery", "in_kitchen"].includes(
+      (s || "").toLowerCase()
+    );
+
+  const isDelivered = (s: string) =>
+    ["delivered", "completed", "picked_up", "handed_over"].includes(
+      (s || "").toLowerCase()
+    );
+
+  const isCancelled = (s: string) =>
+    ["cancelled", "rejected"].includes((s || "").toLowerCase());
+
   const filteredOrders = orders.filter((order) => {
     if (filter === "active") {
-      return ["pending", "confirmed", "preparing", "out_for_delivery"].includes(order.status);
+      return isActive(order.status);
     }
     if (filter === "delivered") {
-      return order.status === "delivered";
+      return isDelivered(order.status);
     }
     if (filter === "cancelled") {
-      return order.status === "cancelled";
+      return isCancelled(order.status);
     }
     return true;
   });
 
   const getStatusBadge = (status: CustomerOrderRecord["status"]) => {
-    switch (status) {
+    const s = (status || "").toLowerCase();
+    switch (s) {
       case "pending":
+      case "new":
         return {
-          label: "Pending",
+          label: "Order Placed",
           className: "bg-amber-50 text-amber-700 border-amber-200",
           icon: Clock,
         };
       case "confirmed":
+      case "accepted":
         return {
-          label: "Confirmed",
+          label: "Order Accepted",
           className: "bg-blue-50 text-blue-700 border-blue-200",
           icon: CheckCircle2,
         };
       case "preparing":
+      case "in_kitchen":
         return {
           label: "Preparing in Kitchen",
           className: "bg-orange-50 text-[#D66B43] border-orange-200",
           icon: Sparkles,
+        };
+      case "ready":
+        return {
+          label: "Ready for Pickup",
+          className: "bg-emerald-50 text-emerald-700 border-emerald-200",
+          icon: Package,
         };
       case "out_for_delivery":
         return {
@@ -72,13 +95,17 @@ export const CustomerOrdersView: React.FC<CustomerOrdersViewProps> = ({
           className: "bg-purple-50 text-purple-700 border-purple-200",
           icon: Package,
         };
+      case "completed":
       case "delivered":
+      case "picked_up":
+      case "handed_over":
         return {
           label: "Delivered",
           className: "bg-emerald-50 text-emerald-700 border-emerald-200",
           icon: CheckCircle2,
         };
       case "cancelled":
+      case "rejected":
         return {
           label: "Cancelled",
           className: "bg-rose-50 text-rose-700 border-rose-200",
@@ -98,19 +125,17 @@ export const CustomerOrdersView: React.FC<CustomerOrdersViewProps> = ({
     {
       id: "active",
       label: "Active",
-      count: orders.filter((o) =>
-        ["pending", "confirmed", "preparing", "out_for_delivery"].includes(o.status)
-      ).length,
+      count: orders.filter((o) => isActive(o.status)).length,
     },
     {
       id: "delivered",
       label: "Delivered",
-      count: orders.filter((o) => o.status === "delivered").length,
+      count: orders.filter((o) => isDelivered(o.status)).length,
     },
     {
       id: "cancelled",
       label: "Cancelled",
-      count: orders.filter((o) => o.status === "cancelled").length,
+      count: orders.filter((o) => isCancelled(o.status)).length,
     },
   ];
 

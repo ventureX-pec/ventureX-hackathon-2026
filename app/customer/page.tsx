@@ -53,6 +53,7 @@ import {
   fetchLiveOrders,
   getStoredActiveOrder,
   saveStoredActiveOrder,
+  clearStoredActiveOrder,
   getStoredCart,
   saveStoredCart,
   getStoredStoreStatus,
@@ -253,7 +254,9 @@ export default function CustomerDashboardPage() {
             setCustomerOrders(parsed);
 
             const latestActive = parsed.find((o: CustomerOrderRecord) =>
-              ["pending", "confirmed", "preparing", "out_for_delivery"].includes(o.status)
+              ["new", "pending", "confirmed", "accepted", "preparing", "ready", "out_for_delivery"].includes(
+                (o.status || "").toLowerCase()
+              )
             );
             if (latestActive) {
               setActiveOrder({
@@ -325,11 +328,13 @@ export default function CustomerDashboardPage() {
                 ord.status === "completed"
                   ? "delivered"
                   : ord.status === "ready"
-                  ? "out_for_delivery"
+                  ? "ready"
                   : ord.status === "preparing" || ord.status === "accepted"
                   ? "preparing"
                   : ord.status === "cancelled"
                   ? "cancelled"
+                  : ord.status === "new"
+                  ? "new"
                   : "pending",
               orderType: ord.orderType || "takeaway",
               tableOrShelf: ord.tableOrShelf || "Counter 1",
@@ -359,12 +364,12 @@ export default function CustomerDashboardPage() {
       if (event.type === "DISHES_UPDATED" && Array.isArray(event.payload)) {
         setAllDishes(event.payload);
       } else if (event.type === "ORDERS_UPDATED" && Array.isArray(event.payload)) {
-        // When kitchen updates order status (e.g. from Preparing to Ready), update active order
+        // When kitchen updates order status (e.g. from Preparing to Ready to Completed), update active order
         const current = getStoredActiveOrder();
         if (current) {
           const match = event.payload.find(
             (o: AdminOrder) =>
-              o.id === current.id || o.tokenNumber === current.token
+              o.id === current.id || o.tokenNumber === current.token || o.id === current.orderNumber
           );
           if (match && match.status !== current.status) {
             const updated = {
@@ -378,8 +383,8 @@ export default function CustomerDashboardPage() {
         }
 
         // Also update customer history list in real time
-        setCustomerOrders((prev) =>
-          prev.map((ord) => {
+        setCustomerOrders((prev) => {
+          const updated = prev.map((ord) => {
             const match = event.payload.find(
               (o: AdminOrder) => o.id === ord.id || o.tokenNumber === ord.tokenNumber
             );
@@ -388,17 +393,28 @@ export default function CustomerDashboardPage() {
                 match.status === "completed"
                   ? "delivered"
                   : match.status === "ready"
-                  ? "out_for_delivery"
+                  ? "ready"
                   : match.status === "preparing" || match.status === "accepted"
                   ? "preparing"
                   : match.status === "cancelled"
                   ? "cancelled"
+                  : match.status === "new"
+                  ? "new"
                   : "pending";
               return { ...ord, status: mappedStatus };
             }
             return ord;
-          })
-        );
+          });
+
+          if (typeof window !== "undefined") {
+            try {
+              localStorage.setItem("serveza_customer_orders", JSON.stringify(updated));
+              const email = loggedInCustomer?.email || "alex.morgan@serveza.com";
+              localStorage.setItem(`serveza_orders_${email}`, JSON.stringify(updated));
+            } catch (e) {}
+          }
+          return updated;
+        });
       }
     });
 
@@ -454,11 +470,13 @@ export default function CustomerDashboardPage() {
               ord.status === "completed"
                 ? "delivered"
                 : ord.status === "ready"
-                ? "out_for_delivery"
+                ? "ready"
                 : ord.status === "preparing" || ord.status === "accepted"
                 ? "preparing"
                 : ord.status === "cancelled"
                 ? "cancelled"
+                : ord.status === "new"
+                ? "new"
                 : "pending",
             orderType: ord.orderType || "takeaway",
             tableOrShelf: ord.tableOrShelf || "Counter 1",
@@ -758,7 +776,7 @@ export default function CustomerDashboardPage() {
         instructions: i.instructions,
       })),
       totalAmount: orderTotal,
-      status: "preparing",
+      status: "new",
       orderType: details.orderType,
       tableOrShelf: details.tableOrShelf,
       pickupSlot: details.pickupSlot,
@@ -964,6 +982,10 @@ export default function CustomerDashboardPage() {
                   tableOrShelf={activeOrder.tableOrShelf}
                   status={activeOrder.status}
                   onOpenModal={() => setIsSuccessModalOpen(true)}
+                  onDismiss={() => {
+                    setActiveOrder(null);
+                    clearStoredActiveOrder();
+                  }}
                 />
               )}
 

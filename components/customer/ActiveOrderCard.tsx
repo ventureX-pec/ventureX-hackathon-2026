@@ -12,6 +12,7 @@ interface ActiveOrderCardProps {
   status?: string;
   prepTimeEstimate?: string;
   onOpenModal: () => void;
+  onDismiss?: () => void;
 }
 
 export const ActiveOrderCard: React.FC<ActiveOrderCardProps> = ({
@@ -22,6 +23,7 @@ export const ActiveOrderCard: React.FC<ActiveOrderCardProps> = ({
   status = "new",
   prepTimeEstimate,
   onOpenModal,
+  onDismiss,
 }) => {
   // Normalize status
   const normalizedStatus = status.toLowerCase();
@@ -109,13 +111,24 @@ export const ActiveOrderCard: React.FC<ActiveOrderCardProps> = ({
           </div>
         </div>
 
-        <button
-          onClick={onOpenModal}
-          className="px-4 py-2 rounded-xl bg-[#D66B43] text-white text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[#BF5832] transition-colors shadow-soft"
-        >
-          <QrCode className="w-3.5 h-3.5" />
-          <span>View QR Pickup Pass</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {onDismiss && (
+            <button
+              onClick={onDismiss}
+              className="px-3 py-2 rounded-xl bg-[#FAF8F3] hover:bg-[#ECE7DE] text-[#6E6D66] hover:text-[#252522] border border-[#ECE7DE] text-xs font-semibold flex items-center justify-center transition-colors cursor-pointer"
+              title="Dismiss active card"
+            >
+              <span>{isCompleted ? "Dismiss" : "Hide"}</span>
+            </button>
+          )}
+          <button
+            onClick={onOpenModal}
+            className="px-4 py-2 rounded-xl bg-[#D66B43] text-white text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[#BF5832] transition-colors shadow-soft cursor-pointer"
+          >
+            <QrCode className="w-3.5 h-3.5" />
+            <span>View QR Pickup Pass</span>
+          </button>
+        </div>
       </div>
 
       {/* Progress Line */}
