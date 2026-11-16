@@ -50,6 +50,7 @@ import {
 import { AdminOrder } from "@/data/mockAdminData";
 import {
   createLiveOrder,
+  fetchLiveOrders,
   getStoredActiveOrder,
   saveStoredActiveOrder,
   getStoredCart,
@@ -392,7 +393,15 @@ export default function CustomerDashboardPage() {
       }
     });
 
-    return () => unsubscribe();
+    // Periodic background sync every 3s to reflect kitchen order progress
+    const pollOrdersInterval = setInterval(() => {
+      fetchLiveOrders().catch(() => {});
+    }, 3000);
+
+    return () => {
+      clearInterval(pollOrdersInterval);
+      unsubscribe();
+    };
   }, []);
 
   // Synchronize orders whenever authenticated customer profile switches
@@ -758,7 +767,21 @@ export default function CustomerDashboardPage() {
       console.warn("Could not save customer order", e);
     }
 
-    // 2. Create Active Order State for live tracking card
+    // 2. Capture immutable cart items before clearing
+    const orderItems = cart.map((c) => ({
+      dishName: c.dish.name,
+      quantity: c.quantity,
+      price: c.dish.price,
+      notes: details.notes || c.instructions || "",
+    }));
+
+    const extractedTableNum =
+      details.orderType === "dine-in"
+        ? details.tableOrShelf.match(/Table\s*#?([A-Za-z0-9_-]+)/i)?.[1] ||
+          details.tableOrShelf
+        : undefined;
+
+    // Create Active Order State for live tracking card
     const activeOrderData = {
       id: orderId,
       orderNumber,
@@ -769,7 +792,7 @@ export default function CustomerDashboardPage() {
       orderType: details.orderType,
       tableOrShelf: details.tableOrShelf,
       pickupSlot: details.pickupSlot,
-      status: "preparing",
+      status: "new",
     };
 
     setActiveOrder(activeOrderData);
@@ -781,7 +804,7 @@ export default function CustomerDashboardPage() {
     setIsCartOpen(false);
     setIsSuccessModalOpen(true);
 
-    // 4. Persist to Supabase PostgreSQL Database (Instantly syncs with Admin Kitchen KDS)
+    // 4. Persist to Supabase Database + Serverless Memory Cache (Instantly syncs with Admin KDS)
     const adminOrderPayload: AdminOrder = {
       id: orderId,
       orderNumber,
@@ -793,12 +816,8 @@ export default function CustomerDashboardPage() {
       restaurantName: primaryRestaurant,
       orderType: details.orderType,
       tableOrShelf: details.tableOrShelf,
-      items: cart.map((c) => ({
-        dishName: c.dish.name,
-        quantity: c.quantity,
-        price: c.dish.price,
-        notes: details.notes || c.instructions,
-      })),
+      tableNumber: extractedTableNum,
+      items: orderItems,
       totalAmount: orderTotal,
       status: "new",
       prepTimeEstimate: "~ 12 min",
@@ -932,6 +951,7 @@ export default function CustomerDashboardPage() {
                   itemsCount={activeOrder.items.reduce((s, i) => s + i.quantity, 0)}
                   pickupSlot={activeOrder.pickupSlot}
                   tableOrShelf={activeOrder.tableOrShelf}
+                  status={activeOrder.status}
                   onOpenModal={() => setIsSuccessModalOpen(true)}
                 />
               )}
@@ -1234,6 +1254,7 @@ export default function CustomerDashboardPage() {
           orderType={activeOrder.orderType}
           tableOrShelf={activeOrder.tableOrShelf}
           pickupSlot={activeOrder.pickupSlot}
+          status={activeOrder.status}
         />
       )}
 

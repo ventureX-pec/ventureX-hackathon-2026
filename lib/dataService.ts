@@ -19,8 +19,15 @@ if (typeof window !== "undefined" && "BroadcastChannel" in window) {
 }
 
 function broadcastEvent(type: string, payload?: any) {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent("serveza:sync", { detail: { type, payload, timestamp: Date.now() } })
+    );
+  }
   if (broadcastChannel) {
-    broadcastChannel.postMessage({ type, payload, timestamp: Date.now() });
+    try {
+      broadcastChannel.postMessage({ type, payload, timestamp: Date.now() });
+    } catch (e) {}
   }
 }
 
@@ -42,12 +49,21 @@ export function subscribeToDataChanges(callback: (event: { type: string; payload
     }
   };
 
+  const handleCustomSync = (e: Event) => {
+    const customEvt = e as CustomEvent;
+    if (customEvt.detail && customEvt.detail.type) {
+      callback(customEvt.detail);
+    }
+  };
+
   broadcastChannel?.addEventListener("message", handleBroadcast);
   window.addEventListener("storage", handleStorage);
+  window.addEventListener("serveza:sync", handleCustomSync);
 
   return () => {
     broadcastChannel?.removeEventListener("message", handleBroadcast);
     window.removeEventListener("storage", handleStorage);
+    window.removeEventListener("serveza:sync", handleCustomSync);
   };
 }
 
@@ -77,7 +93,7 @@ export function saveStoredOrders(orders: AdminOrder[]) {
 }
 
 /**
- * Fetches live orders from Supabase (/api/orders) and syncs local storage
+ * Fetches live orders from backend (/api/orders) and merges safely with local storage
  */
 export async function fetchLiveOrders(): Promise<AdminOrder[]> {
   try {
@@ -85,8 +101,21 @@ export async function fetchLiveOrders(): Promise<AdminOrder[]> {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (data.success && Array.isArray(data.orders)) {
-      saveStoredOrders(data.orders);
-      return data.orders;
+      const local = getStoredOrders();
+      const map = new Map<string, AdminOrder>();
+
+      // Preserve any locally staged orders
+      local.forEach((o) => map.set(o.id, o));
+      // Overlay server authoritative orders
+      data.orders.forEach((o: AdminOrder) => map.set(o.id, o));
+
+      const merged = Array.from(map.values());
+      // Save merged list
+      try {
+        localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(merged));
+        broadcastEvent("ORDERS_UPDATED", merged);
+      } catch (e) {}
+      return merged;
     }
   } catch (err) {
     console.warn("[DataService] Fallback to cached orders:", err);

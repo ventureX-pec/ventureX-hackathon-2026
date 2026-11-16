@@ -25,6 +25,7 @@ interface CheckoutSuccessModalProps {
   orderType: "dine-in" | "takeaway";
   tableOrShelf: string;
   pickupSlot: string;
+  status?: string;
 }
 
 export const CheckoutSuccessModal: React.FC<CheckoutSuccessModalProps> = ({
@@ -36,11 +37,23 @@ export const CheckoutSuccessModal: React.FC<CheckoutSuccessModalProps> = ({
   orderType,
   tableOrShelf,
   pickupSlot,
+  status = "new",
 }) => {
-  const [prepProgress, setPrepProgress] = useState(35); // 35% in kitchen
-  const [activeStep, setActiveStep] = useState(2); // 1 = Received, 2 = Cooking, 3 = Ready
   const [countdownMinutes, setCountdownMinutes] = useState(7);
   const [countdownSeconds, setCountdownSeconds] = useState(30);
+
+  const normStatus = (status || "").toLowerCase();
+  const isCompleted = normStatus === "completed" || normStatus === "delivered";
+  const isReady = normStatus === "ready" || normStatus === "out_for_delivery" || isCompleted;
+  const isPreparing = normStatus === "preparing" || isReady;
+
+  const statusLabel = isCompleted
+    ? "Order Completed • Bon Appétit!"
+    : isReady
+    ? "Order Ready for Pickup!"
+    : isPreparing
+    ? "Kitchen Slicing & Cooking"
+    : "Order Placed & Sent to Kitchen";
 
   useEffect(() => {
     if (isOpen) {
@@ -145,35 +158,49 @@ export const CheckoutSuccessModal: React.FC<CheckoutSuccessModalProps> = ({
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-[#252522] flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-[#D66B43]" />
-                  Estimated Time: {countdownMinutes}:
-                  {countdownSeconds < 10 ? `0${countdownSeconds}` : countdownSeconds} min
+                  Estimated Time: {isCompleted ? "0:00" : `${countdownMinutes}:${countdownSeconds < 10 ? `0${countdownSeconds}` : countdownSeconds}`} min
                 </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#5F7A65]/10 text-[#5F7A65]">
-                  Kitchen Slicing & Cooking
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                  isCompleted ? "bg-[#5F7A65]/10 text-[#5F7A65]" : isReady ? "bg-[#25855A]/10 text-[#25855A]" : "bg-[#D66B43]/10 text-[#D66B43]"
+                }`}>
+                  {statusLabel}
                 </span>
               </div>
 
               {/* Step dots */}
-              <div className="grid grid-cols-3 gap-2 text-center pt-2">
+              <div className="grid grid-cols-4 gap-2 text-center pt-2">
                 <div className="flex flex-col items-center">
                   <div className="w-6 h-6 rounded-full bg-[#5F7A65] text-[#FAF8F3] text-xs flex items-center justify-center font-bold mb-1">
                     ✓
                   </div>
-                  <span className="text-[11px] font-semibold text-[#252522]">Received</span>
+                  <span className="text-[10px] font-semibold text-[#252522]">Received</span>
                 </div>
 
                 <div className="flex flex-col items-center">
-                  <div className="w-6 h-6 rounded-full bg-[#D66B43] text-[#FAF8F3] text-xs flex items-center justify-center font-bold mb-1 animate-pulse">
-                    2
+                  <div className={`w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold mb-1 ${
+                    isPreparing ? "bg-[#5F7A65] text-[#FAF8F3]" : "bg-[#ECE7DE] text-[#6E6D66]"
+                  }`}>
+                    {isPreparing ? "✓" : "2"}
                   </div>
-                  <span className="text-[11px] font-semibold text-[#D66B43]">Preparing</span>
+                  <span className={`text-[10px] ${isPreparing ? "font-semibold text-[#252522]" : "text-[#6E6D66]"}`}>Cooking</span>
                 </div>
 
                 <div className="flex flex-col items-center">
-                  <div className="w-6 h-6 rounded-full bg-[#ECE7DE] text-[#6E6D66] text-xs flex items-center justify-center font-bold mb-1">
-                    3
+                  <div className={`w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold mb-1 ${
+                    isReady ? "bg-[#5F7A65] text-[#FAF8F3]" : normStatus === "preparing" ? "bg-[#D66B43] text-white animate-pulse" : "bg-[#ECE7DE] text-[#6E6D66]"
+                  }`}>
+                    {isReady ? "✓" : "3"}
                   </div>
-                  <span className="text-[11px] font-medium text-[#6E6D66]">Ready</span>
+                  <span className={`text-[10px] ${isReady ? "font-semibold text-[#252522]" : "text-[#6E6D66]"}`}>Ready</span>
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <div className={`w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold mb-1 ${
+                    isCompleted ? "bg-[#5F7A65] text-[#FAF8F3]" : "bg-[#ECE7DE] text-[#6E6D66]"
+                  }`}>
+                    {isCompleted ? "✓" : "4"}
+                  </div>
+                  <span className={`text-[10px] ${isCompleted ? "font-semibold text-[#252522]" : "text-[#6E6D66]"}`}>Picked Up</span>
                 </div>
               </div>
             </div>

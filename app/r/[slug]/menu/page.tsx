@@ -209,6 +209,13 @@ function TableMenuContent() {
     setActiveOrder(orderData);
     saveStoredActiveOrder(orderData);
 
+    const orderItems = cart.map((c) => ({
+      dishName: c.dish.name,
+      quantity: c.quantity,
+      price: c.dish.price,
+      notes: details.notes || c.instructions || "",
+    }));
+
     setCart([]);
     saveStoredCart([]);
     setIsCartOpen(false);
@@ -226,12 +233,7 @@ function TableMenuContent() {
       tableNumber: tableNumber,
       restaurantId: restaurant?.id || slug,
       restaurantName: restaurant?.name || "Burger House",
-      items: cart.map((c) => ({
-        dishName: c.dish.name,
-        quantity: c.quantity,
-        price: c.dish.price,
-        notes: details.notes || c.instructions,
-      })),
+      items: orderItems,
       totalAmount: orderTotal,
       status: "new",
       prepTimeEstimate: "~ 12 min",

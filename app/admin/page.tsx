@@ -78,14 +78,23 @@ export default function AdminDashboardPage() {
     setIngredients(getStoredIngredients());
     setStaffList(getStoredStaff());
 
-    // 2. Fetch live database orders from Supabase
+    // 2. Fetch live database orders immediately
     fetchLiveOrders().then((liveOrders) => {
       if (liveOrders && liveOrders.length > 0) {
         setOrders(liveOrders);
       }
     });
 
-    // 3. Listen to cross-tab updates (e.g. customer places an order on /customer)
+    // 3. Periodic polling every 2.5s for seamless multi-device / multi-tab live sync
+    const pollInterval = setInterval(() => {
+      fetchLiveOrders().then((liveOrders) => {
+        if (liveOrders && liveOrders.length > 0) {
+          setOrders(liveOrders);
+        }
+      });
+    }, 2500);
+
+    // 4. Listen to instant reactive cross-tab and window sync events
     const unsubscribe = subscribeToDataChanges((event) => {
       if (event.type === "ORDERS_UPDATED" && Array.isArray(event.payload)) {
         setOrders(event.payload);
@@ -98,7 +107,10 @@ export default function AdminDashboardPage() {
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      clearInterval(pollInterval);
+      unsubscribe();
+    };
   }, []);
 
   // Modals Open State
