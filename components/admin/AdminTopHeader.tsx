@@ -42,7 +42,7 @@ export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
   adminName,
   adminEmail,
 }) => {
-  const [selectedLocation, setSelectedLocation] = useState("Main Food Court, Block A");
+  const [selectedLocation, setSelectedLocation] = useState("Block A • Food Court (Burger House)");
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isStoreLive, setIsStoreLive] = useState(true);
@@ -77,8 +77,8 @@ export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
     setStoredStoreStatus(nextStatus);
     setToastMessage(
       nextStatus
-        ? "Kitchen is now LIVE • Accepting student orders"
-        : "Kitchen PAUSED • New customer checkouts paused"
+        ? "Burger House Kitchen LIVE • Accepting student orders"
+        : "Burger House Kitchen PAUSED • New customer checkouts paused"
     );
     setTimeout(() => setToastMessage(null), 3500);
   };
@@ -111,10 +111,10 @@ export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
   const initials = getInitials(displayName);
 
   const locations = [
-    "Main Food Court, Block A",
-    "Academic Block B • Kiosk Stall",
-    "Library Courtyard • Café Stall",
-    "Sports Complex • Stall 04",
+    "Block A • Food Court (Burger House)",
+    "Main Commons • Stall 03 (Pizza Palace)",
+    "Courtyard Wing • Block A (The Corner Café)",
+    "East Wing Courtyard (Sushi World)",
   ];
 
   return (
@@ -241,11 +241,11 @@ export const AdminTopHeader: React.FC<AdminTopHeaderProps> = ({
 
             {/* Customer Portal Link Pill */}
             <Link
-              href="/customer"
+              href="/customer?restaurant=burger-house"
               className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#D66B43]/10 border border-[#D66B43]/20 text-[#D66B43] text-xs font-semibold hover:bg-[#D66B43]/15 transition-colors"
-              title="View Customer Facing Storefront"
+              title="Open Burger House in Customer Store"
             >
-              <span>Customer Store</span>
+              <span>Burger House Store</span>
               <ExternalLink className="w-3 h-3" />
             </Link>
 

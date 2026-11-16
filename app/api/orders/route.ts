@@ -23,8 +23,8 @@ function toDbRow(order: AdminOrder) {
     status: dbStatus,
     pickup_type: order.orderType || "takeaway",
     pickup_slot: order.tableOrShelf || "Counter 1",
-    restaurant_id: order.restaurantId || "the-corner-table",
-    table_id: order.tableId || (extractedTableNum ? `tbl_${order.restaurantId || "corner"}_${extractedTableNum}` : null),
+    restaurant_id: order.restaurantId || "burger-house",
+    table_id: order.tableId || (extractedTableNum ? `tbl_${order.restaurantId || "burger"}_${extractedTableNum}` : null),
     table_number: extractedTableNum || null,
     items: {
       orderNumber: order.orderNumber,
@@ -36,8 +36,8 @@ function toDbRow(order: AdminOrder) {
       timeAgo: order.timeAgo || "Just now",
       image: order.image,
       dishList: order.items,
-      restaurantId: order.restaurantId || "the-corner-table",
-      restaurantName: order.restaurantName || "The Corner Table",
+      restaurantId: order.restaurantId || "burger-house",
+      restaurantName: order.restaurantName || "Burger House",
       tableNumber: extractedTableNum,
       tableId: order.tableId,
       createdAt: order.createdAt,
@@ -64,7 +64,7 @@ function fromDbRow(row: any): AdminOrder {
       ? "Burger House"
       : row.restaurant_id === "pizza-palace"
       ? "Pizza Palace"
-      : "The Corner Table");
+      : "Burger House");
 
   return {
     id: row.id,
@@ -102,7 +102,7 @@ function fromDbRow(row: any): AdminOrder {
     image:
       (isWrapped && meta.image) ||
       "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80",
-    restaurantId: meta.restaurantId || row.restaurant_id || "the-corner-table",
+    restaurantId: meta.restaurantId || row.restaurant_id || "burger-house",
     restaurantName,
     tableNumber,
     tableId: meta.tableId || row.table_id,
@@ -254,8 +254,8 @@ export async function POST(req: Request) {
       items: verifiedItems,
       totalAmount: verifiedTotal,
       tableNumber: verifiedTableNumber,
-      restaurantId: body.restaurantId || "the-corner-table",
-      restaurantName: body.restaurantName || "The Corner Table",
+      restaurantId: body.restaurantId || "burger-house",
+      restaurantName: body.restaurantName || "Burger House",
     };
 
     const supabase = getSupabaseAdmin();

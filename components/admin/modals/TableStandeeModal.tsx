@@ -20,7 +20,7 @@ export const TableStandeeModal: React.FC<TableStandeeModalProps> = ({
   onClose,
   table,
   restaurantName,
-  restaurantSlug = "corner-cafe",
+  restaurantSlug = "burger-house",
 }) => {
   const standeeRef = useRef<HTMLDivElement>(null);
 

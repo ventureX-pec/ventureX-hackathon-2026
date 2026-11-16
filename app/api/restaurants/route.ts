@@ -13,13 +13,6 @@ export interface RestaurantInfo {
 // 6 Real Campus Partner Restaurants matching the storefront catalog
 export const BASELINE_RESTAURANTS: RestaurantInfo[] = [
   {
-    id: "corner-cafe",
-    name: "The Corner Café",
-    slug: "corner-cafe",
-    address: "Courtyard Wing • Block A",
-    phone: "+91 98765 43210",
-  },
-  {
     id: "burger-house",
     name: "Burger House",
     slug: "burger-house",
@@ -32,6 +25,13 @@ export const BASELINE_RESTAURANTS: RestaurantInfo[] = [
     slug: "pizza-palace",
     address: "Main Commons • Stall 03",
     phone: "+91 98222 33445",
+  },
+  {
+    id: "corner-cafe",
+    name: "The Corner Café",
+    slug: "corner-cafe",
+    address: "Courtyard Wing • Block A",
+    phone: "+91 98765 43210",
   },
   {
     id: "sushi-world",

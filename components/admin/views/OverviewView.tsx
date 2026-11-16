@@ -51,7 +51,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         {/* Eyebrow Pill */}
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D66B43]/10 border border-[#D66B43]/20 text-[#D66B43] text-xs font-semibold">
           <Flame className="w-3.5 h-3.5 fill-[#D66B43]" />
-          <span>Kitchen Operations</span>
+          <span>Burger House • Kitchen Operations</span>
         </div>
 
         {/* Editorial Heading */}
@@ -63,7 +63,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         </h1>
 
         <p className="text-xs sm:text-sm text-[#736E65] font-normal">
-          Here&apos;s what&apos;s happening at your kitchen today.
+          Live kitchen dashboard for <span className="font-semibold text-[#252522]">Burger House (Block A • Food Court)</span>.
         </p>
       </div>
 

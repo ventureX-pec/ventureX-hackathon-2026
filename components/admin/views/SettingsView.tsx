@@ -16,17 +16,17 @@ import {
 export const SettingsView: React.FC = () => {
   const [saved, setSaved] = useState(false);
   const [formData, setFormData] = useState({
-    name: "The Corner Café & Kitchen",
-    tagline: "Your Daily Fuel & Comfort Food • Zero Queues, Pure Flavor",
-    address: "Main Food Court, Block A • Central Campus Commons",
-    phone: "+91 98765 43210",
-    upiId: "serveza@campusbank",
-    openingHours: "8:30 AM - 10:30 PM",
+    name: "Burger House",
+    tagline: "Double-smashed artisanal patties & brioche buns • Fast Express Pickup",
+    address: "Block A • Food Court, Central Campus Commons",
+    phone: "+91 98111 22334",
+    upiId: "burgerhouse@campusbank",
+    openingHours: "10:30 AM - 11:30 PM",
     dineInEnabled: true,
     takeawayEnabled: true,
-    avgPrepTime: 10,
-    shelfCount: 18,
-    tablesCount: 14,
+    avgPrepTime: 12,
+    shelfCount: 16,
+    tablesCount: 12,
   });
 
   const handleSave = (e: React.FormEvent) => {

@@ -35,8 +35,8 @@ export const AddDishModal: React.FC<AddDishModalProps> = ({
     const newDish: MenuItem = {
       id: `dish-custom-${Date.now()}`,
       name: name.trim(),
-      restaurantId: "corner-cafe",
-      restaurantName: "The Corner Café",
+      restaurantId: "burger-house",
+      restaurantName: "Burger House",
       category,
       price: Number(price) || 150,
       description: description.trim() || "Freshly prepared campus specialty.",

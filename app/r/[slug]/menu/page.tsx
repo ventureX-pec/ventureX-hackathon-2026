@@ -27,7 +27,7 @@ import { createLiveOrder, saveStoredActiveOrder, saveStoredCart, getStoredCart }
 function TableMenuContent() {
   const params = useParams();
   const rawSlug = (params?.slug as string) || "";
-  const slug = rawSlug?.toLowerCase().trim() || "the-corner-table";
+  const slug = rawSlug?.toLowerCase().trim() || "burger-house";
 
   const searchParams = useSearchParams();
   const tableParam = searchParams.get("table"); // e.g. "T01"
@@ -225,7 +225,7 @@ function TableMenuContent() {
       tableOrShelf: verifiedTable,
       tableNumber: tableNumber,
       restaurantId: restaurant?.id || slug,
-      restaurantName: restaurant?.name || "The Corner Table",
+      restaurantName: restaurant?.name || "Burger House",
       items: cart.map((c) => ({
         dishName: c.dish.name,
         quantity: c.quantity,

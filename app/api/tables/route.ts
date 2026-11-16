@@ -98,6 +98,22 @@ export const INITIAL_TABLES: Record<string, RestaurantTable[]> = {
       seating_area: "Family Booth",
       status: "available",
     },
+    {
+      id: "tbl_burger_T05",
+      restaurant_id: "burger-house",
+      table_number: "T05",
+      capacity: 2,
+      seating_area: "Express Counter",
+      status: "available",
+    },
+    {
+      id: "tbl_burger_T06",
+      restaurant_id: "burger-house",
+      table_number: "T06",
+      capacity: 8,
+      seating_area: "Private Diner Booth",
+      status: "available",
+    },
   ],
   "pizza-palace": [
     {
@@ -236,16 +252,16 @@ const RESTAURANT_ID_MAP: Record<string, string> = {
   "sushi-bay": "sushi-world",
 };
 
-// GET /api/tables?restaurantId=corner-cafe
+// GET /api/tables?restaurantId=burger-house
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const rawRestId = searchParams.get("restaurantId") || "corner-cafe";
+    const rawRestId = searchParams.get("restaurantId") || "burger-house";
     const restaurantId = RESTAURANT_ID_MAP[rawRestId] || rawRestId;
 
     const supabase = getSupabaseAdmin();
     if (!supabase) {
-      const fallback = (INITIAL_TABLES[restaurantId] || INITIAL_TABLES["corner-cafe"]).map(
+      const fallback = (INITIAL_TABLES[restaurantId] || INITIAL_TABLES["burger-house"]).map(
         (tbl) => ({
           ...tbl,
           qr_code_url: generateTableMenuUrl(tbl.restaurant_id, tbl.table_number),
@@ -262,7 +278,7 @@ export async function GET(req: Request) {
 
     if (error || !data || data.length === 0) {
       // Auto-seed baseline tables into Supabase if empty
-      const baseline = (INITIAL_TABLES[restaurantId] || INITIAL_TABLES["corner-cafe"]).map(
+      const baseline = (INITIAL_TABLES[restaurantId] || INITIAL_TABLES["burger-house"]).map(
         (tbl) => ({
           ...tbl,
           qr_code_url: generateTableMenuUrl(tbl.restaurant_id, tbl.table_number),

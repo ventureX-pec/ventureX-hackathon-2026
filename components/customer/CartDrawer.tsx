@@ -57,7 +57,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     defaultOrderType || (defaultTable ? "dine-in" : "takeaway")
   );
   const [tableOrShelf, setTableOrShelf] = useState(
-    defaultTable ? `Table ${defaultTable}` : "Shelf B • Express"
+    defaultTable ? `Table ${defaultTable}` : "Table #T01"
   );
   const [pickupSlot, setPickupSlot] = useState(
     defaultTable ? "⚡ Table-Side Service (~10 min)" : "⚡ Instant (Ready in ~8-10 min)"
@@ -175,7 +175,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <button
                     onClick={() => {
                       setOrderType("takeaway");
-                      setTableOrShelf("Shelf B • Express Shelf");
+                      setTableOrShelf("Shelf A • Express Shelf");
                     }}
                     className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
                       orderType === "takeaway"
@@ -189,7 +189,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <button
                     onClick={() => {
                       setOrderType("dine-in");
-                      setTableOrShelf("Table #12");
+                      setTableOrShelf("Table #T01");
                     }}
                     className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
                       orderType === "dine-in"
@@ -215,7 +215,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     type="text"
                     value={tableOrShelf}
                     onChange={(e) => setTableOrShelf(e.target.value)}
-                    placeholder={orderType === "dine-in" ? "e.g. Table #14" : "Shelf A, B, or C"}
+                    placeholder={orderType === "dine-in" ? "e.g. Table #T01, T02..." : "Shelf A, B, or C"}
                     className="w-full px-3 py-2 rounded-xl bg-[#FAF8F3] border border-[#ECE7DE] text-xs font-medium text-[#252522] focus:outline-none focus:border-[#D66B43]"
                   />
                 </div>

@@ -137,10 +137,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             />
             <div>
               <span className="font-serif text-lg font-bold tracking-tight text-[#252522] block leading-none">
-                Serve<span className="text-[#D66B43]">Za</span>
+                Burger<span className="text-[#D66B43]"> House</span>
               </span>
               <span className="text-[10px] font-semibold tracking-wider text-[#8C877D] uppercase">
-                Admin Workspace
+                Kitchen Admin • Block A
               </span>
             </div>
           </Link>

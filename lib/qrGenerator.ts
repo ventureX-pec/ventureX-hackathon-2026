@@ -36,7 +36,7 @@ export function getAppBaseUrl(): string {
  */
 export function generateTableMenuUrl(restaurantSlug?: string, tableNumber?: string): string {
   const baseUrl = getAppBaseUrl();
-  const rawSlug = (restaurantSlug || "corner-cafe").toLowerCase().trim();
+  const rawSlug = (restaurantSlug || "burger-house").toLowerCase().trim();
   const cleanSlug = encodeURIComponent(rawSlug);
   const cleanTable = encodeURIComponent((tableNumber ? String(tableNumber) : "T01").toUpperCase().trim());
   return `${baseUrl}/r/${cleanSlug}/menu?table=${cleanTable}`;

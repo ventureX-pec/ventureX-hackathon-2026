@@ -223,6 +223,15 @@ export default function CustomerDashboardPage() {
         } catch (e) {}
       }
 
+      // Check URL parameters for direct restaurant navigation (e.g. /customer?restaurant=burger-house)
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const restParam = urlParams.get("restaurant") || urlParams.get("r");
+        if (restParam) {
+          setSelectedRestaurantId(restParam);
+        }
+      }
+
       // Load persistent cart
       const storedCart = getStoredCart();
       if (storedCart && storedCart.length > 0) {
@@ -298,7 +307,7 @@ export default function CustomerDashboardPage() {
                   ? "Burger House"
                   : ord.restaurantId === "pizza-palace"
                   ? "Pizza Palace"
-                  : "The Corner Table"),
+                  : "Burger House"),
               items: ord.items.map((i) => ({
                 dishName: i.dishName,
                 quantity: i.quantity,
@@ -357,6 +366,29 @@ export default function CustomerDashboardPage() {
             saveStoredActiveOrder(updated);
           }
         }
+
+        // Also update customer history list in real time
+        setCustomerOrders((prev) =>
+          prev.map((ord) => {
+            const match = event.payload.find(
+              (o: AdminOrder) => o.id === ord.id || o.tokenNumber === ord.tokenNumber
+            );
+            if (match) {
+              const mappedStatus =
+                match.status === "completed"
+                  ? "delivered"
+                  : match.status === "ready"
+                  ? "out_for_delivery"
+                  : match.status === "preparing" || match.status === "accepted"
+                  ? "preparing"
+                  : match.status === "cancelled"
+                  ? "cancelled"
+                  : "pending";
+              return { ...ord, status: mappedStatus };
+            }
+            return ord;
+          })
+        );
       }
     });
 
@@ -391,7 +423,7 @@ export default function CustomerDashboardPage() {
                 ? "Burger House"
                 : ord.restaurantId === "pizza-palace"
                 ? "Pizza Palace"
-                : "The Corner Table"),
+                : "Burger House"),
             items: ord.items.map((i) => ({
               dishName: i.dishName,
               quantity: i.quantity,
@@ -685,12 +717,12 @@ export default function CustomerDashboardPage() {
       cart[0]?.dish.restaurantName ||
       (selectedRestaurantId
         ? RESTAURANTS.find((r) => r.id === selectedRestaurantId)?.name
-        : "The Corner Table") ||
-      "The Corner Table";
+        : "Burger House") ||
+      "Burger House";
     const primaryRestaurantId =
       cart[0]?.dish.restaurantId ||
       selectedRestaurantId ||
-      "the-corner-table";
+      "burger-house";
 
     // 1. Create Customer History Record (for "My Orders" tab)
     const newCustomerOrder: CustomerOrderRecord = {

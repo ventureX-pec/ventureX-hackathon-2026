@@ -127,7 +127,7 @@ export const PreviousOrdersSection: React.FC<PreviousOrdersSectionProps> = ({
             {customerName ? `No previous orders yet for ${customerName}` : "No previous orders found"}
           </h3>
           <p className="text-xs text-[#6E6D66] max-w-md mx-auto mb-4 leading-relaxed">
-            Whenever you order from <span className="font-semibold text-[#252522]">The Corner Table</span>, <span className="font-semibold text-[#252522]">The Corner Cafe</span>, or other partner restaurants, your full receipt & dish history will be stored in the database for your profile here.
+            Whenever you order from <span className="font-semibold text-[#252522]">Burger House</span>, <span className="font-semibold text-[#252522]">Pizza Palace</span>, or other partner restaurants, your full receipt & dish history will be stored in the database for your profile here.
           </p>
           <button
             onClick={onViewAllClick}

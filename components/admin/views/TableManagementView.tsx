@@ -30,13 +30,6 @@ import { EditTableModal } from "@/components/admin/modals/EditTableModal";
 
 const DEFAULT_RESTAURANTS: RestaurantInfo[] = [
   {
-    id: "corner-cafe",
-    name: "The Corner Café",
-    slug: "corner-cafe",
-    address: "Courtyard Wing • Block A",
-    phone: "+91 98765 43210",
-  },
-  {
     id: "burger-house",
     name: "Burger House",
     slug: "burger-house",
@@ -49,6 +42,13 @@ const DEFAULT_RESTAURANTS: RestaurantInfo[] = [
     slug: "pizza-palace",
     address: "Main Commons • Stall 03",
     phone: "+91 98222 33445",
+  },
+  {
+    id: "corner-cafe",
+    name: "The Corner Café",
+    slug: "corner-cafe",
+    address: "Courtyard Wing • Block A",
+    phone: "+91 98765 43210",
   },
   {
     id: "sushi-world",
@@ -75,7 +75,7 @@ const DEFAULT_RESTAURANTS: RestaurantInfo[] = [
 
 export const TableManagementView: React.FC = () => {
   const [restaurants, setRestaurants] = useState<RestaurantInfo[]>(DEFAULT_RESTAURANTS);
-  const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>("corner-cafe");
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>("burger-house");
   const [tables, setTables] = useState<RestaurantTable[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
