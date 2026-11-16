@@ -461,7 +461,7 @@ export function DishOrbitCarousel({
           </p>
           <div className="dsh-hero-ctas">
             <Link
-              href="/customer"
+              href="/login"
               className="dsh-hero-btn-primary"
             >
               <svg className="dsh-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

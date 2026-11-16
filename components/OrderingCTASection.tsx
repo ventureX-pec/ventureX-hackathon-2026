@@ -40,7 +40,7 @@ export default function OrderingCTASection({ onOpenReservation }: OrderingCTASec
             {/* Action Button */}
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Link
-                href="/customer"
+                href="/login"
                 className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-[#c96342] hover:bg-[#a84d31] text-white font-medium text-sm transition-all shadow-lg shadow-[#c96342]/25 hover:shadow-xl active:scale-95 cursor-pointer"
               >
                 <span>Get Started</span>

@@ -129,7 +129,7 @@ export default function Footer({ onOpenReservation, onOpenPolicy }: FooterProps)
                 </a>
               </li>
               <li>
-                <Link href="/customer" className="hover:text-[#c96342] transition-colors">
+                <Link href="/login" className="hover:text-[#c96342] transition-colors">
                   Order Online
                 </Link>
               </li>
