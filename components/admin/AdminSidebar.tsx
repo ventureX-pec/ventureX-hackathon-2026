@@ -2,8 +2,9 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { formatDisplayName, getInitials, getStoredUserProfile } from "@/lib/auth";
+import { formatDisplayName, getInitials, getStoredUserProfile, signOutUser } from "@/lib/auth";
 import {
   LayoutDashboard,
   Bell,
@@ -52,8 +53,22 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   isOpen = true,
   onToggle,
 }) => {
+  const router = useRouter();
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+
+  const handleBackToSignIn = async () => {
+    try {
+      await signOutUser();
+    } catch (e) {}
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("serveza_user");
+        localStorage.removeItem("serveza_admin_user");
+      } catch (e) {}
+    }
+    router.push("/login");
+  };
 
   // Dynamic admin profile
   const [adminName, setAdminName] = useState("Kitchen Admin");
@@ -205,8 +220,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         </div>
       </div>
 
-      {/* Bottom Profile / Quick Info */}
-      <div className="p-3 border-t border-[#EFE8DE] bg-[#FAF8F5]">
+      {/* Bottom Profile / Quick Info & Back to Sign In */}
+      <div className="p-3 border-t border-[#EFE8DE] bg-[#FAF8F5] space-y-2">
         <div className="flex items-center justify-between p-2 rounded-2xl hover:bg-[#F2ECE2] transition-colors">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-full bg-[#D66B43]/15 text-[#D66B43] font-bold text-xs flex items-center justify-center shrink-0">
@@ -214,18 +229,28 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             </div>
             <div className="min-w-0">
               <div className="text-xs font-bold text-[#252522] truncate">{adminName}</div>
-              <div className="text-[10px] text-[#8C877D] truncate">Kitchen Admin</div>
+              <div className="text-[10px] text-[#8C877D] truncate">Burger House Admin</div>
             </div>
           </div>
 
-          <Link
-            href="/customer"
-            className="p-1.5 rounded-xl text-[#8C877D] hover:text-[#D66B43] hover:bg-white transition-colors"
-            title="Switch to Customer View"
+          <button
+            onClick={handleBackToSignIn}
+            className="p-1.5 rounded-xl text-[#8C877D] hover:text-[#D66B43] hover:bg-white transition-colors cursor-pointer"
+            title="Sign out & Back to Sign In"
           >
             <LogOut className="w-4 h-4" />
-          </Link>
+          </button>
         </div>
+
+        {/* Dedicated Back to Sign In Action Button */}
+        <button
+          onClick={handleBackToSignIn}
+          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white border border-[#EDE5DA] text-xs font-semibold text-[#5C5954] hover:text-[#D66B43] hover:border-[#D66B43]/40 shadow-2xs transition-colors cursor-pointer group"
+          title="Sign out and return to Sign In page"
+        >
+          <LogOut className="w-3.5 h-3.5 text-[#8C877D] group-hover:text-[#D66B43] transition-colors" />
+          <span>Back to Sign In</span>
+        </button>
       </div>
 
       {/* Draggable Resize Handle */}

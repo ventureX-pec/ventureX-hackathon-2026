@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Home,
   LayoutGrid,
@@ -9,7 +10,9 @@ import {
   ClipboardList,
   Heart,
   PanelLeftClose,
+  LogOut,
 } from "lucide-react";
+import { signOutUser } from "@/lib/auth";
 
 interface SidebarProps {
   activeTab: string;
@@ -32,8 +35,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onToggle,
 }) => {
+  const router = useRouter();
   const [isDragging, setIsDragging] = useState(false);
   const sidebarRef = useRef<HTMLDivElement | null>(null);
+
+  const handleBackToSignIn = async () => {
+    try {
+      await signOutUser();
+    } catch (e) {}
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("serveza_user");
+        localStorage.removeItem("serveza_customer_user");
+      } catch (e) {}
+    }
+    router.push("/login");
+  };
 
   // Updated navigation order: Home -> Categories -> Restaurants -> My Orders -> Favorites
   const navItems = [
@@ -164,15 +181,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
       </div>
 
-      {/* Clean Bottom Area */}
-      <div className="pt-4 border-t border-[#ECE7DE] flex items-center justify-between text-[11px] text-[#6E6D66]">
-        <span>Drag right edge to resize</span>
+      {/* Clean Bottom Area: Back to Sign In */}
+      <div className="pt-3 border-t border-[#ECE7DE] flex items-center justify-between gap-2">
         <button
-          onClick={onToggle}
-          className="text-[#D66B43] font-semibold hover:underline cursor-pointer"
+          onClick={handleBackToSignIn}
+          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white border border-[#EDE5DA] text-xs font-semibold text-[#5C5954] hover:text-[#D66B43] hover:border-[#D66B43]/40 shadow-2xs transition-colors cursor-pointer group"
+          title="Sign out and return to Sign In page"
         >
-          Hide
+          <LogOut className="w-3.5 h-3.5 text-[#8C877D] group-hover:text-[#D66B43] transition-colors" />
+          <span>Back to Sign In</span>
         </button>
+
+        {onToggle && (
+          <button
+            onClick={onToggle}
+            className="text-[11px] text-[#8C877D] hover:text-[#252522] font-medium cursor-pointer px-1 py-1"
+            title="Collapse sidebar"
+          >
+            Hide
+          </button>
+        )}
       </div>
 
       {/* Resizable Slider Drag Handle on the Right Edge */}
